@@ -8,6 +8,7 @@ import {
   TextArea,
 } from "native-base";
 import { StyleSheet } from "react-native";
+import PostForm from "../components/PostForm";
 
 const Upload = () => {
   const theme = extendTheme({
@@ -51,6 +52,7 @@ const Upload = () => {
             py={5}
             style={styles.field}
           />
+          <PostForm />
           <Input
             size="lg"
             variant="test"

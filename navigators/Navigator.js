@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "../views/Login";
 import Register from "../views/Register";
+import Upload from "../views/Upload";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,8 +17,13 @@ const StackScreen = () => {
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: false }}
+		options={{ headerShown: false }}
       ></Stack.Screen>
+      <Stack.Screen
+        name="Upload"
+        component={Upload}
+		options={{ headerShown: false }}
+	   ></Stack.Screen>
     </Stack.Navigator>
   );
 };
