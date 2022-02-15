@@ -1,40 +1,33 @@
 import {
-    Box,
-    Container,
-    extendTheme,
-    Flex,
-    Heading,
-    Input,
-    NativeBaseProvider,
-    ScrollView,
-    Spacer,
-    Text,
-    TextArea,
-    VStack,
-  } from "native-base";
-import React from "react";
+  Box,
+  extendTheme,
+  Heading,
+  Input,
+  NativeBaseProvider,
+  ScrollView,
+  TextArea,
+} from "native-base";
+import { StyleSheet } from "react-native";
 
-function Upload() {
-    export default function App() {
-        const theme = extendTheme({
-          components: {
-            Input: {
-              variants: {
-                test: () => {
-                  return {
-                    bg: "#F9F4F1",
-                    borderRadius: 15,
-                    borderWidth: 1,
-                  };
-                },
-              },
-            },
+const Upload = () => {
+  const theme = extendTheme({
+    components: {
+      Input: {
+        variants: {
+          test: () => {
+            return {
+              bg: "#F9F4F1",
+              borderRadius: 15,
+              borderWidth: 1,
+            };
           },
-        });
-    }
-        
+        },
+      },
+    },
+  });
+
   return (
-    <Container>
+    <NativeBaseProvider theme={theme}>
       <Box flex="1" safeAreaTop>
         <ScrollView px="5%">
           <Heading size="md" style={styles.title}>
@@ -46,6 +39,7 @@ function Upload() {
             width="100%"
             placeholder="Green salad"
             alignSelf="center"
+            px={4}
           />
           <Heading size="md" style={[styles.field, styles.title]}>
             Select latest pick-up date
@@ -69,9 +63,9 @@ function Upload() {
           />
         </ScrollView>
       </Box>
-    </Container>
+    </NativeBaseProvider>
   );
-}
+};
 
 const styles = StyleSheet.create({
   title: {
