@@ -51,7 +51,7 @@ const Register = () => {
   });
 
   const logoSize = 220;
-  const formBoxHeight = 80;
+  const formBoxHeight = 85;
   const picturePosition = 100 - formBoxHeight;
 
   return (

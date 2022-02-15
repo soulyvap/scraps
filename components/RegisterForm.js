@@ -1,35 +1,130 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  FormControl,
-  Image,
-  Input,
-  Text,
-  View,
-} from "native-base";
+import { Avatar, Box, Button, FormControl, Input, View } from "native-base";
 import react, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
+import { useLogin, useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import userFileImage from "../assets/a.jpg";
+import { avatarTag, userFileTag } from "../utils/variables";
+import { Alert, Image } from "react-native";
 
 const RegisterForm = () => {
   const [image, setImage] = useState(
     "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
   );
-  const [type, setType] = useState("image");
-  const [imageSelected, setImageSelected] = useState(false);
+  let address = "";
+  let userCredentials = {};
+  let userToken;
+  let userId;
+  const { postUser, checkUsername } = useUser();
+  const { postLogin } = useLogin();
+  const { postTag } = useTag();
+  const { postMedia } = useMedia();
+
+  const createUser = async (data) => {
+    try {
+      delete data.confirmPassword;
+      delete data.address;
+      const userData = await postUser(data);
+      console.log("Created successfully with id: ", userData);
+      if (userData) {
+        Alert.alert("Success", "User created");
+        await createFilesWithToken();
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const createFilesWithToken = async () => {
+    try {
+      const response = await postLogin(userCredentials);
+      const id = response.user.user_id;
+      const token = response.token;
+      userId = id;
+      userToken = token;
+      await createProfilePic();
+      await createUserFile();
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const createProfilePic = async () => {
+    const formData = new FormData();
+    formData.append("title", `profile_${userId}`);
+    const filename = image.split("/").pop();
+    let fileExtension = filename.split(".").pop();
+    fileExtension = fileExtension === "jpg" ? "jpeg" : fileExtension;
+    formData.append("file", {
+      uri: image,
+      name: filename,
+      type: "image/" + fileExtension,
+    });
+    try {
+      const response = await postMedia(formData, userToken);
+      const fileId = response.file_id;
+      response && console.log("create profile pic", response);
+      await addProfilePicTag(fileId);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const addProfilePicTag = async (fileId) => {
+    try {
+      const tagData = {
+        file_id: fileId,
+        tag: avatarTag + userId,
+      };
+      const response = await postTag(tagData, userToken);
+      response && console.log("tag added" + tagData.tag);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const createUserFile = async () => {
+    const formData = new FormData();
+    formData.append("title", `userfile_${userId}`);
+    const description = JSON.stringify(address);
+    formData.append("description", description);
+    const userFileUri = Image.resolveAssetSource(userFileImage).uri;
+    formData.append("file", {
+      uri: userFileUri,
+      name: "a.jpg",
+      type: "image/jpg",
+    });
+    try {
+      const response = await postMedia(formData, userToken);
+      const fileId = response.file_id;
+      response && (await addUserFileTag(fileId));
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const addUserFileTag = async (fileId) => {
+    try {
+      const tagData = {
+        file_id: fileId,
+        tag: userFileTag + userId,
+      };
+      const response = await postTag(tagData, userToken);
+      response && console.log("tag added", tagData.tag);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 0.5,
     });
     console.log(result);
     if (!result.cancelled) {
       setImage(result.uri);
-      setImageSelected(true);
-      setType(result.type);
     }
   };
 
@@ -47,7 +142,11 @@ const RegisterForm = () => {
       confirmPassword: "",
     },
   });
-  const onSubmit = async (data) => {};
+  const onSubmit = async (data) => {
+    address = data.address;
+    userCredentials = { username: data.username, password: data.password };
+    await createUser(data);
+  };
 
   return (
     <Box>
@@ -84,9 +183,15 @@ const RegisterForm = () => {
       <Controller
         control={control}
         rules={{
-          required: true,
-          pattern:
-            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+          required: { value: true, message: "Username is required." },
+          validate: async (value) => {
+            const usernameInfo = await checkUsername(value);
+            if (usernameInfo.available) {
+              return true;
+            } else {
+              return `${usernameInfo.username} is already taken`;
+            }
+          },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <FormControl isRequired isInvalid={errors.username}>
@@ -99,7 +204,7 @@ const RegisterForm = () => {
             />
             {errors.username && (
               <FormControl.ErrorMessage my={0}>
-                Username is required
+                {errors.username.message}
               </FormControl.ErrorMessage>
             )}
           </FormControl>
@@ -172,7 +277,7 @@ const RegisterForm = () => {
           },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isRequired isInvalid={errors.password}>
+          <FormControl isRequired isInvalid={errors.confirmPassword}>
             <Input
               onBlur={onBlur}
               onChangeText={onChange}
@@ -190,7 +295,7 @@ const RegisterForm = () => {
             )}
           </FormControl>
         )}
-        name="confirm-password"
+        name="confirmPassword"
       />
 
       <Button mt={3} bgColor={"#33CA7F"} onPress={handleSubmit(onSubmit)}>
