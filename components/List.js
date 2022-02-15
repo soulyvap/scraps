@@ -1,17 +1,12 @@
 import React from "react";
 import {
   Avatar,
-  Box,
   Button,
-  Center,
   Divider,
   Flex,
   Heading,
-  HStack,
   Icon,
   Input,
-  ScrollView,
-  Stack,
   Text,
   View,
   VStack,
@@ -22,6 +17,8 @@ import PropTypes from "prop-types";
 import { FlatGrid } from "react-native-super-grid";
 import { MaterialIcons } from "@expo/vector-icons";
 
+// TODO: tag categories are currently hardcoded
+// need to decide on the categories/tags before this can be changed
 const tagCategories = [
   {
     key: 1,
@@ -72,6 +69,7 @@ const List = ({ navigation }) => {
   return (
     <View>
       <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
+        {/* TODO: need login ready so I can get username */}
         Hi, Ilkka!
       </Heading>
       <Input
@@ -106,19 +104,36 @@ const List = ({ navigation }) => {
           </VStack>
         )}
       ></FlatGrid>
-      <Center>
-        <Button.Group shadow={9} _text={{ color: "#F9F4F1" }}>
-          <Button w="25%" bgColor={"#33CA7F"}>
-            Uncooked
-          </Button>
-          <Button w="25%" bgColor={"#33CA7F"}>
-            Cooked
-          </Button>
-          <Button w="25%" bgColor={"#33CA7F"}>
-            Frozen
-          </Button>
-        </Button.Group>
-      </Center>
+      <Flex direction="row" justifyContent="space-evenly" mt={2} mb={2}>
+        {/* TODO: implement color themes to change button color, onPress actions */}
+        <Button
+          w="25%"
+          bgColor={"#33CA7F"}
+          shadow={3}
+          _text={{ color: "#F9F4F1", fontWeight: "bold" }}
+          borderRadius="full"
+        >
+          Uncooked
+        </Button>
+        <Button
+          w="25%"
+          bgColor={"#33CA7F"}
+          shadow={3}
+          _text={{ color: "#F9F4F1", fontWeight: "bold" }}
+          borderRadius="full"
+        >
+          Cooked
+        </Button>
+        <Button
+          w="25%"
+          bgColor={"#33CA7F"}
+          shadow={3}
+          _text={{ color: "#F9F4F1", fontWeight: "bold" }}
+          borderRadius="full"
+        >
+          Frozen
+        </Button>
+      </Flex>
       <Divider mt={2} bg={"#898980"} />
       <FlatGrid
         itemDimension={120}
