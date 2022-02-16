@@ -16,6 +16,7 @@ import PropTypes from "prop-types";
 import { FlatGrid } from "react-native-super-grid";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MainContext } from "../contexts/MainContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // TODO: tag categories are currently hardcoded
 // need to decide on the categories/tags before this can be changed
@@ -66,13 +67,40 @@ const tagCategories = [
 
 const List = ({ navigation }) => {
   const { mediaArray } = useMedia();
-  const { user } = useContext(MainContext);
+  const { user, setIsLoggedIn } = useContext(MainContext);
+
+  const logout = async () => {
+    console.log("logout");
+    await AsyncStorage.clear();
+    setIsLoggedIn(false);
+  };
 
   return (
     <View flex={1}>
-      <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
-        Hi, {user.username}!
-      </Heading>
+      {/* <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
+          Hi, {user.username}!
+        </Heading> */}
+      <View
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
+          Hi, {user.username}!
+        </Heading>
+        <Button
+          bgColor={"#132A15"}
+          paddingY={2}
+          mr={3}
+          shadow={3}
+          _text={{ color: "#F9F4F1", fontWeight: "bold" }}
+          borderRadius="full"
+          onPress={() => logout()}
+        >
+          Logout
+        </Button>
+      </View>
+
       {/* TODO: implement search functionality */}
       <Input
         alignSelf="center"

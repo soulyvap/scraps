@@ -45,7 +45,16 @@ const useUser = () => {
     return userData;
   };
 
-  return { postUser, checkUsername, getUserById };
+  const getUserByToken = async (token) => {
+    const options = {
+      method: "GET",
+      headers: { "x-access-token": token },
+    };
+    const userData = await doFetch(baseUrl + "users/user", options);
+    return userData;
+  };
+
+  return { postUser, checkUsername, getUserById, getUserByToken };
 };
 
 const useLogin = () => {
