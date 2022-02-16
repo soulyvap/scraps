@@ -387,3 +387,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+localVariables.js

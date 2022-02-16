@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useLogin } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
+import PlacesInput from "./PlacesInput";
 
 const LoginForm = () => {
   const { postLogin } = useLogin();
@@ -22,6 +23,7 @@ const LoginForm = () => {
   const onSubmit = async (data) => {
     try {
       const loginData = await postLogin(data);
+      console.log(loginData);
       const token = loginData.token;
       setIsLoggedIn(true);
       setUser(loginData.user);

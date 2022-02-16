@@ -2,10 +2,12 @@ import { Box, extendTheme, Image, NativeBaseProvider, View } from "native-base";
 import react, { useEffect, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AddressForm from "../components/AddressForm";
 import RegisterForm from "../components/RegisterForm";
 
 const Register = () => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
+  const [next, setNext] = useState(false);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -71,7 +73,8 @@ const Register = () => {
             borderTopRightRadius={keyboardShowing ? 0 : 90}
           >
             <View flex={1}></View>
-            <RegisterForm />
+            {/* <AddressForm /> */}
+            {next ? <AddressForm /> : <RegisterForm setNext={setNext} />}
             <View flex={0.3}></View>
           </Box>
         </View>
