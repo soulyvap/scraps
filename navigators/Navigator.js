@@ -7,6 +7,8 @@ import Single from "../views/Single";
 import Login from "../views/Login";
 import Register from "../views/Register";
 import { MainContext } from "../contexts/MainContext";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Icon } from "native-base";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -18,6 +20,21 @@ const TabScreen = () => {
         tabBarStyle: { backgroundColor: "#33CA7F" },
         tabBarActiveTintColor: "#FED766",
         tabBarInactiveTintColor: "#132A15",
+        tabBarShowLabel: false,
+        tabBarHideOnKeyboard: true,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          if (route.name === "Home") {
+            iconName = "home";
+          }
+          return (
+            <Icon
+              as={<MaterialIcons name={iconName} />}
+              size={9}
+              color={color}
+            />
+          );
+        },
       })}
     >
       <Tab.Screen
