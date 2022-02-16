@@ -1,5 +1,7 @@
-const uploadsUrl = "https://media.mw.metropolia.fi/wbma/uploads/";
 const baseUrl = "https://media.mw.metropolia.fi/wbma/";
-const appId = "gigisapp";
+const uploadsUrl = "https://media.mw.metropolia.fi/wbma/uploads/";
+const appId = "scraps2022";
+const avatarTag = `${appId}_avatar_`;
+const userFileTag = `${appId}_`;
 
-export { uploadsUrl, baseUrl, appId };
+export { baseUrl, uploadsUrl, appId, avatarTag, userFileTag };

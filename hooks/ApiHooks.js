@@ -18,6 +18,51 @@ const doFetch = async (url, options = {}) => {
   }
 };
 
+const useUser = () => {
+  const postUser = async (data) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    };
+    const json = await doFetch(baseUrl + "users", options);
+    return json;
+  };
+
+  const checkUsername = async (userName) => {
+    const response = await doFetch(baseUrl + "users/username/" + userName);
+    return await response;
+  };
+
+  const getUserById = async (userId, token) => {
+    const options = {
+      method: "GET",
+      headers: { "x-access-token": token },
+    };
+    const userData = await doFetch(baseUrl + "users/" + userId, options);
+    return userData;
+  };
+
+  return { postUser, checkUsername, getUserById };
+};
+
+const useLogin = () => {
+  const postLogin = async (userCredentials) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userCredentials),
+    };
+    const json = await doFetch(baseUrl + "login", options);
+    return json;
+  };
+  return { postLogin };
+};
+
 const useMedia = () => {
   const [mediaArray, setMediaArray] = useState([]);
   const loadMedia = async (start = 0, limit = 100) => {
@@ -47,27 +92,36 @@ const useMedia = () => {
     loadMedia();
   }, []);
 
-  return { mediaArray };
-};
-
-const useUser = () => {
-  const getUserById = async (userId, token) => {
+  const postMedia = async (formData, token) => {
     const options = {
-      method: "GET",
-      headers: { "x-access-token": token },
+      method: "POST",
+      headers: {
+        "x-access-token": token,
+        "Content-Type": "multipart/form-data",
+      },
+      body: formData,
     };
-    return await doFetch(`${baseUrl}users/${userId}`, options);
+    const result = await doFetch(baseUrl + "media", options);
+    return result;
   };
 
-  return { getUserById };
+  return { postMedia, mediaArray };
 };
 
 const useTag = () => {
-  const getFilesByTag = async (tag) => {
-    return await doFetch(baseUrl + "tags/" + tag);
+  const postTag = async (tagData, token) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token,
+      },
+      body: JSON.stringify(tagData),
+    };
+    return await doFetch(baseUrl + "tags/", options);
   };
 
-  return { getFilesByTag };
+  return { postTag };
 };
 
-export { useMedia, useUser, useTag };
+export { useMedia, useLogin, useUser, useTag };
