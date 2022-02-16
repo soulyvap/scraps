@@ -66,6 +66,7 @@ const tagCategories = [
 
 const List = ({ navigation }) => {
   const { mediaArray } = useMedia();
+
   return (
     <View>
       <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
