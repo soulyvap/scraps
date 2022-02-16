@@ -6,12 +6,14 @@ const Upload = () => {
   const theme = extendTheme({
     components: {
       Input: {
-        baseStyle: {
-          bgColor: "#F9F4F1",
-          borderColor: "transparent",
-          borderRadius: 15,
-          marginBottom: "5%",
-          textAlign: "center",
+        variants: {
+          basic: {
+            bgColor: "#F9F4F1",
+            borderColor: "transparent",
+            borderRadius: 15,
+            marginBottom: "5%",
+            textAlign: "center",
+          },
         },
       },
     },
@@ -27,15 +29,5 @@ const Upload = () => {
     </NativeBaseProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  title: {
-    color: "#132A15",
-    marginBottom: "2%",
-  },
-  field: {
-    marginTop: "5%",
-  },
-});
 
 export default Upload;

@@ -1,16 +1,22 @@
 import {
   Box,
   Button,
+  extendTheme,
   FormControl,
   Input,
   Text,
   TextArea,
   View,
 } from "native-base";
-import react from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import react, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const PostForm = () => {
+  const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState("date");
+  const [show, setShow] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -21,6 +27,37 @@ const PostForm = () => {
       password: "",
     },
   });
+
+  const theme = extendTheme({
+    components: {
+      Input: {
+        variants: {
+          basic: {
+            bgColor: "#F9F4F1",
+            borderColor: "transparent",
+            borderRadius: 15,
+            marginBottom: "5%",
+            textAlign: "center",
+          },
+        },
+      },
+    },
+  });
+
+  const onChanged = (selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShow(false);
+    setDate(currentDate);
+  };
+
+  const showMode = (currentMode) => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode("date");
+  };
 
   return (
     <Box>
@@ -43,10 +80,11 @@ const PostForm = () => {
             </FormControl.Label>
             <Input
               autoCapitalize="none"
-              placeholder={"Green salad"}
               onBlur={onBlur}
               onChangeText={onChange}
+              placeholder={"Green salad"}
               size="lg"
+              variant={"basic"}
             />
           </FormControl>
         )}
@@ -67,6 +105,21 @@ const PostForm = () => {
             >
               Select latest pick-up date
             </FormControl.Label>
+            <Text alignSelf={"center"} marginBottom={"5%"}>
+              example date here
+            </Text>
+            <Button alignSelf={"flex-end"} onPress={showDatepicker}>
+              P
+            </Button>
+            {show && (
+              <DateTimePicker
+                display="default"
+                mode={mode}
+                onChange={onChanged}
+                testID="dateTimePicker"
+                value={date}
+              />
+            )}
           </FormControl>
         )}
         name="time"
@@ -91,6 +144,7 @@ const PostForm = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               size="lg"
+              variant={"basic"}
             />
           </FormControl>
         )}
@@ -149,7 +203,11 @@ const PostForm = () => {
             >
               Select a category
             </FormControl.Label>
-            <Button.Group direction="row" justifyContent={"space-between"}>
+            <Button.Group
+              direction="row"
+              justifyContent={"space-between"}
+              marginBottom={"5%"}
+            >
               <Button borderRadius={15} width={"30%"}>
                 Uncooked
               </Button>
@@ -164,6 +222,67 @@ const PostForm = () => {
         )}
         name="category"
       />
+
+      {/* Add tags */}
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormControl isInvalid={errors.tags}>
+            <FormControl.Label
+              _text={{
+                color: "#132A15",
+                fontWeight: "bold",
+                fontSize: "lg",
+              }}
+            >
+              Add tags
+            </FormControl.Label>
+            <Box
+              bgColor={"#F9F4F1"}
+              borderRadius={15}
+              flex={1}
+              height={60}
+              marginBottom={"5%"}
+              paddingY={"3%"}
+            >
+              <View
+                flexDirection={"row"}
+                justifyContent={"space-between"}
+                px={4}
+              >
+                <Input
+                  alignSelf={"center"}
+                  placeholder="enter tag"
+                  variant={"underlined"}
+                />
+                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                  vegan
+                </Button>
+                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                  healthy
+                </Button>
+                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                  vegetarian
+                </Button>
+              </View>
+            </Box>
+          </FormControl>
+        )}
+        name="tags"
+      />
+      <Button
+        alignSelf={"center"}
+        bgColor={"#33CA7F"}
+        borderRadius={15}
+        marginTop={"5%"}
+        padding={"3%"}
+        width={"40%"}
+        _text={{
+          color: "#F9F4F1",
+        }}
+      >
+        Post
+      </Button>
     </Box>
   );
 };
