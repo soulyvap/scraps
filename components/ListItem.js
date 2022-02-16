@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Heading,
@@ -13,7 +13,6 @@ import {
 } from "native-base";
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTag, useUser } from "../hooks/ApiHooks";
 
 // TODO: currently just the entire card is pressable and takes you to single item.
@@ -70,6 +69,7 @@ const ListItem = ({ navigation, singleMedia }) => {
         rounded="lg"
         overflow="hidden"
         borderColor={"#898980"}
+        shadow={4}
         backgroundColor={"#F9F4F1"}
         borderWidth="1"
       >

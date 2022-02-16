@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Button,
-  Divider,
   Flex,
   Heading,
   Icon,
@@ -66,9 +65,10 @@ const tagCategories = [
 
 const List = ({ navigation }) => {
   const { mediaArray } = useMedia();
+  const [searchOn, setSearchOn] = useState(false);
 
   return (
-    <View>
+    <View flex={1}>
       <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
         {/* TODO: need login ready so I can get username */}
         Hi, Ilkka!
@@ -79,6 +79,7 @@ const List = ({ navigation }) => {
         placeholderTextColor={"#898980"}
         color={"#132A15"}
         w="95%"
+        h={9}
         variant="rounded"
         size="md"
         paddingLeft="5"
@@ -89,12 +90,13 @@ const List = ({ navigation }) => {
             size={5}
             mr="3"
             color="#898980"
+            onPress={() => console.log("Execute search")}
           />
         }
       ></Input>
       <FlatGrid
         itemDimension={60}
-        height={100}
+        height={120}
         // fixed={true}
         horizontal={true}
         data={tagCategories}
@@ -135,7 +137,6 @@ const List = ({ navigation }) => {
           Frozen
         </Button>
       </Flex>
-      <Divider mt={2} bg={"#898980"} />
       <FlatGrid
         itemDimension={120}
         data={mediaArray}

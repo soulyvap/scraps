@@ -6,8 +6,8 @@ import PropTypes from "prop-types";
 const Home = ({ navigation }) => {
   return (
     <>
-      <SafeAreaView>
-        <List navigation={navigation} />
+      <SafeAreaView flex={1}>
+        <List flex={1} navigation={navigation} />
       </SafeAreaView>
     </>
   );

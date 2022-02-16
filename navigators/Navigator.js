@@ -12,9 +12,9 @@ const TabScreen = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarStyle: { backgroundColor: "#0D0C1D" },
-        tabBarActiveTintColor: "#F1DAC4",
-        tabBarInactiveTintColor: "#474973",
+        tabBarStyle: { backgroundColor: "#33CA7F" },
+        tabBarActiveTintColor: "#FED766",
+        tabBarInactiveTintColor: "#132A15",
       })}
     >
       <Tab.Screen
@@ -22,11 +22,6 @@ const TabScreen = () => {
         component={Home}
         options={{ headerShown: false }}
       ></Tab.Screen>
-      {/* <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={{ headerShown: false }}
-      ></Tab.Screen> */}
     </Tab.Navigator>
   );
 };
@@ -35,6 +30,7 @@ const StackScreen = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
+        flex={1}
         name="HomeScreen"
         component={TabScreen}
         options={{ headerShown: false }}
