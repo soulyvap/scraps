@@ -1,10 +1,13 @@
 import { Box, Button, FormControl, Input, Text } from "native-base";
-import react from "react";
+import react, { useContext } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useLogin } from "../hooks/ApiHooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MainContext } from "../contexts/MainContext";
 
 const LoginForm = () => {
   const { postLogin } = useLogin();
+  const { user, setUser, isLoggedIn, setIsLoggedIn } = useContext(MainContext);
 
   const {
     control,
@@ -16,7 +19,17 @@ const LoginForm = () => {
       password: "",
     },
   });
-  const onSubmit = (data) => postLogin(data);
+  const onSubmit = async (data) => {
+    try {
+      const loginData = await postLogin(data);
+      const token = loginData.token;
+      setIsLoggedIn(true);
+      setUser(loginData.user);
+      await AsyncStorage.setItem("userToken", token);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 
   return (
     <Box>

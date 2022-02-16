@@ -3,7 +3,6 @@ import { baseUrl } from "../utils/variables";
 const doFetch = async (url, options) => {
   try {
     const response = await fetch(url, options);
-    console.log(options);
     const json = await response.json();
     if (response.ok) {
       return json;
