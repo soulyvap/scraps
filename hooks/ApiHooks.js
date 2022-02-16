@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { baseUrl } from "../utils/variables";
 
-const doFetch = async (url, options = {}) => {
+const doFetch = async (url, options) => {
   try {
     const response = await fetch(url, options);
     const json = await response.json();
@@ -65,11 +65,22 @@ const useLogin = () => {
 
 const useMedia = () => {
   const [mediaArray, setMediaArray] = useState([]);
-  const loadMedia = async (start = 0, limit = 100) => {
+  const postMedia = async (formData, token) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "x-access-token": token,
+        "Content-Type": "multipart/form-data",
+      },
+      body: formData,
+    };
+    const result = await doFetch(baseUrl + "media", options);
+    return result;
+  };
+
+  const loadMedia = async () => {
     try {
-      const response = await fetch(
-        `${baseUrl}media?start=${start}&limit${limit}`
-      );
+      const response = await fetch(`${baseUrl}media`);
       if (!response.ok) {
         throw Error(response.statusText);
       }
@@ -92,19 +103,6 @@ const useMedia = () => {
     loadMedia();
   }, []);
 
-  const postMedia = async (formData, token) => {
-    const options = {
-      method: "POST",
-      headers: {
-        "x-access-token": token,
-        "Content-Type": "multipart/form-data",
-      },
-      body: formData,
-    };
-    const result = await doFetch(baseUrl + "media", options);
-    return result;
-  };
-
   return { postMedia, mediaArray };
 };
 
@@ -121,7 +119,11 @@ const useTag = () => {
     return await doFetch(baseUrl + "tags/", options);
   };
 
-  return { postTag };
+  const getFilesByTag = async (tag) => {
+    return await doFetch(baseUrl + "tags/" + tag);
+  };
+
+  return { postTag, getFilesByTag };
 };
 
 export { useMedia, useLogin, useUser, useTag };

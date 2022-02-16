@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Avatar,
   Button,
@@ -15,6 +15,7 @@ import ListItem from "./ListItem";
 import PropTypes from "prop-types";
 import { FlatGrid } from "react-native-super-grid";
 import { MaterialIcons } from "@expo/vector-icons";
+import { MainContext } from "../contexts/MainContext";
 
 // TODO: tag categories are currently hardcoded
 // need to decide on the categories/tags before this can be changed
@@ -65,14 +66,14 @@ const tagCategories = [
 
 const List = ({ navigation }) => {
   const { mediaArray } = useMedia();
-  const [searchOn, setSearchOn] = useState(false);
+  const { user } = useContext(MainContext);
 
   return (
     <View flex={1}>
       <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
-        {/* TODO: need login ready so I can get username */}
-        Hi, Ilkka!
+        Hi, {user.username}!
       </Heading>
+      {/* TODO: implement search functionality */}
       <Input
         alignSelf="center"
         placeholder="Search..."
@@ -108,7 +109,7 @@ const List = ({ navigation }) => {
         )}
       ></FlatGrid>
       <Flex direction="row" justifyContent="space-evenly" mt={2} mb={2}>
-        {/* TODO: implement color themes to change button color, onPress actions */}
+        {/* TODO: implement color themes to change button color + implement onPress actions */}
         <Button
           w="25%"
           bgColor={"#33CA7F"}
