@@ -229,17 +229,41 @@ const PostForm = () => {
               Select a category
             </FormControl.Label>
             <Button.Group
+              defaultValue={1}
               direction="row"
               justifyContent={"space-between"}
               marginBottom={"5%"}
             >
-              <Button borderRadius={15} width={"30%"}>
+              <Button
+                isFocused
+                bgColor={"#132A15"}
+                borderRadius={15}
+                value={1}
+                width={"30%"}
+                _focus={{
+                  bgColor: "#33CA7F",
+                }}
+              >
                 Uncooked
               </Button>
-              <Button borderRadius={15} width={"30%"}>
+              <Button
+                bgColor={"#132A15"}
+                borderRadius={15}
+                width={"30%"}
+                _pressed={{
+                  bgColor: "#33CA7F",
+                }}
+              >
                 Cooked
               </Button>
-              <Button borderRadius={15} width={"30%"}>
+              <Button
+                bgColor={"#132A15"}
+                borderRadius={15}
+                width={"30%"}
+                _focus={{
+                  bgColor: "#33CA7F",
+                }}
+              >
                 Frozen
               </Button>
             </Button.Group>
@@ -307,11 +331,9 @@ const PostForm = () => {
         bgColor={"#33CA7F"}
         borderRadius={15}
         marginTop={"5%"}
+        marginBottom={"5%"}
         padding={"3%"}
         width={"40%"}
-        _text={{
-          color: "#F9F4F1",
-        }}
       >
         Post
       </Button>
