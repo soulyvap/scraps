@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  extendTheme,
   FormControl,
   Input,
   Text,
@@ -16,6 +15,7 @@ const PostForm = () => {
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
+  const [dateText, setDateText] = useState("");
 
   const {
     control,
@@ -23,31 +23,20 @@ const PostForm = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      title: "",
+      time: "",
+      description: "",
+      picture: "",
+      category: "",
+      tags: "",
     },
   });
 
-  const theme = extendTheme({
-    components: {
-      Input: {
-        variants: {
-          basic: {
-            bgColor: "#F9F4F1",
-            borderColor: "transparent",
-            borderRadius: 15,
-            marginBottom: "5%",
-            textAlign: "center",
-          },
-        },
-      },
-    },
-  });
-
-  const onChanged = (selectedDate) => {
+  const onChanged = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(false);
     setDate(currentDate);
+    split(currentDate);
   };
 
   const showMode = (currentMode) => {
@@ -57,6 +46,21 @@ const PostForm = () => {
 
   const showDatepicker = () => {
     showMode("date");
+  };
+
+  // Converts original DatePicker value to more pleasant one,
+  // for displaying it in the Text component.
+  const split = (original) => {
+    const modified = original.toString();
+    const splitted = modified.split(" ", 4);
+    console.log("split modified", modified);
+    console.log("split splitted", splitted);
+    let final = "";
+    for (let i = 0; i < splitted.length; i++) {
+      i === 0 ? (final = splitted[i]) : (final = final + "/" + splitted[i]);
+    }
+    console.log("split looped final", final);
+    setDateText(final);
   };
 
   return (
@@ -103,23 +107,44 @@ const PostForm = () => {
                 fontSize: "lg",
               }}
             >
-              Select latest pick-up date
+              Select latest pick-up date & when you are available
             </FormControl.Label>
-            <Text alignSelf={"center"} marginBottom={"5%"}>
-              example date here
-            </Text>
-            <Button alignSelf={"flex-end"} onPress={showDatepicker}>
-              P
-            </Button>
-            {show && (
-              <DateTimePicker
-                display="default"
-                mode={mode}
-                onChange={onChanged}
-                testID="dateTimePicker"
-                value={date}
+            <View>
+              <Text
+                alignSelf={"flex-start"}
+                marginBottom={"1.5%"}
+                marginTop={"1%"}
+              >
+                {dateText}
+              </Text>
+              <Input
+                alignSelf={"flex-start"}
+                placeholder="e.g. any time between 4PM and 9PM"
+                size={"lg"}
+                variant={"basic"}
               />
-            )}
+              <Button
+                alignSelf={"flex-end"}
+                bgColor={"#FED766"}
+                borderRadius={"full"}
+                onPress={showDatepicker}
+                position={"absolute"}
+                _text={{
+                  color: "black",
+                }}
+              >
+                IC
+              </Button>
+              {show && (
+                <DateTimePicker
+                  display="default"
+                  mode={mode}
+                  onChange={onChanged}
+                  testID="dateTimePicker"
+                  value={date}
+                />
+              )}
+            </View>
           </FormControl>
         )}
         name="time"
@@ -241,25 +266,32 @@ const PostForm = () => {
               bgColor={"#F9F4F1"}
               borderRadius={15}
               flex={1}
-              height={60}
               marginBottom={"5%"}
               paddingY={"3%"}
             >
               <View
                 flexDirection={"row"}
+                flexWrap={"wrap"}
                 justifyContent={"space-between"}
                 px={4}
               >
-                <Input
-                  alignSelf={"center"}
-                  placeholder="enter tag"
-                  variant={"underlined"}
-                />
                 <Button bgColor={"#898980"} borderRadius={15} w={100}>
-                  vegan
+                  dairy-free
                 </Button>
                 <Button bgColor={"#898980"} borderRadius={15} w={100}>
-                  healthy
+                  egg-free
+                </Button>
+                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                  gluten-free
+                </Button>
+                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                  lactose-free
+                </Button>
+                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                  nut-free
+                </Button>
+                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                  vegan
                 </Button>
                 <Button bgColor={"#898980"} borderRadius={15} w={100}>
                   vegetarian
