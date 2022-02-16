@@ -139,7 +139,7 @@ const List = ({ navigation }) => {
         </Button>
       </Flex>
       <FlatGrid
-        itemDimension={120}
+        itemDimension={140}
         data={mediaArray}
         keyExtractor={(item) => item.file_id.toString()}
         renderItem={({ item }) => (
