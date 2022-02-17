@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Home from "../views/Home";
+import Upload from "../views/Upload";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Single from "../views/Single";
 import Login from "../views/Login";
@@ -27,6 +28,9 @@ const TabScreen = () => {
           if (route.name === "Home") {
             iconName = "home";
           }
+          if (route.name === "Upload") {
+            iconName = "file-upload";
+          }
           return (
             <Icon
               as={<MaterialIcons name={iconName} />}
@@ -40,6 +44,11 @@ const TabScreen = () => {
       <Tab.Screen
         name="Home"
         component={Home}
+        options={{ headerShown: false }}
+      ></Tab.Screen>
+      <Tab.Screen
+        name="Upload"
+        component={Upload}
         options={{ headerShown: false }}
       ></Tab.Screen>
     </Tab.Navigator>
