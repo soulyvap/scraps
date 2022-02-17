@@ -42,6 +42,11 @@ const TabScreen = () => {
         component={Home}
         options={{ headerShown: false }}
       ></Tab.Screen>
+      <Tab.Screen
+        name="Single"
+        component={Single}
+        options={{ headerShown: false }}
+      ></Tab.Screen>
     </Tab.Navigator>
   );
 };
@@ -59,7 +64,11 @@ const StackScreen = () => {
             component={TabScreen}
             options={{ headerShown: false }}
           ></Stack.Screen>
-          <Stack.Screen name="Single" component={Single}></Stack.Screen>
+          <Stack.Screen
+            name="Single"
+            component={TabScreen}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
         </>
       ) : (
         <>
