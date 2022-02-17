@@ -8,16 +8,15 @@ import {
   Box,
   Button,
   Center,
-  Heading,
   HStack,
+  IconButton,
   Image,
-  Popover,
   ScrollView,
   Text,
-  View,
   VStack,
-  ZStack,
 } from "native-base";
+import Popover from "react-native-popover-view";
+import { FlatGrid } from "react-native-super-grid";
 
 const Single = ({ route }) => {
   const { file } = route.params;
@@ -27,6 +26,17 @@ const Single = ({ route }) => {
   const [avatar, setAvatar] = useState(
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
+
+  const tags = [
+    "vegan",
+    "vegetarian",
+    "nut-free",
+    "soy-free",
+    "gluten-free",
+    "dessert",
+    "dairy-free",
+    "egg-free",
+  ];
 
   const fetchOwner = async () => {
     try {
@@ -59,6 +69,7 @@ const Single = ({ route }) => {
 
   return (
     <Center h={"100%"} bgColor={"#33CA7F"}>
+      <IconButton></IconButton>
       <Box
         h={"80%"}
         w={"100%"}
@@ -83,20 +94,55 @@ const Single = ({ route }) => {
         top={"35%"}
         alignItems={"center"}
       >
-        <Heading size="lg">{file.title}</Heading>
+        <Text fontSize={25} color="#132A15" fontWeight={"bold"}>
+          {file.title}
+        </Text>
+        <Popover
+          from={
+            <Button
+              position={"absolute"}
+              right={"9%"}
+              top={"14%"}
+              borderRadius={"full"}
+              bgColor={"#FED766"}
+            >
+              <Text color="#132A15" fontWeight={"bold"}>
+                Check allergens
+              </Text>
+            </Button>
+          }
+          placement="center"
+          animationConfig={{ duration: 0 }}
+          popoverStyle={{
+            borderRadius: 10,
+            width: "80%",
+            minHeight: 30,
+            padding: 20,
+            alignItems: "center",
+            backgroundColor: "#F9F4F1",
+            borderColor: "#132A15",
+            borderWidth: 2,
+          }}
+        >
+          <Text color="#132A15">
+            {owner.username} didn't list any allergens
+          </Text>
+        </Popover>
         <Box
           bgColor={"#F9F4F1"}
           w={"50%"}
-          h={"11%"}
+          h={"12%"}
           borderTopRightRadius="10"
           borderTopLeftRadius="10"
+          borderBottomWidth={1}
+          borderBottomColor={"#898980"}
           shadow={9}
           alignSelf="flex-start"
           ml={"5%"}
           mt={"5%"}
         >
           <HStack
-            alignItems="center"
+            alignContent="center"
             position="absolute"
             top="0"
             px="3"
@@ -123,27 +169,30 @@ const Single = ({ route }) => {
         <Box
           bgColor={"#F9F4F1"}
           w={"90%"}
-          h={"50%"}
+          h={"40%"}
           borderTopRightRadius="10"
           borderBottomLeftRadius="10"
           borderBottomRightRadius="10"
           shadow={9}
         >
           <ScrollView showsVerticalScrollIndicator>
-            <Text m={"4%"} fontSize={"18"}>
+            <Text m={2} fontSize={"16"} color={"#132A15"}>
               {file.description}
-              Etiam commodo efficitur justo vel finibus. Nulla laoreet sem vel
-              eros egestas, id malesuada orci fringilla. Maecenas tincidunt
-              tellus ipsum, quis tincidunt sem vehicula a. Fusce bibendum a quam
-              et pellentesque. Pellentesque in pulvinar tortor, a convallis
-              sapien. Cras ut ipsum viverra nisi dictum fermentum in at lectus.
-              Integer id finibus libero. Class aptent taciti sociosqu ad litora
-              torquent per conubia nostra, per inceptos himenaeos. Curabitur
-              maximus felis id dui tempor sodales. Donec eu facilisis metus.
             </Text>
           </ScrollView>
         </Box>
-        <Button mt={"10%"} borderRadius={"full"} bgColor={"#33CA7F"}>
+        <Box w={"90%"} h={12} mt={1}>
+          <FlatGrid
+            horizontal={true}
+            data={tags}
+            renderItem={({ item }) => (
+              <Box bgColor={"#F9F4F1"} borderRadius="10" padding={1}>
+                <Text color={"#898980"}>{item}</Text>
+              </Box>
+            )}
+          ></FlatGrid>
+        </Box>
+        <Button mt={9} borderRadius={"full"} bgColor={"#33CA7F"}>
           Book now
         </Button>
       </VStack>
