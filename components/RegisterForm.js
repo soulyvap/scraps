@@ -7,7 +7,7 @@ import userFileImage from "../assets/a.jpg";
 import { avatarTag, userFileTag } from "../utils/variables";
 import { Alert, Image } from "react-native";
 
-const RegisterForm = () => {
+const RegisterForm = ({ setSuccess }) => {
   const [image, setImage] = useState(
     "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
   );
@@ -27,7 +27,6 @@ const RegisterForm = () => {
       const userData = await postUser(data);
       console.log("Created successfully with id: ", userData);
       if (userData) {
-        Alert.alert("Success", "User created");
         await createFilesWithToken();
       }
     } catch (error) {
@@ -77,7 +76,7 @@ const RegisterForm = () => {
         tag: avatarTag + userId,
       };
       const response = await postTag(tagData, userToken);
-      response && console.log("tag added" + tagData.tag);
+      response && console.log("tag added", tagData.tag);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -110,7 +109,11 @@ const RegisterForm = () => {
         tag: userFileTag + userId,
       };
       const response = await postTag(tagData, userToken);
-      response && console.log("tag added", tagData.tag);
+      if (response) {
+        console.log("tag added", tagData.tag);
+        Alert.alert("Success", "User created");
+        setSuccess(true);
+      }
     } catch (error) {
       throw new Error(error.message);
     }
@@ -160,6 +163,8 @@ const RegisterForm = () => {
         control={control}
         rules={{
           required: true,
+          pattern:
+            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <FormControl isRequired isInvalid={errors.email}>
@@ -172,7 +177,7 @@ const RegisterForm = () => {
             />
             {errors.email && (
               <FormControl.ErrorMessage my={0}>
-                Email is required
+                Please enter a valid email address
               </FormControl.ErrorMessage>
             )}
           </FormControl>

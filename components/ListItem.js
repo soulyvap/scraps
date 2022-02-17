@@ -14,6 +14,7 @@ import {
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
 import { useTag, useUser } from "../hooks/ApiHooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // TODO: currently just the entire card is pressable and takes you to single item.
 // needs to be changed so that by clicking on avatar, it would take you to profile page
@@ -28,8 +29,7 @@ const ListItem = ({ navigation, singleMedia }) => {
   const fetchOwner = async () => {
     try {
       // TODO: change token when login ready
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozNCwidXNlcm5hbWUiOiJnaW50YXJlIiwiZW1haWwiOiJnaW50YXJlLnNhYWxpQG1ldHJvcG9saWEuZmkiLCJmdWxsX25hbWUiOiJHaW50YXJlIFNhYWxpIiwiaXNfYWRtaW4iOm51bGwsInRpbWVfY3JlYXRlZCI6IjIwMjItMDEtMTFUMTI6MjU6MTguMDAwWiIsImlhdCI6MTY0NTAwNzMyNywiZXhwIjoxNjQ1MDkzNzI3fQ.yUGfv1OsCdGs1aUoBnUZu3dw7a-m3XuiQwK_DDaJf_0";
+      const token = await AsyncStorage.getItem("userToken");
       const userData = await getUserById(singleMedia.user_id, token);
       setOwner(userData);
     } catch (error) {

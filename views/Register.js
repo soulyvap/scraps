@@ -4,8 +4,13 @@ import { Keyboard, ScrollView, StyleSheet } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RegisterForm from "../components/RegisterForm";
 
-const Register = () => {
+const Register = ({ navigation }) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    success && navigation.goBack();
+  }, [success]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -71,7 +76,7 @@ const Register = () => {
             borderTopRightRadius={keyboardShowing ? 0 : 90}
           >
             <View flex={1}></View>
-            <RegisterForm />
+            <RegisterForm setSuccess={setSuccess} />
             <View flex={0.3}></View>
           </Box>
         </View>
