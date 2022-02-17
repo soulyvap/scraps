@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   FormControl,
@@ -10,17 +11,20 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import react, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import * as ImagePicker from "expo-image-picker";
 
 const PostForm = () => {
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState("");
+  const [image, setImage] = useState("https://place-hold.it/50&text=test");
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm({
     defaultValues: {
       title: "",
@@ -63,13 +67,28 @@ const PostForm = () => {
     setDateText(final);
   };
 
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+    console.log("pickImage result: ", result);
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
   return (
-    <Box>
+    <Box marginTop={"4%"}>
       {/* Add title */}
       <Controller
         control={control}
         rules={{
-          required: true,
+          required: {
+            value: true,
+            message: "This is required.",
+          },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <FormControl isRequired isInvalid={errors.title}>
@@ -88,8 +107,14 @@ const PostForm = () => {
               onChangeText={onChange}
               placeholder={"Green salad"}
               size="lg"
+              value={value}
               variant={"basic"}
             />
+            {errors.title && (
+              <FormControl.ErrorMessage my={0}>
+                {errors.title.message}
+              </FormControl.ErrorMessage>
+            )}
           </FormControl>
         )}
         name="title"
@@ -122,6 +147,7 @@ const PostForm = () => {
                 placeholder="e.g. any time between 4PM and 9PM"
                 size={"lg"}
                 variant={"basic"}
+                width={"80%"}
               />
               <Button
                 alignSelf={"flex-end"}
@@ -188,7 +214,7 @@ const PostForm = () => {
                 fontSize: "lg",
               }}
             >
-              Add pictures
+              Add a picture
             </FormControl.Label>
             <Box
               bgColor={"#F9F4F1"}
@@ -198,12 +224,20 @@ const PostForm = () => {
               paddingY={"3%"}
             >
               <View flexDirection={"row"} justifyContent={"flex-start"} px={4}>
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button
+                  bgColor={"#898980"}
+                  borderRadius={15}
+                  onPress={pickImage}
+                  w={100}
+                >
                   Choose File
                 </Button>
-                <Text alignSelf={"center"} marginLeft={5}>
-                  placeholder.jpg
-                </Text>
+                <Avatar
+                  alt="selected image"
+                  marginX={"auto"}
+                  size={39}
+                  source={{ uri: image }}
+                ></Avatar>
               </View>
             </Box>
           </FormControl>
@@ -235,7 +269,6 @@ const PostForm = () => {
               marginBottom={"5%"}
             >
               <Button
-                isFocused
                 bgColor={"#132A15"}
                 borderRadius={15}
                 value={1}
@@ -250,7 +283,7 @@ const PostForm = () => {
                 bgColor={"#132A15"}
                 borderRadius={15}
                 width={"30%"}
-                _pressed={{
+                _focus={{
                   bgColor: "#33CA7F",
                 }}
               >
