@@ -12,6 +12,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import react, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
+import { useMedia, useTag } from "../hooks/ApiHooks";
 
 const PostForm = () => {
   const [date, setDate] = useState(new Date());
@@ -19,20 +20,18 @@ const PostForm = () => {
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState("");
   const [image, setImage] = useState("https://place-hold.it/50&text=test");
+  const [category, setCategory] = useState("uncooked");
+  const { postMedia } = useMedia;
+  const { postTag } = useTag;
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-    getValues,
   } = useForm({
     defaultValues: {
       title: "",
-      time: "",
       description: "",
-      picture: "",
-      category: "",
-      tags: "",
     },
   });
 
@@ -57,13 +56,11 @@ const PostForm = () => {
   const split = (original) => {
     const modified = original.toString();
     const splitted = modified.split(" ", 4);
-    console.log("split modified", modified);
-    console.log("split splitted", splitted);
     let final = "";
+
     for (let i = 0; i < splitted.length; i++) {
       i === 0 ? (final = splitted[i]) : (final = final + "/" + splitted[i]);
     }
-    console.log("split looped final", final);
     setDateText(final);
   };
 
@@ -73,10 +70,24 @@ const PostForm = () => {
       allowsEditing: true,
       quality: 1,
     });
-    console.log("pickImage result: ", result);
+
     if (!result.cancelled) {
       setImage(result.uri);
     }
+  };
+
+  const onSubmit = async (data) => {
+    console.log("onSubmit data: ", data);
+    const filename = image.split("/").pop();
+    console.log("onSubmit filename: ", filename);
+    let fileExtension = filename.split(".").pop();
+    fileExtension = fileExtension === "jpg" ? "jpeg" : fileExtension;
+    console.log("onSubmit fileExtension: ", fileExtension);
+    const test = category;
+    console.log("onSubmit category: ", test);
+
+    /* const formData = new FormData();
+    formData */
   };
 
   return (
@@ -248,11 +259,11 @@ const PostForm = () => {
       {/* Select category */}
       <Controller
         control={control}
-        rules={{
-          required: true,
-        }}
+        // rules={{
+        //   required: { value: true, message: "This is required." },
+        // }}
         render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isRequired isInvalid={errors.category}>
+          <FormControl isInvalid={errors.category}>
             <FormControl.Label
               _text={{
                 color: "#132A15",
@@ -263,7 +274,6 @@ const PostForm = () => {
               Select a category
             </FormControl.Label>
             <Button.Group
-              defaultValue={1}
               direction="row"
               justifyContent={"space-between"}
               marginBottom={"5%"}
@@ -271,7 +281,9 @@ const PostForm = () => {
               <Button
                 bgColor={"#132A15"}
                 borderRadius={15}
-                value={1}
+                onBlur={onBlur}
+                onChange={onChange}
+                onPress={setCategory("uncooked")}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -282,6 +294,9 @@ const PostForm = () => {
               <Button
                 bgColor={"#132A15"}
                 borderRadius={15}
+                onBlur={onBlur}
+                onChange={onChange}
+                onPress={setCategory("cooked")}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -292,6 +307,9 @@ const PostForm = () => {
               <Button
                 bgColor={"#132A15"}
                 borderRadius={15}
+                onBlur={onBlur}
+                onChange={onChange}
+                onPress={setCategory("frozen")}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -300,6 +318,11 @@ const PostForm = () => {
                 Frozen
               </Button>
             </Button.Group>
+            {errors.category && (
+              <FormControl.ErrorMessage>
+                {errors.category.message}
+              </FormControl.ErrorMessage>
+            )}
           </FormControl>
         )}
         name="category"
@@ -332,25 +355,25 @@ const PostForm = () => {
                 justifyContent={"space-between"}
                 px={4}
               >
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button bgColor={"#898980"} borderRadius={20} w={100}>
                   dairy-free
                 </Button>
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button bgColor={"#898980"} borderRadius={20} w={100}>
                   egg-free
                 </Button>
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button bgColor={"#898980"} borderRadius={20} w={100}>
                   gluten-free
                 </Button>
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button bgColor={"#898980"} borderRadius={20} w={100}>
                   lactose-free
                 </Button>
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button bgColor={"#898980"} borderRadius={20} w={100}>
                   nut-free
                 </Button>
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button bgColor={"#898980"} borderRadius={20} w={100}>
                   vegan
                 </Button>
-                <Button bgColor={"#898980"} borderRadius={15} w={100}>
+                <Button bgColor={"#898980"} borderRadius={20} w={100}>
                   vegetarian
                 </Button>
               </View>
@@ -365,6 +388,7 @@ const PostForm = () => {
         borderRadius={15}
         marginTop={"5%"}
         marginBottom={"5%"}
+        onPress={handleSubmit(onSubmit)}
         padding={"3%"}
         width={"40%"}
       >
