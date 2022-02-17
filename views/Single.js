@@ -9,7 +9,6 @@ import {
   Button,
   Center,
   HStack,
-  IconButton,
   Image,
   ScrollView,
   Text,
@@ -69,7 +68,6 @@ const Single = ({ route }) => {
 
   return (
     <Center h={"100%"} bgColor={"#33CA7F"}>
-      <IconButton></IconButton>
       <Box
         h={"80%"}
         w={"100%"}
@@ -97,75 +95,75 @@ const Single = ({ route }) => {
         <Text fontSize={25} color="#132A15" fontWeight={"bold"}>
           {file.title}
         </Text>
-        <Popover
-          from={
-            <Button
-              position={"absolute"}
-              right={"9%"}
-              top={"14%"}
-              borderRadius={"full"}
-              bgColor={"#FED766"}
-            >
-              <Text color="#132A15" fontWeight={"bold"}>
-                Check allergens
-              </Text>
-            </Button>
-          }
-          placement="center"
-          animationConfig={{ duration: 0 }}
-          popoverStyle={{
-            borderRadius: 10,
-            width: "80%",
-            minHeight: 30,
-            padding: 20,
-            alignItems: "center",
-            backgroundColor: "#F9F4F1",
-            borderColor: "#132A15",
-            borderWidth: 2,
-          }}
-        >
-          <Text color="#132A15">
-            {owner.username} didn't list any allergens
-          </Text>
-        </Popover>
-        <Box
-          bgColor={"#F9F4F1"}
-          w={"50%"}
-          h={"12%"}
-          borderTopRightRadius="10"
-          borderTopLeftRadius="10"
-          borderBottomWidth={1}
-          borderBottomColor={"#898980"}
-          shadow={9}
-          alignSelf="flex-start"
-          ml={"5%"}
-          mt={"5%"}
-        >
-          <HStack
-            alignContent="center"
-            position="absolute"
-            top="0"
-            px="3"
-            py="1.5"
-            width="100%"
+        <HStack w={"90%"} h={"13%"} mt={5}>
+          <Box
+            bgColor={"#F9F4F1"}
+            w={"50%"}
+            h={"100%"}
+            borderTopRightRadius="10"
+            borderTopLeftRadius="10"
+            borderBottomWidth={1}
+            borderBottomColor={"#898980"}
+            shadow={9}
           >
-            <Avatar
-              marginRight="2"
-              size="sm"
-              source={{
-                uri: avatar,
+            <HStack
+              alignItems="center"
+              position="absolute"
+              top="0"
+              ml={3}
+              mt={1}
+              width="100%"
+            >
+              <Avatar
+                marginRight="2"
+                size="sm"
+                source={{
+                  uri: avatar,
+                }}
+              ></Avatar>
+              <VStack>
+                <Text color="#132A15" fontWeight="bold">
+                  {owner.username}
+                </Text>
+                <Text color="#132A15" fontWeight="400">
+                  5 stars
+                </Text>
+              </VStack>
+            </HStack>
+          </Box>
+          <Box alignSelf={"center"} width={"50%"}>
+            <Popover
+              placement="center"
+              animationConfig={{ duration: 0 }}
+              popoverStyle={{
+                borderRadius: 10,
+                width: "80%",
+                minHeight: 30,
+                padding: 20,
+                alignItems: "center",
+                backgroundColor: "#F9F4F1",
+                borderColor: "#132A15",
+                borderWidth: 2,
               }}
-            ></Avatar>
-            <VStack>
-              <Text color="#132A15" fontWeight="bold">
-                {owner.username}
+              from={
+                <Button
+                  borderRadius={"full"}
+                  bgColor={"#FED766"}
+                  w={140}
+                  alignSelf="center"
+                >
+                  <Text color="#132A15" fontWeight={"bold"}>
+                    Check allergens
+                  </Text>
+                </Button>
+              }
+            >
+              <Text color="#132A15" fontSize={16}>
+                {owner.username} didn't list any allergens
               </Text>
-              <Text color="#132A15" fontWeight="400">
-                5 stars
-              </Text>
-            </VStack>
-          </HStack>
-        </Box>
+            </Popover>
+          </Box>
+        </HStack>
         <Box
           bgColor={"#F9F4F1"}
           w={"90%"}
@@ -193,7 +191,9 @@ const Single = ({ route }) => {
           ></FlatGrid>
         </Box>
         <Button mt={9} borderRadius={"full"} bgColor={"#33CA7F"}>
-          Book now
+          <Text color="#F9F4F1" fontWeight={"bold"}>
+            Book now
+          </Text>
         </Button>
       </VStack>
     </Center>
