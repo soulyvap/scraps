@@ -8,7 +8,6 @@ import {
   Text,
   HStack,
   VStack,
-  Stack,
   Pressable,
 } from "native-base";
 import PropTypes from "prop-types";

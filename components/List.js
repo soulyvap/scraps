@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import {
   Avatar,
   Button,
+  extendTheme,
   Flex,
   Heading,
   Icon,
@@ -77,9 +78,6 @@ const List = ({ navigation }) => {
 
   return (
     <View flex={1}>
-      {/* <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
-          Hi, {user.username}!
-        </Heading> */}
       <View
         flexDirection={"row"}
         justifyContent={"space-between"}
@@ -126,7 +124,6 @@ const List = ({ navigation }) => {
       <FlatGrid
         itemDimension={60}
         height={120}
-        // fixed={true}
         horizontal={true}
         data={tagCategories}
         renderItem={({ item }) => (
@@ -137,34 +134,10 @@ const List = ({ navigation }) => {
         )}
       ></FlatGrid>
       <Flex direction="row" justifyContent="space-evenly" mt={2} mb={2}>
-        {/* TODO: implement color themes to change button color + implement onPress actions */}
-        <Button
-          w="25%"
-          bgColor={"#33CA7F"}
-          shadow={3}
-          _text={{ color: "#F9F4F1", fontWeight: "bold" }}
-          borderRadius="full"
-        >
-          Uncooked
-        </Button>
-        <Button
-          w="25%"
-          bgColor={"#33CA7F"}
-          shadow={3}
-          _text={{ color: "#F9F4F1", fontWeight: "bold" }}
-          borderRadius="full"
-        >
-          Cooked
-        </Button>
-        <Button
-          w="25%"
-          bgColor={"#33CA7F"}
-          shadow={3}
-          _text={{ color: "#F9F4F1", fontWeight: "bold" }}
-          borderRadius="full"
-        >
-          Frozen
-        </Button>
+        {/* TODO: implement onPress actions */}
+        <Button>Uncooked</Button>
+        <Button>Cooked</Button>
+        <Button>Frozen</Button>
       </Flex>
       <FlatGrid
         itemDimension={140}
@@ -177,6 +150,22 @@ const List = ({ navigation }) => {
     </View>
   );
 };
+
+const theme = extendTheme({
+  components: {
+    Button: {
+      baseStyle: {
+        w: "25%",
+        shadow: 3,
+        _text: { color: "#F9F4F1", fontWeight: "bold" },
+        borderRadius: "full",
+      },
+      defaultProps: {
+        bgColor: "#33CA7F",
+      },
+    },
+  },
+});
 
 List.propTypes = {
   navigation: PropTypes.object,

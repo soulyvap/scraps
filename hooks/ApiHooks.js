@@ -102,12 +102,10 @@ const useMedia = () => {
         })
       );
       setMediaArray(media);
-      console.log(mediaArray);
     } catch (error) {
       console.error("Problem fetching the data from API", error);
     }
   };
-  // call loadMedia() only once when the component is loaded
   useEffect(() => {
     loadMedia();
   }, []);
