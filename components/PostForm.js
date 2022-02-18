@@ -16,6 +16,7 @@ import { useMedia, useTag } from "../hooks/ApiHooks";
 
 const PostForm = () => {
   const [date, setDate] = useState(new Date());
+  // TODO: delete mode states???
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState("");
@@ -31,6 +32,7 @@ const PostForm = () => {
   } = useForm({
     defaultValues: {
       title: "",
+      time: "",
       description: "",
     },
   });
@@ -85,6 +87,7 @@ const PostForm = () => {
     console.log("onSubmit fileExtension: ", fileExtension);
     const test = category;
     console.log("onSubmit category: ", test);
+    console.log("onSubmit dateText: ", dateText);
 
     /* const formData = new FormData();
     formData */
@@ -155,8 +158,11 @@ const PostForm = () => {
               </Text>
               <Input
                 alignSelf={"flex-start"}
+                onBlur={onBlur}
+                onChangeText={onChange}
                 placeholder="e.g. any time between 4PM and 9PM"
                 size={"lg"}
+                value={value}
                 variant={"basic"}
                 width={"80%"}
               />
