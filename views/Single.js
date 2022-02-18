@@ -9,15 +9,19 @@ import {
   Button,
   Center,
   HStack,
+  Icon,
+  IconButton,
   Image,
   Modal,
+  Pressable,
   ScrollView,
   Text,
   VStack,
 } from "native-base";
 import { FlatGrid } from "react-native-super-grid";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const Single = ({ route }) => {
+const Single = ({ route, navigation }) => {
   const { file } = route.params;
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
@@ -69,6 +73,14 @@ const Single = ({ route }) => {
 
   return (
     <Center h={"100%"} bgColor={"#33CA7F"}>
+      <Box position={"absolute"} top={5} left={5} w={10} h={10}>
+        <IconButton
+          icon={<Icon as={MaterialIcons} name="arrow-back" />}
+          size={7}
+          color="#132A15"
+          onPress={() => navigation.navigate("Home")}
+        />
+      </Box>
       <Box
         h={"80%"}
         w={"100%"}
@@ -157,12 +169,6 @@ const Single = ({ route }) => {
                 <Text color="#132A15" fontSize={16}>
                   {owner.username} didn't list any allergens
                 </Text>
-                <Text color="#132A15" fontSize={16}>
-                  {owner.username} didn't list any allergens
-                </Text>
-                <Text color="#132A15" fontSize={16}>
-                  {owner.username} didn't list any allergens
-                </Text>
               </Modal.Body>
             </Modal.Content>
           </Modal>
@@ -205,6 +211,7 @@ const Single = ({ route }) => {
 
 Single.propTypes = {
   route: PropTypes.object,
+  navigation: PropTypes.object,
 };
 
 export default Single;

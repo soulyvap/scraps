@@ -100,7 +100,6 @@ const List = ({ navigation }) => {
       <FlatGrid
         itemDimension={60}
         height={120}
-        // fixed={true}
         horizontal={true}
         data={tagCategories}
         renderItem={({ item }) => (
