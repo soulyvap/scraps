@@ -188,17 +188,17 @@ const Single = ({ route, navigation }) => {
             </Text>
           </ScrollView>
         </Box>
-        <Box w={"90%"} h={12} mt={1}>
-          <FlatGrid
-            horizontal={true}
-            data={tags}
-            renderItem={({ item }) => (
-              <Box bgColor={"#F9F4F1"} borderRadius="10" padding={1}>
-                <Text color={"#898980"}>{item}</Text>
-              </Box>
-            )}
-          ></FlatGrid>
-        </Box>
+        <FlatGrid
+          horizontal={true}
+          data={tags}
+          renderItem={({ item }) => (
+            <Box bgColor={"#F9F4F1"} borderRadius="10" px={2} pt={1} h={8}>
+              <Text textAlign="center" color={"#898980"}>
+                {item}
+              </Text>
+            </Box>
+          )}
+        ></FlatGrid>
         <Button mt={9} borderRadius={"full"} bgColor={"#33CA7F"}>
           <Text color="#F9F4F1" fontWeight={"bold"}>
             Book now
