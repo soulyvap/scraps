@@ -7,6 +7,7 @@ import {
   Heading,
   Icon,
   Input,
+  NativeBaseProvider,
   Text,
   View,
   VStack,
@@ -77,7 +78,7 @@ const List = ({ navigation }) => {
   };
 
   return (
-    <View flex={1}>
+    <NativeBaseProvider flex={1} theme={theme}>
       <View
         flexDirection={"row"}
         justifyContent={"space-between"}
@@ -147,7 +148,7 @@ const List = ({ navigation }) => {
           <ListItem navigation={navigation} singleMedia={item} />
         )}
       ></FlatGrid>
-    </View>
+    </NativeBaseProvider>
   );
 };
 
