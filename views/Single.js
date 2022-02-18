@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
 import { useTag, useUser } from "../hooks/ApiHooks";
@@ -10,11 +10,11 @@ import {
   Center,
   HStack,
   Image,
+  Modal,
   ScrollView,
   Text,
   VStack,
 } from "native-base";
-import Popover from "react-native-popover-view";
 import { FlatGrid } from "react-native-super-grid";
 
 const Single = ({ route }) => {
@@ -25,6 +25,7 @@ const Single = ({ route }) => {
   const [avatar, setAvatar] = useState(
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
+  const [showModal, setShowModal] = useState(false);
 
   const tags = [
     "vegan",
@@ -132,37 +133,39 @@ const Single = ({ route }) => {
             </HStack>
           </Box>
           <Box alignSelf={"center"} width={"50%"}>
-            <Popover
-              placement="center"
-              animationConfig={{ duration: 0 }}
-              popoverStyle={{
-                borderRadius: 10,
-                width: "80%",
-                minHeight: 30,
-                padding: 20,
-                alignItems: "center",
-                backgroundColor: "#F9F4F1",
-                borderColor: "#132A15",
-                borderWidth: 2,
-              }}
-              from={
-                <Button
-                  borderRadius={"full"}
-                  bgColor={"#FED766"}
-                  w={140}
-                  alignSelf="center"
-                >
-                  <Text color="#132A15" fontWeight={"bold"}>
-                    Check allergens
-                  </Text>
-                </Button>
-              }
+            <Button
+              borderRadius={"full"}
+              bgColor={"#FED766"}
+              w={140}
+              alignSelf="center"
+              onPress={() => setShowModal(true)}
             >
-              <Text color="#132A15" fontSize={16}>
-                {owner.username} didn't list any allergens
+              <Text color="#132A15" fontWeight={"bold"}>
+                Check allergens
               </Text>
-            </Popover>
+            </Button>
           </Box>
+          <Modal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            closeOnOverlayClick
+          >
+            <Modal.Content maxWidth="400px" bgColor={"#F9F4F1"}>
+              <Modal.CloseButton />
+              <Modal.Header>Allergens</Modal.Header>
+              <Modal.Body>
+                <Text color="#132A15" fontSize={16}>
+                  {owner.username} didn't list any allergens
+                </Text>
+                <Text color="#132A15" fontSize={16}>
+                  {owner.username} didn't list any allergens
+                </Text>
+                <Text color="#132A15" fontSize={16}>
+                  {owner.username} didn't list any allergens
+                </Text>
+              </Modal.Body>
+            </Modal.Content>
+          </Modal>
         </HStack>
         <Box
           bgColor={"#F9F4F1"}
