@@ -1,30 +1,43 @@
-import { Box, extendTheme, Image, NativeBaseProvider, View } from "native-base";
-import react, { useEffect, useState } from "react";
-import { Keyboard, ScrollView, StyleSheet } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import RegisterForm from "../components/RegisterForm";
+import { extendTheme, NativeBaseProvider, View } from "native-base";
+import { useEffect, useState } from "react";
+import CreateUserUI from "../components/CreateUserUI";
+import LocationForm from "../components/LocationForm";
+import { useLogin, useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import { avatarTag, userFileTag } from "../utils/variables";
+import userFileImage from "../assets/a.jpg";
+import { Alert, Image } from "react-native";
 
 const Register = ({ navigation }) => {
-  const [keyboardShowing, setKeyboardShowing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [next, setNext] = useState(false);
+  const [address, setAddress] = useState("");
+  const [pinpoint, setPinpoint] = useState();
+  const [formData, setFormData] = useState();
+  const [userImage, setUserImage] = useState();
+
+  let userToken;
+  let userId;
+
+  const { postUser } = useUser();
+  const { postLogin } = useLogin();
+  const { postTag } = useTag();
+  const { postMedia } = useMedia();
 
   useEffect(() => {
-    success && navigation.goBack();
+    if (success) {
+      navigation.goBack();
+    }
   }, [success]);
 
   useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      setKeyboardShowing(true);
-    });
-    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardShowing(false);
-    });
+    console.log(pinpoint);
+  }, [pinpoint]);
 
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
+  useEffect(async () => {
+    if (address.length > 0) {
+      formData && (await createUser(formData));
+    }
+  }, [address]);
 
   const theme = extendTheme({
     components: {
@@ -55,48 +68,121 @@ const Register = ({ navigation }) => {
     },
   });
 
-  const logoSize = 220;
-  const formBoxHeight = 85;
-  const picturePosition = 100 - formBoxHeight;
+  const createUser = async () => {
+    try {
+      delete formData.confirmPassword;
+      const userData = await postUser(formData);
+      console.log("Created successfully with id: ", userData);
+      if (userData) {
+        await createFilesWithToken();
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const createFilesWithToken = async () => {
+    try {
+      const userCredentials = {
+        username: formData.username,
+        password: formData.password,
+      };
+      const response = await postLogin(userCredentials);
+      const id = response.user.user_id;
+      const token = response.token;
+      userId = id;
+      userToken = token;
+      await createProfilePic();
+      await createUserFile();
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const createProfilePic = async () => {
+    const formData = new FormData();
+    formData.append("title", `profile_${userId}`);
+    const filename = userImage.split("/").pop();
+    let fileExtension = filename.split(".").pop();
+    fileExtension = fileExtension === "jpg" ? "jpeg" : fileExtension;
+    formData.append("file", {
+      uri: userImage,
+      name: filename,
+      type: "image/" + fileExtension,
+    });
+    try {
+      const response = await postMedia(formData, userToken);
+      const fileId = response.file_id;
+      response && console.log("create profile pic", response);
+      await addProfilePicTag(fileId);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const addProfilePicTag = async (fileId) => {
+    try {
+      const tagData = {
+        file_id: fileId,
+        tag: avatarTag + userId,
+      };
+      const response = await postTag(tagData, userToken);
+      response && console.log("tag added", tagData.tag);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const createUserFile = async () => {
+    const formData = new FormData();
+    formData.append("title", `userfile_${userId}`);
+    const description = JSON.stringify({
+      address: address,
+      coords: pinpoint,
+    });
+    formData.append("description", description);
+    const userFileUri = Image.resolveAssetSource(userFileImage).uri;
+    formData.append("file", {
+      uri: userFileUri,
+      name: "a.jpg",
+      type: "image/jpg",
+    });
+    try {
+      const response = await postMedia(formData, userToken);
+      const fileId = response.file_id;
+      response && (await addUserFileTag(fileId));
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const addUserFileTag = async (fileId) => {
+    try {
+      const tagData = {
+        file_id: fileId,
+        tag: userFileTag + userId,
+      };
+      const response = await postTag(tagData, userToken);
+      if (response) {
+        console.log("tag added", tagData.tag);
+        Alert.alert("Success", "User created");
+        setSuccess(true);
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 
   return (
     <NativeBaseProvider theme={theme}>
       <View flex={1}>
-        <View
-          flex={1}
-          bgColor={"#33CA7F"}
-          display={"flex"}
-          justifyContent={keyboardShowing ? "flex-start" : "flex-end"}
-        >
-          <Box
-            height={keyboardShowing ? "100%" : formBoxHeight + "%"}
-            bgColor={"white"}
-            bottom={0}
-            borderTopLeftRadius={keyboardShowing ? 0 : 90}
-            borderTopRightRadius={keyboardShowing ? 0 : 90}
-          >
-            <View flex={1}></View>
-            <RegisterForm setSuccess={setSuccess} />
-            <View flex={0.3}></View>
-          </Box>
-        </View>
-        {!keyboardShowing && (
-          <Image
-            position={"absolute"}
-            source={require("../assets/logo-elevated.png")}
-            alt={"scraps-logo"}
-            size={logoSize}
-            top={picturePosition + "%"}
-            left={"50%"}
-            style={
-              ({},
-              {
-                transform: [
-                  { translateX: -logoSize / 2 },
-                  { translateY: -logoSize / 2 },
-                ],
-              })
-            }
+        {next ? (
+          <LocationForm setAddress={setAddress} setPinpoint={setPinpoint} />
+        ) : (
+          <CreateUserUI
+            setFormData={setFormData}
+            setUserImage={setUserImage}
+            setNext={setNext}
           />
         )}
       </View>
