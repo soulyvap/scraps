@@ -3,7 +3,13 @@ import react, { useEffect, useState } from "react";
 import { Keyboard } from "react-native";
 import CreateUserForm from "./CreateUserForm";
 
-const CreateUserUI = ({ setFormData, setUserImage, setNext }) => {
+const CreateUserUI = ({
+  setFormData,
+  setUserImage,
+  setNext,
+  formData,
+  userImage,
+}) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
 
   useEffect(() => {
@@ -21,7 +27,7 @@ const CreateUserUI = ({ setFormData, setUserImage, setNext }) => {
   }, []);
 
   const logoSize = 220;
-  const formBoxHeight = 80;
+  const formBoxHeight = 75;
   const picturePosition = 100 - formBoxHeight;
 
   return (
@@ -44,6 +50,8 @@ const CreateUserUI = ({ setFormData, setUserImage, setNext }) => {
             setFormData={setFormData}
             setUserImage={setUserImage}
             setNext={setNext}
+            formData={formData}
+            userImage={userImage}
           />
           <View flex={0.3}></View>
         </Box>

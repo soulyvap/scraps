@@ -1,14 +1,27 @@
 import { Avatar, Box, Button, FormControl, Input, View } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useUser } from "../hooks/ApiHooks";
 
-const RegisterForm = ({ setFormData, setUserImage, setNext }) => {
+const RegisterForm = ({
+  setFormData,
+  setUserImage,
+  setNext,
+  formData,
+  userImage,
+}) => {
   const [pic, setPic] = useState(
     "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
   );
   const { checkUsername } = useUser();
+
+  const defVal = {
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -22,18 +35,25 @@ const RegisterForm = ({ setFormData, setUserImage, setNext }) => {
     }
   };
 
+  useEffect(() => {
+    if (typeof userImage !== "undefined") setPic(userImage);
+    if (formData) {
+      console.log(formData);
+      setValue("email", formData.email);
+      setValue("username", formData.username);
+      setValue("password", formData.password);
+      setValue("confirmPassword", formData.confirmPassword);
+    }
+  }, []);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     getValues,
+    setValue,
   } = useForm({
-    defaultValues: {
-      email: "",
-      username: "",
-      password: "",
-      confirmPassword: "",
-    },
+    defaultValues: defVal,
   });
   const onSubmit = async (data) => {
     setUserImage(pic);

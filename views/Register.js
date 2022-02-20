@@ -1,15 +1,16 @@
 import { extendTheme, NativeBaseProvider, View } from "native-base";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CreateUserUI from "../components/CreateUserUI";
 import LocationForm from "../components/LocationForm";
 import { useLogin, useMedia, useTag, useUser } from "../hooks/ApiHooks";
 import { avatarTag, userFileTag } from "../utils/variables";
 import userFileImage from "../assets/a.jpg";
-import { Alert, Image } from "react-native";
+import { Alert, BackHandler, Image } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Register = ({ navigation }) => {
   const [success, setSuccess] = useState(false);
-  const [next, setNext] = useState(false);
+  const [next, setNext] = useState(true);
   const [address, setAddress] = useState("");
   const [pinpoint, setPinpoint] = useState();
   const [formData, setFormData] = useState();
@@ -22,6 +23,25 @@ const Register = ({ navigation }) => {
   const { postLogin } = useLogin();
   const { postTag } = useTag();
   const { postMedia } = useMedia();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (next) {
+          setNext(false);
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      };
+    }, [])
+  );
 
   useEffect(() => {
     if (success) {
@@ -183,6 +203,8 @@ const Register = ({ navigation }) => {
             setFormData={setFormData}
             setUserImage={setUserImage}
             setNext={setNext}
+            formData={formData}
+            userImage={userImage}
           />
         )}
       </View>

@@ -1,9 +1,10 @@
-import { Button, Heading, Icon, Text, View } from "native-base";
+import { Avatar, Button, Heading, Icon, Image, Text, View } from "native-base";
 import react, { useEffect, useState } from "react";
 import MapView from "react-native-maps";
 import CustomMapView from "./CustomMapView";
 import LocationInput from "./LocationInput";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Keyboard } from "react-native";
 
 const LocationForm = ({ setAddress, setPinpoint }) => {
   const [region, setRegion] = useState({
@@ -12,43 +13,101 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
     longitude: 24.9622,
     longitudeDelta: 5,
   });
-  const [pointer, setPointer] = useState();
+  let pointer;
   const [addressSelected, setAddressSelected] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");
 
-  useEffect(() => {
-    setPointer(region);
-  }, [region]);
+  const setPointer = (coords) => {
+    pointer = coords;
+    console.log(pointer);
+  };
 
   useEffect(() => {
     console.log(currentAddress);
   }, [currentAddress]);
 
+  const [keyboardShowing, setKeyboardShowing] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardShowing(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardShowing(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const logoSize = 220;
+  const formBoxHeight = 75;
+  const picturePosition = 100 - formBoxHeight;
+
   return (
-    <View flex={1} bgColor={"white"}>
+    <View flex={1} bgColor={"#33CA7F"}>
+      {!keyboardShowing && !addressSelected && (
+        <Image
+          source={require("../assets/logo-elevated.png")}
+          alt={"scraps-logo"}
+          size={logoSize}
+          top={picturePosition + "%"}
+          left={"50%"}
+          style={
+            ({},
+            {
+              transform: [
+                { translateX: -logoSize / 2 },
+                { translateY: -logoSize / 2 },
+              ],
+            })
+          }
+          zIndex={200}
+        />
+      )}
       <View
         position={"absolute"}
         zIndex={100}
         width={"100%"}
-        top={addressSelected ? 0 : "45%"}
+        height={
+          addressSelected
+            ? undefined
+            : keyboardShowing
+            ? "100%"
+            : `${formBoxHeight}%`
+        }
+        top={addressSelected ? 0 : keyboardShowing ? 0 : undefined}
+        bottom={addressSelected ? undefined : 0}
+        bgColor={"white"}
+        borderTopRadius={keyboardShowing ? 0 : 90}
+        px={addressSelected ? 0 : 10}
+        pt={addressSelected ? 0 : keyboardShowing ? 10 : logoSize / 2 + 10}
+        justifyContent={keyboardShowing ? "flex-start" : "center"}
       >
-        {!addressSelected && (
-          <Heading mb={4} fontSize="17" textAlign={"center"}>
-            Enter your address
-          </Heading>
-        )}
-        <LocationInput
-          setRegion={setRegion}
-          setCurrentAddress={setCurrentAddress}
-          setAddressSelected={setAddressSelected}
-        />
-        {addressSelected && (
-          <View bgColor={"#33CA7F"} py={3}>
-            <Heading fontSize="17" textAlign={"center"} color={"white"}>
-              Pinpoint your front door on the map and save
-            </Heading>
-          </View>
-        )}
+        <View flex={1} zIndex={150}>
+          {!addressSelected && (
+            <View>
+              <Heading mb={5}>Setting up your address</Heading>
+              <Text mb={5} textAlign={"justify"}>
+                {`Scraps will only use your address to connect you to your neighbours within a 500m radius.\nIt will not be visible unless you decide to share it for food pickup.\nYou can of course always arrange another pickup location with your neighbour.`}
+              </Text>
+            </View>
+          )}
+          <LocationInput
+            setRegion={setRegion}
+            setCurrentAddress={setCurrentAddress}
+            setAddressSelected={setAddressSelected}
+          />
+          {addressSelected && (
+            <View bgColor={"#33CA7F"} py={2}>
+              <Heading fontSize="17" textAlign={"center"} color={"white"}>
+                Pinpoint your front door on the map and save
+              </Heading>
+            </View>
+          )}
+        </View>
       </View>
       {addressSelected && (
         <View flex={1}>
@@ -60,8 +119,7 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
             bottom={"45%"}
             right={"45%"}
             justifyContent={"center"}
-            justifyContent={"center"}
-            zIndex={100}
+            zIndex={50}
           >
             <Icon
               as={<MaterialIcons name={"location-on"} />}

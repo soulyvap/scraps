@@ -16,7 +16,6 @@ const CustomMapView = ({ region, setPointer }) => {
         showsUserLocation={true}
         region={region}
         onRegionChange={(reg) => {
-          console.log(reg);
           setPointer(reg);
         }}
       ></MapView>
