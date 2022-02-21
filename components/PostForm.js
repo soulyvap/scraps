@@ -13,6 +13,7 @@ import react, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useMedia, useTag } from "../hooks/ApiHooks";
+import Tags from "react-native-tags";
 
 const PostForm = () => {
   const [date, setDate] = useState(new Date());
@@ -22,6 +23,8 @@ const PostForm = () => {
   const [dateText, setDateText] = useState("");
   const [image, setImage] = useState("https://place-hold.it/50&text=test");
   const [category, setCategory] = useState("uncooked");
+  let selected = [];
+  let tags = [];
   const { postMedia } = useMedia;
   const { postTag } = useTag;
 
@@ -77,6 +80,17 @@ const PostForm = () => {
       setImage(result.uri);
     }
   };
+
+  // When clicking tag
+  const pickTag = (tagLabel) => {
+    if (!selected.includes(tagLabel)) {
+      selected.push(tagLabel);
+      console.log(selected);
+    }
+  };
+
+  // When clicking tag again
+  const removeTag = (tagLabel) => {};
 
   const onSubmit = async (data) => {
     console.log("onSubmit data: ", data);
@@ -361,27 +375,15 @@ const PostForm = () => {
                 justifyContent={"space-between"}
                 px={4}
               >
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  dairy-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  egg-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  gluten-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  lactose-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  nut-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  vegan
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  vegetarian
-                </Button>
+                <Tags
+                  deleteTagOnPress={false}
+                  initialTags={["dairy-free", "egg-free", "fuck-me"]}
+                  onChangeTags={(tags) => console.log(tags)}
+                  onTagPress={(index, tagLabel) => {
+                    pickTag(tagLabel);
+                  }}
+                  readonly={true}
+                />
               </View>
             </Box>
           </FormControl>
