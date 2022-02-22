@@ -49,11 +49,6 @@ const TabScreen = () => {
         options={{ headerShown: false }}
       ></Tab.Screen>
       <Tab.Screen
-        name="Single"
-        component={Single}
-        options={{ headerShown: false }}
-      ></Tab.Screen>
-      <Tab.Screen
         name="Upload"
         component={Upload}
         options={{ headerShown: false }}
@@ -62,6 +57,7 @@ const TabScreen = () => {
         name="Profile"
         component={Profile}
         options={{ headerShown: false }}
+        userFilesOnly={true}
       ></Tab.Screen>
     </Tab.Navigator>
   );
@@ -75,14 +71,18 @@ const StackScreen = () => {
       {isLoggedIn ? (
         <>
           <Stack.Screen
-            flex={1}
             name="HomeScreen"
             component={TabScreen}
             options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen
-            name="Single"
+            name="Profile"
             component={TabScreen}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="Single"
+            component={Single}
             options={{ headerShown: false }}
           ></Stack.Screen>
         </>

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { baseUrl } from "../utils/variables";
+import { MainContext } from "../contexts/MainContext";
 
 const doFetch = async (url, options) => {
   try {
@@ -72,8 +73,11 @@ const useLogin = () => {
   return { postLogin };
 };
 
-const useMedia = () => {
+const useMedia = (userFilesOnly) => {
   const [mediaArray, setMediaArray] = useState([]);
+  const { user, update } = useContext(MainContext);
+  const [loading, setLoading] = useState(false);
+
   const postMedia = async (formData, token) => {
     const options = {
       method: "POST",
@@ -88,12 +92,17 @@ const useMedia = () => {
   };
 
   const loadMedia = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${baseUrl}media`);
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      const json = await response.json();
+      let json = await response.json();
+      if (userFilesOnly) {
+        json = json.filter((file) => file.user_id === user.user_id);
+        console.log(json);
+      }
       const media = await Promise.all(
         json.map(async (item) => {
           const response = await fetch(baseUrl + "media/" + item.file_id);
@@ -104,12 +113,13 @@ const useMedia = () => {
       setMediaArray(media);
     } catch (error) {
       console.error("Problem fetching the data from API", error);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
     loadMedia();
-  }, []);
-
+  }, [update]);
   return { postMedia, mediaArray };
 };
 

@@ -6,13 +6,17 @@ import {
   Icon,
   NativeBaseProvider,
   Text,
+  VStack,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
 import { MainContext } from "../contexts/MainContext";
-import { useTag } from "../hooks/ApiHooks";
+import { useMedia, useTag } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
+import { FlatGrid } from "react-native-super-grid";
+import ListItem from "../components/ListItem";
+import List from "../components/List";
 
 const Profile = ({ navigation }) => {
   const { user } = useContext(MainContext);
@@ -20,6 +24,7 @@ const Profile = ({ navigation }) => {
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
   const { getFilesByTag } = useTag();
+  const { mediaArray } = useMedia();
 
   const fetchAvatar = async () => {
     try {
@@ -49,8 +54,11 @@ const Profile = ({ navigation }) => {
         justifyContent={"center"}
       >
         <Center>
-          <Text fontSize={30}>{user.username}</Text>
-          <HStack>
+          <Text fontSize={30} fontWeight={"bold"}>
+            {user.username}
+          </Text>
+          {/* rating stars */}
+          <HStack marginBottom={5}>
             <Icon
               as={MaterialIcons}
               name="star-outline"
@@ -91,6 +99,16 @@ const Profile = ({ navigation }) => {
             }}
           ></Avatar>
         </Center>
+      </Box>
+      <Box w={"90%"} alignSelf={"center"} my={5}>
+        <Text fontSize={20} fontWeight={"bold"}>
+          Active listings
+        </Text>
+        <List
+          navigation={navigation}
+          mediaArray={mediaArray}
+          userFilesOnly={true}
+        ></List>
       </Box>
     </NativeBaseProvider>
   );

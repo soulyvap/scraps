@@ -78,7 +78,7 @@ const Single = ({ route, navigation }) => {
           icon={<Icon as={MaterialIcons} name="arrow-back" />}
           size={7}
           color="#132A15"
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.goBack()}
         />
       </Box>
       <Box
