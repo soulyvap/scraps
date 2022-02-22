@@ -29,6 +29,7 @@
     "react-native-google-places-autocomplete": "^2.4.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-maps": "0.29.4",
+    "react-native-ratings": "^8.1.0",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-super-grid": "^4.2.0",
