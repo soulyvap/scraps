@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Single from "../views/Single";
 import Login from "../views/Login";
 import Register from "../views/Register";
+import Profile from "../views/Profile";
 import { MainContext } from "../contexts/MainContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Icon } from "native-base";
@@ -27,9 +28,10 @@ const TabScreen = () => {
           let iconName;
           if (route.name === "Home") {
             iconName = "home";
-          }
-          if (route.name === "Upload") {
+          } else if (route.name === "Upload") {
             iconName = "file-upload";
+          } else if (route.name === "Profile") {
+            iconName = "account-circle";
           }
           return (
             <Icon
@@ -52,11 +54,15 @@ const TabScreen = () => {
         options={{ headerShown: false }}
       ></Tab.Screen>
       <Tab.Screen
-      name="Upload"
+        name="Upload"
         component={Upload}
         options={{ headerShown: false }}
-        >
-      </Tab.Screen>
+      ></Tab.Screen>
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{ headerShown: false }}
+      ></Tab.Screen>
     </Tab.Navigator>
   );
 };
