@@ -69,7 +69,7 @@ const Single = ({ route, navigation }) => {
   useEffect(() => {
     fetchOwner();
     fetchAvatar();
-  }, [owner]);
+  }, [avatar, owner]);
 
   return (
     <Center h={"100%"} bgColor={"#33CA7F"}>

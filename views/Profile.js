@@ -4,8 +4,12 @@ import {
   Center,
   HStack,
   Icon,
+  IconButton,
+  Image,
   NativeBaseProvider,
+  Stagger,
   Text,
+  useDisclose,
   VStack,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
@@ -13,9 +17,7 @@ import { MainContext } from "../contexts/MainContext";
 import { useMedia, useTag } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
-import { MaterialIcons } from "@expo/vector-icons";
-import { FlatGrid } from "react-native-super-grid";
-import ListItem from "../components/ListItem";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import List from "../components/List";
 
 const Profile = ({ navigation }) => {
@@ -25,6 +27,7 @@ const Profile = ({ navigation }) => {
   );
   const { getFilesByTag } = useTag();
   const { mediaArray } = useMedia();
+  const { isOpen, onToggle } = useDisclose();
 
   const fetchAvatar = async () => {
     try {
@@ -92,8 +95,7 @@ const Profile = ({ navigation }) => {
           </HStack>
           {/* profile image */}
           <Avatar
-            w={230}
-            h={230}
+            size={160}
             source={{
               uri: avatar,
             }}
@@ -101,14 +103,132 @@ const Profile = ({ navigation }) => {
         </Center>
       </Box>
       <Box w={"90%"} alignSelf={"center"} my={5}>
+        <Box
+          backgroundColor={"#F9F4F1"}
+          w={"100%"}
+          h={"30%"}
+          borderRadius={10}
+          shadow={2}
+          mb={5}
+        ></Box>
         <Text fontSize={20} fontWeight={"bold"}>
           Active listings
         </Text>
-        <List
-          navigation={navigation}
-          mediaArray={mediaArray}
-          userFilesOnly={true}
-        ></List>
+        <Box>
+          <List
+            navigation={navigation}
+            mediaArray={mediaArray}
+            userFilesOnly={true}
+          ></List>
+        </Box>
+
+        <Text fontSize={20} fontWeight={"bold"}>
+          Reviews
+        </Text>
+      </Box>
+      <Box position={"absolute"} right={6} bottom={6}>
+        <Box alignItems="center">
+          <Stagger
+            visible={isOpen}
+            initial={{
+              opacity: 0,
+              scale: 0,
+              translateY: 34,
+            }}
+            animate={{
+              translateY: 0,
+              scale: 1,
+              opacity: 1,
+              transition: {
+                type: "spring",
+                mass: 0.8,
+                stagger: {
+                  offset: 30,
+                  reverse: true,
+                },
+              },
+            }}
+            exit={{
+              translateY: 34,
+              scale: 0.5,
+              opacity: 0,
+              transition: {
+                duration: 100,
+                stagger: {
+                  offset: 30,
+                  reverse: true,
+                },
+              },
+            }}
+          >
+            <IconButton
+              mb={4}
+              padding={6}
+              alignItems="center"
+              justifyContent="center"
+              variant="solid"
+              borderRadius="full"
+              background="#FED766"
+              _icon={{
+                color: "#132A15",
+              }}
+              icon={<Icon as={MaterialIcons} name="settings" />}
+              size={7}
+              // onPress={() => navigation.goBack()}
+            />
+            <IconButton
+              mb={4}
+              padding={6}
+              alignItems="center"
+              justifyContent="center"
+              variant="solid"
+              borderRadius="full"
+              background="#FED766"
+              _icon={{
+                color: "#132A15",
+              }}
+              icon={<Icon as={MaterialIcons} name="star-outline" />}
+              size={7}
+              // onPress={() => navigation.goBack()}
+            />
+            <IconButton
+              mb={4}
+              padding={6}
+              alignItems="center"
+              justifyContent="center"
+              variant="solid"
+              borderRadius="full"
+              background="#FED766"
+              _icon={{
+                color: "#132A15",
+              }}
+              icon={
+                <Icon as={MaterialCommunityIcons} name="message-text-outline" />
+              }
+              size={7}
+              // onPress={() => navigation.goBack()}
+            />
+          </Stagger>
+        </Box>
+        <HStack alignItems="center">
+          <IconButton
+            variant="solid"
+            borderRadius="full"
+            size="lg"
+            onPress={onToggle}
+            bg="#132A15"
+            _icon={{
+              color: "#F9F4F1",
+            }}
+            icon={
+              <Icon
+                as={MaterialCommunityIcons}
+                size="6"
+                name="dots-horizontal"
+              />
+            }
+          />
+        </HStack>
       </Box>
     </NativeBaseProvider>
   );

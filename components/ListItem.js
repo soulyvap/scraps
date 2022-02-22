@@ -53,7 +53,8 @@ const ListItem = ({ navigation, singleMedia, userFilesOnly }) => {
   useEffect(() => {
     fetchOwner();
     fetchAvatar();
-  }, []);
+    singleMedia;
+  }, [avatar, owner]);
 
   if (userFilesOnly) {
     return (
