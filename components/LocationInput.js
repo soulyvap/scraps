@@ -1,12 +1,16 @@
-import react from "react";
+import react, { useState } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import mapApiKey from "../utils/localVariables";
 
+//This feature requires an ApiKey that I cannot share online.
 const LocationInput = ({
   setRegion,
   setCurrentAddress,
   setAddressSelected,
 }) => {
+  const [padding, setMapPadding] = useState();
+  const [align, setAlign] = useState("center");
+
   const formatLocation = (location) => {
     return {
       latitude: location.lat,
@@ -25,6 +29,8 @@ const LocationInput = ({
         setRegion(formatLocation(details.geometry.location));
         setCurrentAddress(data.description);
         setAddressSelected(true);
+        setMapPadding(45);
+        setAlign("left");
       }}
       query={{
         key: mapApiKey,
@@ -34,7 +40,8 @@ const LocationInput = ({
       styles={{
         textInput: {
           backgroundColor: "#F9F4F1",
-          textAlign: "center",
+          textAlign: align,
+          paddingStart: padding,
         },
       }}
     />

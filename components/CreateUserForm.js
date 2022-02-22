@@ -1,4 +1,12 @@
-import { Avatar, Box, Button, FormControl, Input, View } from "native-base";
+import {
+  Avatar,
+  Box,
+  Button,
+  FormControl,
+  Input,
+  View,
+  VStack,
+} from "native-base";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
@@ -62,7 +70,7 @@ const RegisterForm = ({
   };
 
   return (
-    <Box>
+    <VStack space={1}>
       <View flexDirection={"row"} justifyContent={"center"} mb={2}>
         <Avatar mr={5} source={{ uri: pic }} alt="profile-pic" size={100} />
         <Button bgColor={"#898980"} w={100} onPress={pickImage}>
@@ -193,10 +201,10 @@ const RegisterForm = ({
         name="confirmPassword"
       />
 
-      <Button mt={3} bgColor={"#33CA7F"} onPress={handleSubmit(onSubmit)}>
+      <Button mt={2} bgColor={"#33CA7F"} onPress={handleSubmit(onSubmit)}>
         Next
       </Button>
-    </Box>
+    </VStack>
   );
 };
 

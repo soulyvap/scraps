@@ -7,10 +7,11 @@ import { avatarTag, userFileTag } from "../utils/variables";
 import userFileImage from "../assets/a.jpg";
 import { Alert, BackHandler, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import BackButton from "../components/BackButton";
 
 const Register = ({ navigation }) => {
   const [success, setSuccess] = useState(false);
-  const [next, setNext] = useState(true);
+  const [next, setNext] = useState(false);
   const [address, setAddress] = useState("");
   const [pinpoint, setPinpoint] = useState();
   const [formData, setFormData] = useState();
@@ -196,6 +197,13 @@ const Register = ({ navigation }) => {
   return (
     <NativeBaseProvider theme={theme}>
       <View flex={1}>
+        <BackButton
+          top={next ? 0 : "2%"}
+          left={next ? 0 : "5%"}
+          onPress={() => {
+            next ? setNext(false) : navigation.goBack();
+          }}
+        />
         {next ? (
           <LocationForm setAddress={setAddress} setPinpoint={setPinpoint} />
         ) : (

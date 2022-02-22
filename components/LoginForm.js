@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, Input, Text } from "native-base";
+import { Box, Button, FormControl, Input, Text, VStack } from "native-base";
 import react, { useContext } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useLogin } from "../hooks/ApiHooks";
@@ -32,7 +32,7 @@ const LoginForm = () => {
   };
 
   return (
-    <Box>
+    <VStack space={2}>
       <Controller
         control={control}
         rules={{
@@ -84,10 +84,10 @@ const LoginForm = () => {
         name="password"
       />
 
-      <Button mt={3} bgColor={"#33CA7F"} onPress={handleSubmit(onSubmit)}>
+      <Button bgColor={"#33CA7F"} onPress={handleSubmit(onSubmit)}>
         Login
       </Button>
-    </Box>
+    </VStack>
   );
 };
 
