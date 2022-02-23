@@ -32,7 +32,6 @@ const PostForm = () => {
     { text: "vegetarian", active: false },
   ]);
   let allergenss = [];
-  let selected = [];
   const { postMedia } = useMedia;
   const { postTag } = useTag;
 
@@ -95,24 +94,13 @@ const PostForm = () => {
     }
   };
 
+  // When clickin a tag
   const toggleTag = (tag) => {
     console.log("toggleTag: ", tag);
     let copyOfTagSomething = JSON.parse(JSON.stringify(tagSomething));
     let index = tagSomething.indexOf(tag);
     copyOfTagSomething[index].active = !copyOfTagSomething[index].active;
     setTagSomething(copyOfTagSomething);
-  };
-
-  // When clicking tag
-  const selectTag = (tagLabel) => {
-    if (!selected.includes(tagLabel)) {
-      selected.push(tagLabel);
-      console.log(selected);
-    } else {
-      const index = selected.indexOf(tagLabel);
-      selected.splice(index, 1);
-      console.log(selected);
-    }
   };
 
   const onSubmit = async (data) => {
@@ -440,7 +428,6 @@ const PostForm = () => {
                 justifyContent={"space-between"}
                 px={4}
               >
-                {/* SECOND ATTEMPT IN PROGRESS */}
                 {tagSomething.map((tag) => {
                   return (
                     <Chip
@@ -454,17 +441,6 @@ const PostForm = () => {
                     </Chip>
                   );
                 })}
-
-                {/* FIRST ATTEMPT, NOT SURE IF WORKABLE DUE TO LIBRARY BEING UNSUITABLE FOR THE USAGE
-                <Tags
-                  deleteTagOnPress={false}
-                  initialTags={["dairy-free", "egg-free", "fuck-me"]}
-                  onChangeTags={(tags) => console.log(tags)}
-                  onTagPress={(index, tagLabel) => {
-                    selectTag(tagLabel);
-                  }}
-                  readonly={true}
-                /> */}
               </View>
             </Box>
           </FormControl>
