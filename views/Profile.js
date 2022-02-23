@@ -1,16 +1,21 @@
 import {
   Avatar,
   Box,
+  Button,
   Center,
+  Container,
+  Flex,
   HStack,
   Icon,
   IconButton,
   Image,
   NativeBaseProvider,
+  Pressable,
   ScrollView,
   Stagger,
   Text,
   useDisclose,
+  View,
   VStack,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
@@ -19,9 +24,7 @@ import { useMedia, useTag } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
-import List from "../components/List";
 import { FlatGrid } from "react-native-super-grid";
-import UserFilesListItem from "../components/UserFilesListItem";
 
 const Profile = ({ navigation }) => {
   const { user } = useContext(MainContext);
@@ -50,97 +53,119 @@ const Profile = ({ navigation }) => {
   }, []);
 
   return (
-    <NativeBaseProvider>
-      {/* green background box */}
-      <Box
-        height={"40%"}
-        bgColor={"#33CA7F"}
-        borderBottomLeftRadius={90}
-        borderBottomRightRadius={90}
-        justifyContent={"center"}
-      >
-        <Center>
-          <Text fontSize={30} fontWeight={"bold"}>
-            {user.username}
-          </Text>
-          {/* rating stars */}
-          <HStack marginBottom={5}>
-            <Icon
-              as={MaterialIcons}
-              name="star-outline"
-              size={5}
-              color="#FED766"
-            ></Icon>
-            <Icon
-              as={MaterialIcons}
-              name="star-outline"
-              size={5}
-              color="#FED766"
-            ></Icon>
-            <Icon
-              as={MaterialIcons}
-              name="star-outline"
-              size={5}
-              color="#FED766"
-            ></Icon>
-            <Icon
-              as={MaterialIcons}
-              name="star-outline"
-              size={5}
-              color="#FED766"
-            ></Icon>
-            <Icon
-              as={MaterialIcons}
-              name="star-outline"
-              size={5}
-              color="#FED766"
-            ></Icon>
-          </HStack>
-          {/* profile image */}
-          <Avatar
-            size={160}
-            source={{
-              uri: avatar,
-            }}
-          ></Avatar>
-        </Center>
-      </Box>
-      <Box w={"90%"} alignSelf={"center"} my={5}>
+    <Box flex="1">
+      <VStack bgColor={"#33CA7F"} alignItems={"center"} mb={5}>
+        <Text fontSize={30} fontWeight={"bold"}>
+          {user.username}
+        </Text>
+        {/* rating stars */}
+        <HStack marginBottom={5}>
+          <Icon
+            as={MaterialIcons}
+            name="star-outline"
+            size={5}
+            color="#FED766"
+          ></Icon>
+          <Icon
+            as={MaterialIcons}
+            name="star-outline"
+            size={5}
+            color="#FED766"
+          ></Icon>
+          <Icon
+            as={MaterialIcons}
+            name="star-outline"
+            size={5}
+            color="#FED766"
+          ></Icon>
+          <Icon
+            as={MaterialIcons}
+            name="star-outline"
+            size={5}
+            color="#FED766"
+          ></Icon>
+          <Icon
+            as={MaterialIcons}
+            name="star-outline"
+            size={5}
+            color="#FED766"
+          ></Icon>
+        </HStack>
+      </VStack>
+      <ScrollView>
+        {/* profile image */}
+        <Avatar
+          alignSelf={"center"}
+          size={180}
+          source={{
+            uri: avatar,
+          }}
+          marginBottom={5}
+        ></Avatar>
+        {/* user's bio */}
         <Box
+          alignSelf={"center"}
           backgroundColor={"#F9F4F1"}
-          w={"100%"}
-          h={"30%"}
+          w={"90%"}
           borderRadius={10}
           shadow={2}
           mb={5}
-        ></Box>
-        <Text fontSize={20} fontWeight={"bold"}>
-          Active listings
+          _text={{
+            m: 3,
+            fontSize: 18,
+            fontWeight: "medium",
+            color: "#132A15",
+          }}
+        >
+          This is my bio. I am so awesome. I make great food. Please eat my
+          food.
+        </Box>
+        <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
+          <HStack>
+            <Icon
+              as={MaterialIcons}
+              name="settings"
+              size={5}
+              color="#132A15"
+            ></Icon>
+            <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
+              Edit profile
+            </Text>
+          </HStack>
+        </Button>
+        {/* user's listings */}
+        <Text fontSize={20} fontWeight={"bold"} px={5}>
+          Active listings ({userMediaArray.length})
         </Text>
-        {/* <Box>
-          <List
-            navigation={navigation}
-            mediaArray={mediaArray}
-            userFilesOnly={true}
-          ></List>
-        </Box> */}
-        <Box>
+        <Box w={"90%"} alignSelf={"center"}>
           <FlatGrid
-            itemDimension={140}
+            horizontal={true}
+            itemDimension={200}
+            height={100}
             data={userMediaArray}
             keyExtractor={(item) => item.file_id.toString()}
             renderItem={({ item }) => (
-              <UserFilesListItem navigation={navigation} singleMedia={item} />
+              <Pressable
+                onPress={() => {
+                  navigation.navigate("Single", { file: item });
+                }}
+              >
+                <Avatar
+                  source={{ uri: uploadsUrl + item.thumbnails?.w160 }}
+                  size={"lg"}
+                ></Avatar>
+              </Pressable>
             )}
           />
         </Box>
-
-        <Text fontSize={20} fontWeight={"bold"}>
+        <Text fontSize={20} fontWeight={"bold"} px={5}>
           Reviews
         </Text>
-      </Box>
-      <Box position={"absolute"} right={6} bottom={6}>
-        <Box alignItems="center">
+        <Text fontSize={16} px={5}>
+          Reviews will be placed here.
+        </Text>
+        <Box position={"absolute"} right={6} top={6}>
+          {/* <Box alignItems="center">
           <Stagger
             visible={isOpen}
             initial={{
@@ -241,9 +266,10 @@ const Profile = ({ navigation }) => {
               />
             }
           />
-        </HStack>
-      </Box>
-    </NativeBaseProvider>
+        </HStack> */}
+        </Box>
+      </ScrollView>
+    </Box>
   );
 };
 

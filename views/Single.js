@@ -98,7 +98,7 @@ const Single = ({ route, navigation }) => {
       <Image
         source={{ uri: uploadsUrl + file.filename }}
         borderRadius={"full"}
-        size={180}
+        size={220}
         position="absolute"
         top="5%"
         alt="image"
@@ -110,7 +110,7 @@ const Single = ({ route, navigation }) => {
         top={"35%"}
         alignItems={"center"}
       >
-        <Text fontSize={25} color="#132A15" fontWeight={"bold"}>
+        <Text fontSize={25} color="#132A15" fontWeight={"bold"} mt={2}>
           {file.title}
         </Text>
         <HStack w={"90%"} h={"13%"} mt={5}>
