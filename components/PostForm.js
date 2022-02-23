@@ -95,6 +95,14 @@ const PostForm = () => {
     }
   };
 
+  const toggleTag = (tag) => {
+    console.log("toggleTag: ", tag);
+    let copyOfTagSomething = JSON.parse(JSON.stringify(tagSomething));
+    let index = tagSomething.indexOf(tag);
+    copyOfTagSomething[index].active = !copyOfTagSomething[index].active;
+    setTagSomething(copyOfTagSomething);
+  };
+
   // When clicking tag
   const selectTag = (tagLabel) => {
     if (!selected.includes(tagLabel)) {
@@ -117,6 +125,10 @@ const PostForm = () => {
     const test = category;
     console.log("onSubmit category: ", test);
     console.log("onSubmit dateText: ", dateText);
+    const testTagsSelected = tagSomething
+      .filter((tag) => tag.active)
+      .map((tag) => tag.text);
+    console.log("selected tags: ", testTagsSelected);
 
     /* const formData = new FormData();
     formData */
@@ -431,7 +443,13 @@ const PostForm = () => {
                 {/* SECOND ATTEMPT IN PROGRESS */}
                 {tagSomething.map((tag) => {
                   return (
-                    <Chip mode={"flat"} onPress={() => {}} selected={false}>
+                    <Chip
+                      mode={"flat"}
+                      onPress={() => {
+                        toggleTag(tag);
+                      }}
+                      selected={tag.active}
+                    >
                       {tag.text}
                     </Chip>
                   );
