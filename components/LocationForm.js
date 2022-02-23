@@ -6,6 +6,8 @@ import LocationInput from "./LocationInput";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Keyboard } from "react-native";
 
+let pointer;
+
 const LocationForm = ({ setAddress, setPinpoint }) => {
   const [region, setRegion] = useState({
     latitude: 60.1666,
@@ -13,14 +15,17 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
     longitude: 24.9622,
     longitudeDelta: 5,
   });
-  let pointer;
+
   const [addressSelected, setAddressSelected] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");
 
   const setPointer = (coords) => {
     pointer = coords;
-    console.log(pointer);
   };
+
+  useEffect(() => {
+    setPointer(region);
+  }, [region]);
 
   useEffect(() => {
     console.log(currentAddress);
@@ -141,6 +146,7 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
               disabled={!addressSelected}
               onPress={() => {
                 setPinpoint(pointer);
+                console.log(pointer);
                 setAddress(currentAddress);
               }}
             >

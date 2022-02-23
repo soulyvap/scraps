@@ -51,11 +51,12 @@ const Register = ({ navigation }) => {
   }, [success]);
 
   useEffect(() => {
-    console.log(pinpoint);
+    console.log("register.js", pinpoint);
   }, [pinpoint]);
 
   useEffect(async () => {
     if (address.length > 0) {
+      console.log("should be sent", pinpoint);
       formData && (await createUser(formData));
     }
   }, [address]);
@@ -158,9 +159,10 @@ const Register = ({ navigation }) => {
     const formData = new FormData();
     formData.append("title", `userfile_${userId}`);
     const description = JSON.stringify({
-      address: address,
       coords: pinpoint,
+      address: address,
     });
+    console.log("userfile desc", description);
     formData.append("description", description);
     const userFileUri = Image.resolveAssetSource(userFileImage).uri;
     formData.append("file", {

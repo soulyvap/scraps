@@ -10,6 +10,8 @@ import Register from "../views/Register";
 import { MainContext } from "../contexts/MainContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Icon } from "native-base";
+import ChatSingle from "../views/ChatSingle";
+import ChatAll from "../views/ChatAll";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -31,6 +33,9 @@ const TabScreen = () => {
           if (route.name === "Upload") {
             iconName = "file-upload";
           }
+          if (route.name === "Chat") {
+            iconName = "chat";
+          }
           return (
             <Icon
               as={<MaterialIcons name={iconName} />}
@@ -47,16 +52,15 @@ const TabScreen = () => {
         options={{ headerShown: false }}
       ></Tab.Screen>
       <Tab.Screen
-        name="Single"
-        component={Single}
+        name="Upload"
+        component={Upload}
         options={{ headerShown: false }}
       ></Tab.Screen>
       <Tab.Screen
-      name="Upload"
-        component={Upload}
+        name="Chat"
+        component={ChatAll}
         options={{ headerShown: false }}
-        >
-      </Tab.Screen>
+      ></Tab.Screen>
     </Tab.Navigator>
   );
 };
@@ -76,7 +80,12 @@ const StackScreen = () => {
           ></Stack.Screen>
           <Stack.Screen
             name="Single"
-            component={TabScreen}
+            component={Single}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="ChatSingle"
+            component={ChatSingle}
             options={{ headerShown: false }}
           ></Stack.Screen>
         </>

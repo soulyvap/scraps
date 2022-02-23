@@ -87,6 +87,10 @@ const useMedia = () => {
     return result;
   };
 
+  const getMediaById = async (fileId) => {
+    return await doFetch(baseUrl + "media/" + fileId);
+  };
+
   const loadMedia = async () => {
     try {
       const response = await fetch(`${baseUrl}media`);
@@ -110,7 +114,7 @@ const useMedia = () => {
     loadMedia();
   }, []);
 
-  return { postMedia, mediaArray };
+  return { postMedia, mediaArray, getMediaById };
 };
 
 const useTag = () => {
@@ -133,4 +137,20 @@ const useTag = () => {
   return { postTag, getFilesByTag };
 };
 
-export { useMedia, useLogin, useUser, useTag };
+const useRating = () => {
+  const getRatingsById = async (userFileId) => {
+    return await doFetch(baseUrl + "ratings/file/" + userFileId);
+  };
+
+  return { getRatingsById };
+};
+
+const useComment = () => {
+  const getCommentsById = async (fileId) => {
+    return await doFetch(baseUrl + "comments/file/" + fileId);
+  };
+
+  return { getCommentsById };
+};
+
+export { useMedia, useLogin, useUser, useTag, useRating, useComment };

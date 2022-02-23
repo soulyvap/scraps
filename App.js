@@ -2,16 +2,16 @@ import { Box, NativeBaseProvider } from "native-base";
 import React from "react";
 import { MainProvider } from "./contexts/MainContext";
 import Navigator from "./navigators/Navigator";
-import ChatAll from "./components/ChatAll";
-import Chat from "./views/Chat";
+import ChatAll from "./views/ChatAll";
+import ChatSingle from "./views/ChatSingle";
 
 const App = () => {
   return (
     <MainProvider>
       <NativeBaseProvider>
         <Box flex={1} safeArea bgColor={"white"}>
-          {/* <Navigator /> */}
-          <Chat />
+          <Navigator />
+          {/* <ChatSingle /> */}
         </Box>
       </NativeBaseProvider>
     </MainProvider>
