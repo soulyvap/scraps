@@ -14,6 +14,7 @@ import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useMedia, useTag } from "../hooks/ApiHooks";
 import Tags from "react-native-tags";
+import { Chip } from "react-native-paper";
 
 const PostForm = () => {
   const [date, setDate] = useState(new Date());
@@ -21,6 +22,16 @@ const PostForm = () => {
   const [dateText, setDateText] = useState("");
   const [image, setImage] = useState("https://place-hold.it/50&text=test");
   const [category, setCategory] = useState("uncooked");
+  const [tagSomething, setTagSomething] = useState([
+    { text: "dairy-free", active: false },
+    { text: "egg-free", active: false },
+    { text: "gluten-free", active: false },
+    { text: "keto", active: false },
+    { text: "nut-free", active: false },
+    { text: "vegan", active: false },
+    { text: "vegetarian", active: false },
+  ]);
+  let allergenss = [];
   let selected = [];
   const { postMedia } = useMedia;
   const { postTag } = useTag;
@@ -37,15 +48,15 @@ const PostForm = () => {
     },
   });
 
+  const showDatepicker = () => {
+    setShow(true);
+  };
+
   const onChanged = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(false);
     setDate(currentDate);
     split(currentDate);
-  };
-
-  const showDatepicker = () => {
-    setShow(true);
   };
 
   // Converts original DatePicker value to more pleasant one,
@@ -61,6 +72,17 @@ const PostForm = () => {
     setDateText(final);
   };
 
+  const addAllergen = (allergen) => {
+    if (!allergenss.includes(allergen)) {
+      allergenss.push(allergen);
+      console.log(allergenss);
+    } else {
+      const index = allergenss.indexOf(allergen);
+      allergenss.splice(index, 1);
+      console.log(allergenss);
+    }
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -74,7 +96,7 @@ const PostForm = () => {
   };
 
   // When clicking tag
-  const pickTag = (tagLabel) => {
+  const selectTag = (tagLabel) => {
     if (!selected.includes(tagLabel)) {
       selected.push(tagLabel);
       console.log(selected);
@@ -226,6 +248,44 @@ const PostForm = () => {
         name="description"
       />
 
+      {/* Add allergens */}
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormControl isInvalid={errors.description}>
+            <FormControl.Label
+              _text={{
+                color: "#132A15",
+                fontWeight: "bold",
+                fontSize: "lg",
+              }}
+            >
+              Add allergens
+            </FormControl.Label>
+            <Box
+              bgColor={"#F9F4F1"}
+              borderRadius={15}
+              flex={1}
+              marginBottom={"5%"}
+              paddingY={"3%"}
+            >
+              <Tags
+                onChangeTags={(tags) => {
+                  for (let i = 0; i < tags.length; i++) {
+                    console.log("logi: ", tags[i]);
+                    addAllergen(tags[i]);
+                  }
+                }}
+                onTagPress={(index, tagLabel) => {
+                  addAllergen(tagLabel);
+                }}
+              />
+            </Box>
+          </FormControl>
+        )}
+        name="description"
+      />
+
       {/* Add pictures */}
       <Controller
         control={control}
@@ -368,15 +428,25 @@ const PostForm = () => {
                 justifyContent={"space-between"}
                 px={4}
               >
+                {/* SECOND ATTEMPT IN PROGRESS */}
+                {tagSomething.map((tag) => {
+                  return (
+                    <Chip mode={"flat"} onPress={() => {}} selected={false}>
+                      {tag.text}
+                    </Chip>
+                  );
+                })}
+
+                {/* FIRST ATTEMPT, NOT SURE IF WORKABLE DUE TO LIBRARY BEING UNSUITABLE FOR THE USAGE
                 <Tags
                   deleteTagOnPress={false}
                   initialTags={["dairy-free", "egg-free", "fuck-me"]}
                   onChangeTags={(tags) => console.log(tags)}
                   onTagPress={(index, tagLabel) => {
-                    pickTag(tagLabel);
+                    selectTag(tagLabel);
                   }}
                   readonly={true}
-                />
+                /> */}
               </View>
             </Box>
           </FormControl>
