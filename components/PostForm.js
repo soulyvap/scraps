@@ -17,14 +17,11 @@ import Tags from "react-native-tags";
 
 const PostForm = () => {
   const [date, setDate] = useState(new Date());
-  // TODO: delete mode states???
-  const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState("");
   const [image, setImage] = useState("https://place-hold.it/50&text=test");
   const [category, setCategory] = useState("uncooked");
   let selected = [];
-  let tags = [];
   const { postMedia } = useMedia;
   const { postTag } = useTag;
 
@@ -47,13 +44,8 @@ const PostForm = () => {
     split(currentDate);
   };
 
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
   const showDatepicker = () => {
-    showMode("date");
+    setShow(true);
   };
 
   // Converts original DatePicker value to more pleasant one,
@@ -86,11 +78,12 @@ const PostForm = () => {
     if (!selected.includes(tagLabel)) {
       selected.push(tagLabel);
       console.log(selected);
+    } else {
+      const index = selected.indexOf(tagLabel);
+      selected.splice(index, 1);
+      console.log(selected);
     }
   };
-
-  // When clicking tag again
-  const removeTag = (tagLabel) => {};
 
   const onSubmit = async (data) => {
     console.log("onSubmit data: ", data);
