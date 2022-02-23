@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // TODO: currently just the entire card is pressable and takes you to single item.
 // needs to be changed so that by clicking on avatar, it would take you to profile page
-const ListItem = ({ navigation, singleMedia, userFilesOnly }) => {
+const ListItem = ({ navigation, singleMedia }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
@@ -54,96 +54,80 @@ const ListItem = ({ navigation, singleMedia, userFilesOnly }) => {
     fetchOwner();
     fetchAvatar();
     singleMedia;
-  }, [avatar, owner]);
+  }, []);
 
-  if (userFilesOnly) {
-    return (
-      <Pressable
-        onPress={() => {
-          navigation.navigate("Single", { file: singleMedia });
-        }}
+  return (
+    <Pressable
+      alignItems="center"
+      onPress={() => {
+        navigation.navigate("Single", { file: singleMedia });
+      }}
+    >
+      <Box
+        w="150"
+        h="200"
+        rounded="lg"
+        overflow="hidden"
+        borderColor={"#898980"}
+        shadow={4}
+        backgroundColor={"#F9F4F1"}
+        borderWidth="1"
       >
-        <Avatar
-          source={{ uri: uploadsUrl + singleMedia.thumbnails?.w160 }}
-          size={"lg"}
-        ></Avatar>
-      </Pressable>
-    );
-  } else {
-    return (
-      <Pressable
-        alignItems="center"
-        onPress={() => {
-          navigation.navigate("Single", { file: singleMedia });
-        }}
-      >
-        <Box
-          w="150"
-          h="200"
-          rounded="lg"
-          overflow="hidden"
-          borderColor={"#898980"}
-          shadow={4}
-          backgroundColor={"#F9F4F1"}
-          borderWidth="1"
-        >
-          <Box>
-            <AspectRatio w="100%" ratio={1 / 1}>
-              <Image
-                source={{ uri: uploadsUrl + singleMedia.thumbnails?.w160 }}
-                alt="image"
-              />
-            </AspectRatio>
-            <Box
-              position="absolute"
-              top="0"
-              px="3"
-              py="1.5"
-              backgroundColor="#F9f4f1"
-              width="100%"
-              height="12"
-              opacity="70"
-            ></Box>
-            <HStack
-              alignItems="center"
-              position="absolute"
-              top="0"
-              px="3"
-              py="1.5"
-              width="100%"
-            >
-              <Avatar
-                marginRight="2"
-                size="sm"
-                source={{
-                  uri: avatar,
-                }}
-              ></Avatar>
-              <VStack>
-                <Text color="#132A15" fontWeight="bold">
-                  {owner.username}
-                </Text>
-                <Text color="#132A15" fontWeight="400">
-                  5 stars
-                </Text>
-              </VStack>
-            </HStack>
-          </Box>
-          <Box w="150" h="50" alignItems="center" justifyContent="center">
-            <Heading size="md" color="#132A15" textAlign="center">
-              {singleMedia.title}
-            </Heading>
-          </Box>
+        <Box>
+          <AspectRatio w="100%" ratio={1 / 1}>
+            <Image
+              source={{ uri: uploadsUrl + singleMedia.thumbnails?.w160 }}
+              alt="image"
+            />
+          </AspectRatio>
+          <Box
+            position="absolute"
+            top="0"
+            px="3"
+            py="1.5"
+            backgroundColor="#F9f4f1"
+            width="100%"
+            height="12"
+            opacity="70"
+          ></Box>
+          <HStack
+            alignItems="center"
+            position="absolute"
+            top="0"
+            px="3"
+            py="1.5"
+            width="100%"
+          >
+            <Avatar
+              marginRight="2"
+              size="sm"
+              source={{
+                uri: avatar,
+              }}
+            ></Avatar>
+            <VStack>
+              <Text color="#132A15" fontWeight="bold">
+                {owner.username}
+              </Text>
+              <Text color="#132A15" fontWeight="400">
+                5 stars
+              </Text>
+            </VStack>
+          </HStack>
         </Box>
-      </Pressable>
-    );
-  }
+        <Box w="150" h="50" alignItems="center" justifyContent="center">
+          <Heading size="md" color="#132A15" textAlign="center">
+            {singleMedia.title}
+          </Heading>
+        </Box>
+      </Box>
+    </Pressable>
+  );
 };
 
 ListItem.propTypes = {
   singleMedia: PropTypes.object,
   navigation: PropTypes.object.isRequired,
-  userFilesOnly: PropTypes.bool,
 };
 
 export default ListItem;

@@ -7,6 +7,7 @@ import {
   IconButton,
   Image,
   NativeBaseProvider,
+  ScrollView,
   Stagger,
   Text,
   useDisclose,
@@ -19,6 +20,8 @@ import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import List from "../components/List";
+import { FlatGrid } from "react-native-super-grid";
+import UserFilesListItem from "../components/UserFilesListItem";
 
 const Profile = ({ navigation }) => {
   const { user } = useContext(MainContext);
@@ -26,7 +29,7 @@ const Profile = ({ navigation }) => {
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
   const { getFilesByTag } = useTag();
-  const { mediaArray } = useMedia();
+  const { userMediaArray } = useMedia();
   const { isOpen, onToggle } = useDisclose();
 
   const fetchAvatar = async () => {
@@ -44,7 +47,7 @@ const Profile = ({ navigation }) => {
 
   useEffect(() => {
     fetchAvatar();
-  }, [avatar]);
+  }, []);
 
   return (
     <NativeBaseProvider>
@@ -114,12 +117,22 @@ const Profile = ({ navigation }) => {
         <Text fontSize={20} fontWeight={"bold"}>
           Active listings
         </Text>
-        <Box>
+        {/* <Box>
           <List
             navigation={navigation}
             mediaArray={mediaArray}
             userFilesOnly={true}
           ></List>
+        </Box> */}
+        <Box>
+          <FlatGrid
+            itemDimension={140}
+            data={userMediaArray}
+            keyExtractor={(item) => item.file_id.toString()}
+            renderItem={({ item }) => (
+              <UserFilesListItem navigation={navigation} singleMedia={item} />
+            )}
+          />
         </Box>
 
         <Text fontSize={20} fontWeight={"bold"}>

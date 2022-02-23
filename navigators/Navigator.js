@@ -57,7 +57,7 @@ const TabScreen = () => {
         name="Profile"
         component={Profile}
         options={{ headerShown: false }}
-        userFilesOnly={true}
+        // userFilesOnly={true}
       ></Tab.Screen>
     </Tab.Navigator>
   );

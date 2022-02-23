@@ -75,6 +75,7 @@ const useLogin = () => {
 
 const useMedia = (userFilesOnly) => {
   const [mediaArray, setMediaArray] = useState([]);
+  const [userMediaArray, setUserMediaArray] = useState([]);
   const { user, update } = useContext(MainContext);
   const [loading, setLoading] = useState(false);
 
@@ -99,10 +100,6 @@ const useMedia = (userFilesOnly) => {
         throw Error(response.statusText);
       }
       let json = await response.json();
-      if (userFilesOnly) {
-        json = json.filter((file) => file.user_id === user.user_id);
-        console.log(json);
-      }
       const media = await Promise.all(
         json.map(async (item) => {
           const response = await fetch(baseUrl + "media/" + item.file_id);
@@ -117,10 +114,36 @@ const useMedia = (userFilesOnly) => {
       setLoading(false);
     }
   };
+
+  const loadUserMedia = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(baseUrl + "media/user/" + user.user_id);
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      let json = await response.json();
+      const media = await Promise.all(
+        json.map(async (item) => {
+          const response = await fetch(baseUrl + "media/" + item.file_id);
+          const mediaData = await response.json();
+          return mediaData;
+        })
+      );
+      setUserMediaArray(media);
+    } catch (error) {
+      console.error("Problem fetching the data from API", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadMedia();
+    loadUserMedia();
   }, [update]);
-  return { postMedia, mediaArray };
+
+  return { postMedia, mediaArray, userMediaArray };
 };
 
 const useTag = () => {

@@ -12,11 +12,7 @@ const List = ({ navigation, userFilesOnly = false }) => {
       data={mediaArray}
       keyExtractor={(item) => item.file_id.toString()}
       renderItem={({ item }) => (
-        <ListItem
-          navigation={navigation}
-          singleMedia={item}
-          userFilesOnly={userFilesOnly}
-        />
+        <ListItem navigation={navigation} singleMedia={item} />
       )}
     />
   );
@@ -24,7 +20,6 @@ const List = ({ navigation, userFilesOnly = false }) => {
 
 List.propTypes = {
   navigation: PropTypes.object,
-  userFilesOnly: PropTypes.bool,
 };
 
 export default List;
