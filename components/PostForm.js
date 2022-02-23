@@ -9,7 +9,7 @@ import {
   View,
 } from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import react, { useState } from "react";
+import react, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useMedia, useTag } from "../hooks/ApiHooks";
@@ -20,6 +20,7 @@ const PostForm = () => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState("");
+  const [allergens, setAllergens] = useState([]);
   const [image, setImage] = useState("https://place-hold.it/50&text=test");
   const [category, setCategory] = useState("uncooked");
   const [tagSomething, setTagSomething] = useState([
@@ -31,7 +32,6 @@ const PostForm = () => {
     { text: "vegan", active: false },
     { text: "vegetarian", active: false },
   ]);
-  let allergenss = [];
   const { postMedia } = useMedia;
   const { postTag } = useTag;
 
@@ -71,17 +71,6 @@ const PostForm = () => {
     setDateText(final);
   };
 
-  const addAllergen = (allergen) => {
-    if (!allergenss.includes(allergen)) {
-      allergenss.push(allergen);
-      console.log(allergenss);
-    } else {
-      const index = allergenss.indexOf(allergen);
-      allergenss.splice(index, 1);
-      console.log(allergenss);
-    }
-  };
-
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -116,11 +105,16 @@ const PostForm = () => {
     const testTagsSelected = tagSomething
       .filter((tag) => tag.active)
       .map((tag) => tag.text);
-    console.log("selected tags: ", testTagsSelected);
+    console.log("onSubmit selected tags: ", testTagsSelected);
+    console.log("onSumbit allergens: ", allergens);
 
     /* const formData = new FormData();
     formData */
   };
+
+  useEffect(() => {
+    pickImage();
+  }, [image]);
 
   return (
     <Box marginTop={"4%"}>
@@ -271,13 +265,11 @@ const PostForm = () => {
             >
               <Tags
                 onChangeTags={(tags) => {
-                  for (let i = 0; i < tags.length; i++) {
-                    console.log("logi: ", tags[i]);
-                    addAllergen(tags[i]);
-                  }
+                  setAllergens(tags);
                 }}
-                onTagPress={(index, tagLabel) => {
-                  addAllergen(tagLabel);
+                textInputProps={{
+                  placeholderTextColor: "#000000",
+                  placeholder: "Any type of animal",
                 }}
               />
             </Box>
