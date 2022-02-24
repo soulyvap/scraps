@@ -1,14 +1,21 @@
-import { Avatar, Button, Heading, Icon, Image, Text, View } from "native-base";
-import react, { useEffect, useState } from "react";
-import MapView from "react-native-maps";
+import { Button, Heading, Icon, Image, Text, View } from "native-base";
+import { useEffect, useRef, useState } from "react";
 import CustomMapView from "./CustomMapView";
-import LocationInput from "./LocationInput";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Keyboard } from "react-native";
+import { regForms } from "../views/Register";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import mapApiKey from "../utils/localVariables";
 
 let pointer;
 
-const LocationForm = ({ setAddress, setPinpoint }) => {
+const LocationForm = ({
+  setAddress,
+  setPinpoint,
+  setCurrentForm,
+  address,
+  pinpoint,
+}) => {
   const [region, setRegion] = useState({
     latitude: 60.1666,
     latitudeDelta: 5,
@@ -16,8 +23,21 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
     longitudeDelta: 5,
   });
 
-  const [addressSelected, setAddressSelected] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState("");
+  const [addressSelected, setAddressSelected] = useState();
+  const [currentAddress, setCurrentAddress] = useState();
+
+  const [padding, setMapPadding] = useState();
+  const [align, setAlign] = useState("center");
+  const ref = useRef();
+
+  const formatLocation = (location) => {
+    return {
+      latitude: location.lat,
+      latitudeDelta: 0.003,
+      longitude: location.lng,
+      longitudeDelta: 0.003,
+    };
+  };
 
   const setPointer = (coords) => {
     pointer = coords;
@@ -28,7 +48,19 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
   }, [region]);
 
   useEffect(() => {
+    if (pinpoint && address) {
+      setCurrentAddress(address);
+      setRegion(pinpoint);
+      setAddressSelected(true);
+    } else {
+      setAddressSelected(false);
+    }
+    console.log(currentAddress, region, addressSelected);
+  }, []);
+
+  useEffect(() => {
     console.log(currentAddress);
+    currentAddress && ref.current?.setAddressText(currentAddress);
   }, [currentAddress]);
 
   const [keyboardShowing, setKeyboardShowing] = useState(false);
@@ -100,10 +132,31 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
               </Text>
             </View>
           )}
-          <LocationInput
-            setRegion={setRegion}
-            setCurrentAddress={setCurrentAddress}
-            setAddressSelected={setAddressSelected}
+          <GooglePlacesAutocomplete
+            ref={ref}
+            placeholder="Street address"
+            minLength={3}
+            autoFocus={true}
+            fetchDetails={true}
+            onPress={(data, details = null) => {
+              setRegion(formatLocation(details.geometry.location));
+              setCurrentAddress(data.description);
+              setAddressSelected(true);
+              setMapPadding(45);
+              setAlign("left");
+            }}
+            query={{
+              key: mapApiKey,
+              language: "en",
+              components: "country:fi",
+            }}
+            styles={{
+              textInput: {
+                backgroundColor: "#F9F4F1",
+                textAlign: align,
+                paddingStart: padding,
+              },
+            }}
           />
           {addressSelected && (
             <View bgColor={"#33CA7F"} py={2}>
@@ -146,11 +199,13 @@ const LocationForm = ({ setAddress, setPinpoint }) => {
               disabled={!addressSelected}
               onPress={() => {
                 setPinpoint(pointer);
+                console.log(currentAddress);
                 console.log(pointer);
                 setAddress(currentAddress);
+                setCurrentForm(regForms.bio);
               }}
             >
-              Save
+              Next
             </Button>
           </View>
         </View>

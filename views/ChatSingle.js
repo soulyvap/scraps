@@ -30,7 +30,7 @@ import {
 import userFileImage from "../assets/a.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
-import { Keyboard } from "react-native";
+import { Image, Keyboard } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 const messages = [
@@ -148,16 +148,19 @@ const ChatSingle = ({ route, navigation }) => {
   const { user } = useContext(MainContext);
 
   //set current user info
-  useEffect(async () => {
-    // setUserToken(token);
-    // setCurrentUserId(user.user_id);
+  useEffect(() => {
+    userFileId = undefined;
+    chatFileId = undefined;
+    username = undefined;
+    rating = undefined;
+    avatar = undefined;
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
       const interval = setInterval(() => {
         setUpdate(update + 1);
-      }, 5000);
+      }, 7000);
 
       return () => {
         clearInterval(interval);
@@ -180,8 +183,11 @@ const ChatSingle = ({ route, navigation }) => {
 
   //set other user info
 
-  useEffect(() => {
-    fetchMessages();
+  useEffect(async () => {
+    console.log("update", update);
+    if (update > 0) {
+      chatFileId && (await fetchMessages());
+    }
   }, [update]);
 
   // useEffect(() => {
@@ -253,7 +259,7 @@ const ChatSingle = ({ route, navigation }) => {
         chatFileId = currentChatFileId;
         setUpdate(update + 1);
       } else {
-        await createChatFile();
+        console.log("need to create chat file");
       }
     } catch (error) {}
   };
@@ -273,7 +279,7 @@ const ChatSingle = ({ route, navigation }) => {
       const response = await postMedia(formData, userToken);
       if (response) {
         addChatTag(response.file_id);
-        setChatFileId(response.file_id);
+        chatFileId = response.file_id;
       }
     } catch (error) {
       throw new Error(error.message);
@@ -312,6 +318,16 @@ const ChatSingle = ({ route, navigation }) => {
       throw new Error(error.message);
     }
   };
+
+  const handleSend = async () => {
+    if (chatFileId) {
+      await sendMessage();
+    } else {
+      await createChatFile();
+      await sendMessage();
+    }
+  };
+
   const sendMessage = async () => {
     const userToken = await AsyncStorage.getItem("userToken");
     try {
@@ -410,7 +426,7 @@ const ChatSingle = ({ route, navigation }) => {
           InputRightElement={
             <IconButton
               onPress={async () => {
-                await sendMessage();
+                await handleSend();
                 setInputValue("");
               }}
               bgColor={colors.green}

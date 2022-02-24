@@ -64,7 +64,7 @@ const ChatListTile = ({ chatData, onPress, update }) => {
     try {
       const comments = await getCommentsById(chatData.file_id);
       const lastMessage = comments.pop();
-      setMessage(lastMessage.comment);
+      lastMessage && setMessage(lastMessage.comment);
     } catch (error) {
       console.error("fetchAvatar", error.message);
     }

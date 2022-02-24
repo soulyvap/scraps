@@ -6,16 +6,23 @@ import { useLogin, useMedia, useTag, useUser } from "../hooks/ApiHooks";
 import { avatarTag, userFileTag } from "../utils/variables";
 import userFileImage from "../assets/a.jpg";
 import { Alert, BackHandler, Image } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import BackButton from "../components/BackButton";
+import BioForm from "../components/BioForm";
+
+export const regForms = {
+  user: "user",
+  map: "map",
+  bio: "bio",
+};
 
 const Register = ({ navigation }) => {
   const [success, setSuccess] = useState(false);
-  const [next, setNext] = useState(false);
+  const [bio, setBio] = useState();
   const [address, setAddress] = useState("");
   const [pinpoint, setPinpoint] = useState();
   const [formData, setFormData] = useState();
   const [userImage, setUserImage] = useState();
+  const [currentForm, setCurrentForm] = useState(regForms.user);
 
   let userToken;
   let userId;
@@ -25,24 +32,29 @@ const Register = ({ navigation }) => {
   const { postTag } = useTag();
   const { postMedia } = useMedia();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const onBackPress = () => {
-        if (next) {
-          setNext(false);
-          return true;
-        } else {
-          return false;
-        }
-      };
+  const handleBack = () => {
+    switch (currentForm) {
+      case regForms.user:
+        navigation.goBack();
+        break;
+      case regForms.map:
+        setCurrentForm(regForms.user);
+        break;
+      case regForms.bio:
+        setCurrentForm(regForms.map);
+        break;
+    }
+  };
 
-      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+  useEffect(() => {
+    const onBackPress = () => true;
 
-      return () => {
-        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
-      };
-    }, [])
-  );
+    BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    };
+  }, []);
 
   useEffect(() => {
     if (success) {
@@ -51,15 +63,16 @@ const Register = ({ navigation }) => {
   }, [success]);
 
   useEffect(() => {
-    console.log("register.js", pinpoint);
-  }, [pinpoint]);
+    console.log(currentForm);
+  }, [currentForm]);
 
   useEffect(async () => {
-    if (address.length > 0) {
-      console.log("should be sent", pinpoint);
-      formData && (await createUser(formData));
-    }
-  }, [address]);
+    console.log(formData);
+    console.log(address);
+    console.log(pinpoint);
+    console.log(bio);
+    formData && (await createUser());
+  }, [bio]);
 
   const theme = extendTheme({
     components: {
@@ -161,6 +174,7 @@ const Register = ({ navigation }) => {
     const description = JSON.stringify({
       coords: pinpoint,
       address: address,
+      bio: bio,
     });
     console.log("userfile desc", description);
     formData.append("description", description);
@@ -200,19 +214,25 @@ const Register = ({ navigation }) => {
     <NativeBaseProvider theme={theme}>
       <View flex={1}>
         <BackButton
-          top={next ? 0 : "2%"}
-          left={next ? 0 : "5%"}
-          onPress={() => {
-            next ? setNext(false) : navigation.goBack();
-          }}
+          top={currentForm === regForms.map ? 0 : "2%"}
+          left={currentForm === regForms.map ? 0 : "5%"}
+          onPress={handleBack}
         />
-        {next ? (
-          <LocationForm setAddress={setAddress} setPinpoint={setPinpoint} />
+        {currentForm === regForms.bio ? (
+          <BioForm setBio={setBio} />
+        ) : currentForm === regForms.map ? (
+          <LocationForm
+            setAddress={setAddress}
+            setPinpoint={setPinpoint}
+            address={address}
+            pinpoint={pinpoint}
+            setCurrentForm={setCurrentForm}
+          />
         ) : (
           <CreateUserUI
             setFormData={setFormData}
             setUserImage={setUserImage}
-            setNext={setNext}
+            setCurrentForm={setCurrentForm}
             formData={formData}
             userImage={userImage}
           />

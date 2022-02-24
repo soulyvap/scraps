@@ -1,4 +1,4 @@
-import { Center, Text, View } from "native-base";
+import { Button, Center, Text, View } from "native-base";
 import react from "react";
 import { FlatList, SafeAreaView } from "react-native";
 import ChatListTile from "./ChatListTile";
@@ -25,12 +25,22 @@ const ChatList = ({ chatData, navigation, update }) => {
           renderItem={renderItem}
         />
       ) : (
-        <Center flex={1} px="19%">
+        <View flex={1} px="19%" justifyContent={"center"}>
+          <View flex={1} />
           <Text textAlign={"center"}>
             Your conversations will appear here once you start chatting with
             your neighbours!
           </Text>
-        </Center>
+          <View flex={1} />
+          {/* //test button for creating new chat */}
+          <Button
+            borderRadius={10}
+            mb={3}
+            onPress={() => navigation.navigate("ChatSingle", { userId2: 663 })}
+          >
+            Start a chat with Chat Boi (test)
+          </Button>
+        </View>
       )}
     </View>
   );

@@ -11,11 +11,12 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useUser } from "../hooks/ApiHooks";
+import { regForms } from "../views/Register";
 
 const RegisterForm = ({
   setFormData,
   setUserImage,
-  setNext,
+  setCurrentForm,
   formData,
   userImage,
 }) => {
@@ -27,6 +28,7 @@ const RegisterForm = ({
   const defVal = {
     email: "",
     username: "",
+    full_name: "",
     password: "",
     confirmPassword: "",
   };
@@ -49,6 +51,7 @@ const RegisterForm = ({
       console.log(formData);
       setValue("email", formData.email);
       setValue("username", formData.username);
+      setValue("full_name", formData.full_name);
       setValue("password", formData.password);
       setValue("confirmPassword", formData.confirmPassword);
     }
@@ -66,7 +69,7 @@ const RegisterForm = ({
   const onSubmit = async (data) => {
     setUserImage(pic);
     setFormData(data);
-    setNext(true);
+    setCurrentForm(regForms.map);
   };
 
   return (
@@ -137,6 +140,38 @@ const RegisterForm = ({
           </FormControl>
         )}
         name="username"
+      />
+
+      <Controller
+        control={control}
+        rules={{
+          required: { value: true, message: "Full name is required." },
+          minLength: {
+            value: 3,
+            message: "Full name should be at least 3 characters",
+          },
+          pattern: {
+            value: /^[a-zA-Z]+ [a-zA-Z]+$/,
+            message: "Invalid format (firstname lastname)",
+          },
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormControl isRequired isInvalid={errors.full_name}>
+            <Input
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              placeholder={"full name"}
+              autoCapitalize="words"
+            />
+            {errors.full_name && (
+              <FormControl.ErrorMessage my={0}>
+                {errors.full_name.message}
+              </FormControl.ErrorMessage>
+            )}
+          </FormControl>
+        )}
+        name="full_name"
       />
 
       <Controller

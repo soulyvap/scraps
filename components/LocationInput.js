@@ -1,4 +1,4 @@
-import react, { useState } from "react";
+import react, { useEffect, useRef, useState } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import mapApiKey from "../utils/localVariables";
 
@@ -7,9 +7,11 @@ const LocationInput = ({
   setRegion,
   setCurrentAddress,
   setAddressSelected,
+  currentAddress,
 }) => {
   const [padding, setMapPadding] = useState();
   const [align, setAlign] = useState("center");
+  const ref = useRef();
 
   const formatLocation = (location) => {
     return {
@@ -21,6 +23,7 @@ const LocationInput = ({
   };
   return (
     <GooglePlacesAutocomplete
+      ref={ref}
       placeholder="Street address"
       minLength={3}
       autoFocus={true}

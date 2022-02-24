@@ -28,16 +28,7 @@ const ChatBubbleList = ({ messages, username }) => {
         />
       ) : (
         <Center flex={1}>
-          <Center size={100} borderRadius="full">
-            <Ionicons
-              name="chatbubble-ellipses"
-              size={70}
-              color={colors.grey}
-            />
-          </Center>
-          <Text
-            textAlign={"center"}
-          >{`No messages yet.\nStart chatting with ${username}.`}</Text>
+          <Ionicons name="chatbubble-ellipses" size={70} color={colors.grey} />
         </Center>
       )}
     </View>
