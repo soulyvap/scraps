@@ -2,11 +2,12 @@ import { Center, Fab, IconButton, Image, Text, View } from "native-base";
 import { useMedia, useTag } from "../hooks/ApiHooks";
 import ChatList from "../components/ChatList";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { chatTag } from "../utils/variables";
 import { MainContext } from "../contexts/MainContext";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../utils/colors";
+import { useFocusEffect } from "@react-navigation/native";
 
 // const chatData = [
 //   {
@@ -115,6 +116,30 @@ const ChatAll = ({ navigation }) => {
   const [update, setUpdate] = useState(0);
   const { user } = useContext(MainContext);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const interval = setInterval(() => {
+        setUpdate(update + 1);
+      }, 5000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    })
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const timeout = setTimeout(() => {
+        setUpdate(update + 1);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    })
+  );
+
   useEffect(async () => {
     await setUserInfo();
   }, []);
@@ -127,13 +152,9 @@ const ChatAll = ({ navigation }) => {
 
   useEffect(async () => {
     if (currentUserId) {
-      await getMyChats();
+      getMyChats();
     }
   }, [update]);
-
-  useEffect(async () => {
-    console.log(userToken);
-  }, [userToken]);
 
   const setUserInfo = async () => {
     setCurrentUserId(user.user_id);
@@ -144,7 +165,6 @@ const ChatAll = ({ navigation }) => {
   const getMyChats = async () => {
     try {
       const chatFiles = await getFilesByTag(chatTag);
-      console.log("chatfiles", chatFiles);
       if (currentUserId) {
         const filesFormatted = await chatFiles.map((file) => {
           return {
@@ -157,11 +177,9 @@ const ChatAll = ({ navigation }) => {
             ),
           };
         });
-        console.log("formatted", filesFormatted);
         const userChatFiles = await filesFormatted.filter((file) => {
           return file.title.split("_").includes(currentUserId.toString());
         });
-        console.log("filtered", userChatFiles);
         setChatArray(userChatFiles);
       }
     } catch (error) {
@@ -171,16 +189,6 @@ const ChatAll = ({ navigation }) => {
 
   return (
     <View flex={1} px={3} bgColor={"white"}>
-      <IconButton
-        position="absolute"
-        top={5}
-        right={5}
-        size="lg"
-        _icon={{ as: Ionicons, name: "refresh-circle", color: colors.grey }}
-        onPress={() => {
-          setUpdate(update + 1);
-        }}
-      />
       <Text>Current user: {currentUserId}</Text>
       <Center h={"22%"}>
         <Image
@@ -191,7 +199,11 @@ const ChatAll = ({ navigation }) => {
         />
       </Center>
       <View flex={1}>
-        <ChatList chatData={chatArray} navigation={navigation} />
+        <ChatList
+          chatData={chatArray}
+          navigation={navigation}
+          update={update}
+        />
       </View>
     </View>
   );

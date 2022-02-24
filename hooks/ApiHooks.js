@@ -150,7 +150,19 @@ const useComment = () => {
     return await doFetch(baseUrl + "comments/file/" + fileId);
   };
 
-  return { getCommentsById };
+  const postComment = async (commentData, token) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token,
+      },
+      body: JSON.stringify(commentData),
+    };
+    return doFetch(baseUrl + "comments", options);
+  };
+
+  return { getCommentsById, postComment };
 };
 
 export { useMedia, useLogin, useUser, useTag, useRating, useComment };

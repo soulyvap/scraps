@@ -8,13 +8,17 @@ const ChatBubbleList = ({ messages, username }) => {
   const renderItem = ({ item }) => {
     return (
       <View>
-        <ChatBubble myMessage={item.myMessage} content={item.content} />
+        <ChatBubble
+          myMessage={item.myMessage}
+          content={item.content}
+          username={username}
+        />
         <View h={3} />
       </View>
     );
   };
   return (
-    <View flex={1}>
+    <View>
       {messages ? (
         <FlatList
           keyExtractor={(item) => item.key}

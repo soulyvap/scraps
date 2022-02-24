@@ -3,12 +3,15 @@ import react from "react";
 import { FlatList, SafeAreaView } from "react-native";
 import ChatListTile from "./ChatListTile";
 
-const ChatList = ({ chatData, navigation }) => {
+const ChatList = ({ chatData, navigation, update }) => {
   const renderItem = ({ item }) => (
     <View>
       <ChatListTile
         chatData={item}
-        onPress={() => navigation.navigate("ChatSingle")}
+        onPress={() =>
+          navigation.navigate("ChatSingle", { userId2: item.userId2 })
+        }
+        update={update}
       />
       <View h={2} />
     </View>

@@ -16,7 +16,7 @@ import { colors } from "../utils/colors";
 import { avatarTag, uploadsUrl } from "../utils/variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ChatListTile = ({ chatData, onPress }) => {
+const ChatListTile = ({ chatData, onPress, update }) => {
   const [avatar, setAvatar] = useState();
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
@@ -32,6 +32,10 @@ const ChatListTile = ({ chatData, onPress }) => {
     console.log(chatData.file_id);
     await fetchLastMessage();
   }, []);
+
+  useEffect(async () => {
+    await fetchLastMessage();
+  }, [update]);
 
   const fetchAvatar = async () => {
     try {
