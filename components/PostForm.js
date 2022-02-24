@@ -10,6 +10,7 @@ import {
 } from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import react, { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useMedia, useTag } from "../hooks/ApiHooks";
@@ -22,6 +23,7 @@ const PostForm = () => {
   const [dateText, setDateText] = useState("");
   const [allergens, setAllergens] = useState([]);
   const [image, setImage] = useState("https://place-hold.it/50&text=test");
+  const [type, setType] = useState("image");
   const [category, setCategory] = useState("uncooked");
   const [tagSomething, setTagSomething] = useState([
     { text: "dairy-free", active: false },
@@ -92,6 +94,7 @@ const PostForm = () => {
     setTagSomething(copyOfTagSomething);
   };
 
+  // Posting
   const onSubmit = async (data) => {
     console.log("onSubmit data: ", data);
     const filename = image.split("/").pop();
@@ -108,13 +111,47 @@ const PostForm = () => {
     console.log("onSubmit selected tags: ", testTagsSelected);
     console.log("onSumbit allergens: ", allergens);
 
-    /* const formData = new FormData();
-    formData */
-  };
+    const moreData = {
+      description: data.description,
+      latestPickup: dateText,
+      suitableTimeSlow: data.time,
+      allergens: allergens,
+      category: category,
+      active: true,
+    };
 
-  useEffect(() => {
-    pickImage();
-  }, [image]);
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", JSON.stringify(moreData));
+    formData.append("file", {
+      uri: image,
+      name: filename,
+      type: type + "/" + fileExtension,
+    });
+
+    try {
+      //const token = await AsyncStorage.getItem("userToken")
+      const response = await postMedia(formData, token);
+      // TODO: Somehow loop all selected tags to postTag
+      const tagResponse = await postTag(
+        { file_id: response.file_id, tag: appID },
+        token
+      );
+
+      tagResponse &&
+        Alert.alert("File uploaded.", "Well done, you made it.", [
+          {
+            text: "Ok",
+            onPress: () => {
+              navigation.navigate("Home");
+            },
+          },
+        ]);
+      console.log("tagResponse: ", tagResponse);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   return (
     <Box marginTop={"4%"}>
@@ -348,7 +385,9 @@ const PostForm = () => {
                 borderRadius={15}
                 onBlur={onBlur}
                 onChange={onChange}
-                onPress={setCategory("uncooked")}
+                onPress={() => {
+                  setCategory("uncooked");
+                }}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -361,7 +400,9 @@ const PostForm = () => {
                 borderRadius={15}
                 onBlur={onBlur}
                 onChange={onChange}
-                onPress={setCategory("cooked")}
+                onPress={() => {
+                  setCategory("cooked");
+                }}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -374,7 +415,9 @@ const PostForm = () => {
                 borderRadius={15}
                 onBlur={onBlur}
                 onChange={onChange}
-                onPress={setCategory("frozen")}
+                onPress={() => {
+                  setCategory("frozen");
+                }}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -420,9 +463,10 @@ const PostForm = () => {
                 justifyContent={"space-between"}
                 px={4}
               >
-                {tagSomething.map((tag) => {
+                {tagSomething.map((tag, i) => {
                   return (
                     <Chip
+                      key={i}
                       mode={"flat"}
                       onPress={() => {
                         toggleTag(tag);
