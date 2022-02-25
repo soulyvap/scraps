@@ -125,7 +125,7 @@ const ListItem = ({ navigation, singleMedia }) => {
 };
 
 ListItem.propTypes = {
-  singleMedia: PropTypes.object.isRequired,
+  singleMedia: PropTypes.object,
   navigation: PropTypes.object.isRequired,
 };
 

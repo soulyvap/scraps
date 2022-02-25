@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Single from "../views/Single";
 import Login from "../views/Login";
 import Register from "../views/Register";
+import Profile from "../views/Profile";
 import { MainContext } from "../contexts/MainContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Icon } from "native-base";
@@ -29,9 +30,10 @@ const TabScreen = () => {
           let iconName;
           if (route.name === "Home") {
             iconName = "home";
-          }
-          if (route.name === "Upload") {
+          } else if (route.name === "Upload") {
             iconName = "file-upload";
+          } else if (route.name === "Profile") {
+            iconName = "account-circle";
           }
           if (route.name === "Chat") {
             iconName = "chat";
@@ -60,6 +62,10 @@ const TabScreen = () => {
         name="Chat"
         component={ChatAll}
         options={{ headerShown: false }}
+        name="Profile"
+        component={Profile}
+        options={{ headerShown: false }}
+        // userFilesOnly={true}
       ></Tab.Screen>
     </Tab.Navigator>
   );
@@ -73,7 +79,6 @@ const StackScreen = () => {
       {isLoggedIn ? (
         <>
           <Stack.Screen
-            flex={1}
             name="HomeScreen"
             component={TabScreen}
             options={{ headerShown: false }}
@@ -86,6 +91,13 @@ const StackScreen = () => {
           <Stack.Screen
             name="ChatSingle"
             component={ChatSingle}
+            name="Profile"
+            component={TabScreen}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="Single"
+            component={Single}
             options={{ headerShown: false }}
           ></Stack.Screen>
         </>
