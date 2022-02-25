@@ -126,13 +126,6 @@ let avatar;
 
 const ChatSingle = ({ route, navigation }) => {
   const userId2 = route.params.userId2;
-  // const [userToken, setUserToken] = useState();
-  // const [userFileId, setUserFileId] = useState();
-  // const [chatFileId, setChatFileId] = useState();
-  // const [currentUserId, setCurrentUserId] = useState();
-  // const [avatar, setAvatar] = useState();
-  // const [username, setUsername] = useState("");
-  // const [rating, setRating] = useState();
 
   const [messages, setMessages] = useState();
 
@@ -177,10 +170,6 @@ const ChatSingle = ({ route, navigation }) => {
     await fetchMessages();
   }, []);
 
-  useEffect(async () => {
-    console.log(username, avatar, userFileId, rating, chatFileId);
-  });
-
   //set other user info
 
   useEffect(async () => {
@@ -189,11 +178,6 @@ const ChatSingle = ({ route, navigation }) => {
       chatFileId && (await fetchMessages());
     }
   }, [update]);
-
-  // useEffect(() => {
-  //   console.log(username, avatar, userFileId, rating, chatFileId);
-  //   fetchMessages();
-  // }, [chatFileId]);
 
   const fetchUsername = async () => {
     try {

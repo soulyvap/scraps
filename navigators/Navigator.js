@@ -54,14 +54,16 @@ const TabScreen = () => {
         options={{ headerShown: false }}
       ></Tab.Screen>
       <Tab.Screen
+        name="Chat"
+        component={ChatAll}
+        options={{ headerShown: false }}
+      ></Tab.Screen>
+      <Tab.Screen
         name="Upload"
         component={Upload}
         options={{ headerShown: false }}
       ></Tab.Screen>
       <Tab.Screen
-        name="Chat"
-        component={ChatAll}
-        options={{ headerShown: false }}
         name="Profile"
         component={Profile}
         options={{ headerShown: false }}
@@ -91,13 +93,6 @@ const StackScreen = () => {
           <Stack.Screen
             name="ChatSingle"
             component={ChatSingle}
-            name="Profile"
-            component={TabScreen}
-            options={{ headerShown: false }}
-          ></Stack.Screen>
-          <Stack.Screen
-            name="Single"
-            component={Single}
             options={{ headerShown: false }}
           ></Stack.Screen>
         </>
