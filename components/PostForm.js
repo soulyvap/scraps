@@ -9,20 +9,35 @@ import {
   View,
 } from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import react, { useState } from "react";
+import react, { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useMedia, useTag } from "../hooks/ApiHooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Tags from "react-native-tags";
+import { Chip } from "react-native-paper";
 
 const PostForm = () => {
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState("");
+  const [allergens, setAllergens] = useState([]);
   const [image, setImage] = useState("https://place-hold.it/50&text=test");
+  const [type, setType] = useState("image");
   const [category, setCategory] = useState("uncooked");
-  const { postMedia } = useMedia;
-  const { postTag } = useTag;
+  const [tagSomething, setTagSomething] = useState([
+    { text: "dairy-free", active: false },
+    { text: "egg-free", active: false },
+    { text: "gluten-free", active: false },
+    { text: "keto", active: false },
+    { text: "nut-free", active: false },
+    { text: "vegan", active: false },
+    { text: "vegetarian", active: false },
+  ]);
+  const { postMedia } = useMedia();
+  const { postTag } = useTag();
 
   const {
     control,
@@ -31,24 +46,20 @@ const PostForm = () => {
   } = useForm({
     defaultValues: {
       title: "",
+      time: "",
       description: "",
     },
   });
+
+  const showDatepicker = () => {
+    setShow(true);
+  };
 
   const onChanged = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(false);
     setDate(currentDate);
     split(currentDate);
-  };
-
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
-  const showDatepicker = () => {
-    showMode("date");
   };
 
   // Converts original DatePicker value to more pleasant one,
@@ -76,6 +87,16 @@ const PostForm = () => {
     }
   };
 
+  // When clickin a tag
+  const toggleTag = (tag) => {
+    console.log("toggleTag: ", tag);
+    let copyOfTagSomething = JSON.parse(JSON.stringify(tagSomething));
+    let index = tagSomething.indexOf(tag);
+    copyOfTagSomething[index].active = !copyOfTagSomething[index].active;
+    setTagSomething(copyOfTagSomething);
+  };
+
+  // Posting
   const onSubmit = async (data) => {
     console.log("onSubmit data: ", data);
     const filename = image.split("/").pop();
@@ -85,9 +106,54 @@ const PostForm = () => {
     console.log("onSubmit fileExtension: ", fileExtension);
     const test = category;
     console.log("onSubmit category: ", test);
+    console.log("onSubmit dateText: ", dateText);
+    const testTagsSelected = tagSomething
+      .filter((tag) => tag.active)
+      .map((tag) => tag.text);
+    console.log("onSubmit selected tags: ", testTagsSelected);
+    console.log("onSumbit allergens: ", allergens);
 
-    /* const formData = new FormData();
-    formData */
+    const moreData = {
+      description: data.description,
+      latestPickup: dateText,
+      suitableTimeSlow: data.time,
+      allergens: allergens,
+      category: category,
+      active: true,
+    };
+
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", JSON.stringify(moreData));
+    formData.append("file", {
+      uri: image,
+      name: filename,
+      type: type + "/" + fileExtension,
+    });
+
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      const response = await postMedia(formData, token);
+      console.log("postMedia response: ", response);
+      // TODO: Somehow loop all selected tags to postTag
+      //const tagResponse = await postTag(
+      //  { file_id: response.file_id, tag: appID },
+      //  token
+      //);
+
+      //tagResponse &&
+      //  Alert.alert("File uploaded.", "Well done, you made it.", [
+      //    {
+      //     text: "Ok",
+      //   onPress: () => {
+      //   navigation.navigate("Home");
+      // },
+      //},
+      //]);
+      //console.log("tagResponse: ", tagResponse);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -155,8 +221,11 @@ const PostForm = () => {
               </Text>
               <Input
                 alignSelf={"flex-start"}
+                onBlur={onBlur}
+                onChangeText={onChange}
                 placeholder="e.g. any time between 4PM and 9PM"
                 size={"lg"}
+                value={value}
                 variant={"basic"}
                 width={"80%"}
               />
@@ -208,6 +277,42 @@ const PostForm = () => {
               size="lg"
               variant={"basic"}
             />
+          </FormControl>
+        )}
+        name="description"
+      />
+
+      {/* Add allergens */}
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormControl isInvalid={errors.description}>
+            <FormControl.Label
+              _text={{
+                color: "#132A15",
+                fontWeight: "bold",
+                fontSize: "lg",
+              }}
+            >
+              Add allergens
+            </FormControl.Label>
+            <Box
+              bgColor={"#F9F4F1"}
+              borderRadius={15}
+              flex={1}
+              marginBottom={"5%"}
+              paddingY={"3%"}
+            >
+              <Tags
+                onChangeTags={(tags) => {
+                  setAllergens(tags);
+                }}
+                textInputProps={{
+                  placeholderTextColor: "#000000",
+                  placeholder: "Any type of animal",
+                }}
+              />
+            </Box>
           </FormControl>
         )}
         name="description"
@@ -283,7 +388,9 @@ const PostForm = () => {
                 borderRadius={15}
                 onBlur={onBlur}
                 onChange={onChange}
-                onPress={setCategory("uncooked")}
+                onPress={() => {
+                  setCategory("uncooked");
+                }}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -296,7 +403,9 @@ const PostForm = () => {
                 borderRadius={15}
                 onBlur={onBlur}
                 onChange={onChange}
-                onPress={setCategory("cooked")}
+                onPress={() => {
+                  setCategory("cooked");
+                }}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -309,7 +418,9 @@ const PostForm = () => {
                 borderRadius={15}
                 onBlur={onBlur}
                 onChange={onChange}
-                onPress={setCategory("frozen")}
+                onPress={() => {
+                  setCategory("frozen");
+                }}
                 width={"30%"}
                 _focus={{
                   bgColor: "#33CA7F",
@@ -355,27 +466,20 @@ const PostForm = () => {
                 justifyContent={"space-between"}
                 px={4}
               >
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  dairy-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  egg-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  gluten-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  lactose-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  nut-free
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  vegan
-                </Button>
-                <Button bgColor={"#898980"} borderRadius={20} w={100}>
-                  vegetarian
-                </Button>
+                {tagSomething.map((tag, i) => {
+                  return (
+                    <Chip
+                      key={i}
+                      mode={"flat"}
+                      onPress={() => {
+                        toggleTag(tag);
+                      }}
+                      selected={tag.active}
+                    >
+                      {tag.text}
+                    </Chip>
+                  );
+                })}
               </View>
             </Box>
           </FormControl>

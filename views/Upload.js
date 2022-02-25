@@ -1,5 +1,4 @@
 import { Box, extendTheme, NativeBaseProvider, ScrollView } from "native-base";
-import { StyleSheet } from "react-native";
 import PostForm from "../components/PostForm";
 
 const Upload = () => {
