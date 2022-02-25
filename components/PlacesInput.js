@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import apiKeyMaps from "../utils/localVariables";
 
 const PlacesInput = () => {
   return (

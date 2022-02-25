@@ -14,6 +14,7 @@ import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useMedia, useTag } from "../hooks/ApiHooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Tags from "react-native-tags";
 import { Chip } from "react-native-paper";
 
@@ -34,8 +35,8 @@ const PostForm = () => {
     { text: "vegan", active: false },
     { text: "vegetarian", active: false },
   ]);
-  const { postMedia } = useMedia;
-  const { postTag } = useTag;
+  const { postMedia } = useMedia();
+  const { postTag } = useTag();
 
   const {
     control,
@@ -130,24 +131,25 @@ const PostForm = () => {
     });
 
     try {
-      //const token = await AsyncStorage.getItem("userToken")
+      const token = await AsyncStorage.getItem("userToken");
       const response = await postMedia(formData, token);
+      console.log("postMedia response: ", response);
       // TODO: Somehow loop all selected tags to postTag
-      const tagResponse = await postTag(
-        { file_id: response.file_id, tag: appID },
-        token
-      );
+      //const tagResponse = await postTag(
+      //  { file_id: response.file_id, tag: appID },
+      //  token
+      //);
 
-      tagResponse &&
-        Alert.alert("File uploaded.", "Well done, you made it.", [
-          {
-            text: "Ok",
-            onPress: () => {
-              navigation.navigate("Home");
-            },
-          },
-        ]);
-      console.log("tagResponse: ", tagResponse);
+      //tagResponse &&
+      //  Alert.alert("File uploaded.", "Well done, you made it.", [
+      //    {
+      //     text: "Ok",
+      //   onPress: () => {
+      //   navigation.navigate("Home");
+      // },
+      //},
+      //]);
+      //console.log("tagResponse: ", tagResponse);
     } catch (error) {
       console.log(error.message);
     }

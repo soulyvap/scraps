@@ -8,12 +8,38 @@ import {
   Text,
   View,
 } from "native-base";
-import react, { useEffect, useState } from "react";
+import react, { useContext, useEffect, useState } from "react";
 import { Keyboard } from "react-native";
 import LoginForm from "../components/LoginForm";
+import { useUser } from "../hooks/ApiHooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MainContext } from "../contexts/MainContext";
 
 const Login = ({ navigation }) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
+  const { getUserByToken } = useUser();
+  const { setUser, setIsLoggedIn } = useContext(MainContext);
+
+  const checkToken = async () => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    console.log("Token in storage", userToken);
+    if (userToken) {
+      try {
+        const userData = await getUserByToken(userToken);
+        console.log("check token", userData);
+        if (userData) {
+          setUser(userData);
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkToken();
+  }, []);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {

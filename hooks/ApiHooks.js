@@ -3,6 +3,7 @@ import { baseUrl } from "../utils/variables";
 const doFetch = async (url, options) => {
   try {
     const response = await fetch(url, options);
+    console.log("response: ", response);
     const json = await response.json();
     if (response.ok) {
       return json;
@@ -44,7 +45,16 @@ const useUser = () => {
     return userData;
   };
 
-  return { postUser, checkUsername, getUserById };
+  const getUserByToken = async (token) => {
+    const options = {
+      method: "GET",
+      headers: { "x-access-token": token },
+    };
+    const userData = await doFetch(baseUrl + "users/user", options);
+    return userData;
+  };
+
+  return { postUser, checkUsername, getUserById, getUserByToken };
 };
 
 const useLogin = () => {
