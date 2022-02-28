@@ -57,6 +57,7 @@ const PostForm = ({ navigation }) => {
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState("");
   const [image, setImage] = useState();
+  const [imageSelected, setImageSelected] = useState(false);
   const [cameraPermission, setCameraPermission] = useState();
   const [type, setType] = useState("image");
   const [category, setCategory] = useState();
@@ -70,6 +71,7 @@ const PostForm = ({ navigation }) => {
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm({
     defaultValues: {
       title: "",
@@ -129,6 +131,7 @@ const PostForm = ({ navigation }) => {
       console.log("take pic", result.uri);
       if (!result.cancelled) {
         setImage(result.uri);
+        setImageSelected(true);
       }
     }
   };
@@ -143,6 +146,7 @@ const PostForm = ({ navigation }) => {
 
     if (!result.cancelled) {
       setImage(result.uri);
+      setImageSelected(true);
     }
   };
 
@@ -166,6 +170,7 @@ const PostForm = ({ navigation }) => {
 
   const resetForm = () => {
     setImage(null);
+    setImageSelected(false);
     setValue("title", "");
     setValue("description", "");
     setValue("time", "");
@@ -195,55 +200,78 @@ const PostForm = ({ navigation }) => {
     return true;
   };
 
+  const checkForm = () => {
+    const { title } = getValues();
+    if (!imageSelected) {
+      Alert.alert("Please set an image");
+      return false;
+    } else if (title.length < 1) {
+      Alert.alert("Please set a title");
+      return false;
+    } else if (!dateText) {
+      Alert.alert("Please set a latest pickup date");
+      return false;
+    } else if (!category) {
+      Alert.alert("Please select a category");
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   // Posting
   const onSubmit = async (data) => {
-    //picture
-    const filename = image.split("/").pop();
-    let fileExtension = filename.split(".").pop();
-    fileExtension = fileExtension === "jpg" ? "jpeg" : fileExtension;
-    //allergens and tags
-    const selectedAllergens = tagsToArray(allergenChips);
-    const selectedTags = tagsToArray(tags);
+    const formValid = checkForm();
 
-    const moreData = {
-      description: data.description,
-      latestPickup: dateText,
-      suitableTimeSlot: data.time,
-      allergens: selectedAllergens,
-      category: category,
-      active: true,
-    };
+    if (formValid) {
+      //picture
+      const filename = image.split("/").pop();
+      let fileExtension = filename.split(".").pop();
+      fileExtension = fileExtension === "jpg" ? "jpeg" : fileExtension;
+      //allergens and tags
+      const selectedAllergens = tagsToArray(allergenChips);
+      const selectedTags = tagsToArray(tags);
 
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", JSON.stringify(moreData));
-    formData.append("file", {
-      uri: image,
-      name: filename,
-      type: type + "/" + fileExtension,
-    });
-
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-      const response = await postMedia(formData, token);
-      console.log("postMedia response: ", response);
-      const tagsAdded = await addFoodTags(
-        selectedTags,
-        response.file_id,
-        token
-      );
-      const appTagData = {
-        file_id: response.file_id,
-        tag: foodPostTag,
+      const moreData = {
+        description: data.description,
+        latestPickup: dateText,
+        suitableTimeSlot: data.time,
+        allergens: selectedAllergens,
+        category: category,
+        active: true,
       };
-      const appTagResponse = await postTag(appTagData, token);
-      if (tagsAdded && appTagResponse) {
-        Alert.alert("File added successfully");
-        resetForm();
-        navigation.navigate("Home");
+
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", JSON.stringify(moreData));
+      formData.append("file", {
+        uri: image,
+        name: filename,
+        type: type + "/" + fileExtension,
+      });
+
+      try {
+        const token = await AsyncStorage.getItem("userToken");
+        const response = await postMedia(formData, token);
+        console.log("postMedia response: ", response);
+        const tagsAdded = await addFoodTags(
+          selectedTags,
+          response.file_id,
+          token
+        );
+        const appTagData = {
+          file_id: response.file_id,
+          tag: foodPostTag,
+        };
+        const appTagResponse = await postTag(appTagData, token);
+        if (tagsAdded && appTagResponse) {
+          Alert.alert("File added successfully");
+          resetForm();
+          navigation.navigate("Home");
+        }
+      } catch (error) {
+        console.log(error.message);
       }
-    } catch (error) {
-      console.log(error.message);
     }
   };
 
@@ -252,14 +280,20 @@ const PostForm = ({ navigation }) => {
       {/* Add picture */}
 
       <View>
-        <Heading
-          mb={3}
-          color={colors.notBlack}
-          fontSize="lg"
-          fontWeight={"bold"}
-        >
-          Add an image
+        <Heading>
+          <Heading
+            mb={3}
+            color={colors.notBlack}
+            fontSize="lg"
+            fontWeight={"bold"}
+          >
+            Add an image
+          </Heading>
+          <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+            *
+          </Text>
         </Heading>
+
         <VStack space={3} alignItems={"center"} justifyContent="space-between">
           <Avatar
             source={{ uri: image }}
@@ -281,23 +315,20 @@ const PostForm = ({ navigation }) => {
       {/* Add title */}
       <Controller
         control={control}
-        rules={{
-          required: {
-            value: true,
-            message: "This is required.",
-          },
-        }}
         render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isRequired isInvalid={errors.title}>
-            <FormControl.Label
-              _text={{
-                color: "#132A15",
-                fontWeight: "bold",
-                fontSize: "lg",
-              }}
-            >
-              Add title
-            </FormControl.Label>
+          <FormControl isInvalid={errors.title}>
+            <Heading mb={3}>
+              <Heading
+                color={colors.notBlack}
+                fontSize="lg"
+                fontWeight={"bold"}
+              >
+                Add a title
+              </Heading>
+              <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+                *
+              </Text>
+            </Heading>
             <Input
               autoCapitalize="none"
               onBlur={onBlur}
@@ -319,17 +350,17 @@ const PostForm = ({ navigation }) => {
 
       {/* Date selection */}
       <View>
-        <Heading
-          mb={3}
-          color={colors.notBlack}
-          fontSize="lg"
-          fontWeight={"bold"}
-        >
-          Set a latest pick-up date
+        <Heading mb={3}>
+          <Heading color={colors.notBlack} fontSize="lg" fontWeight={"bold"}>
+            Set a latest pickup date
+          </Heading>
+          <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+            *
+          </Text>
         </Heading>
         <HStack w={"100%"} alignItems="center">
           <Text w="100%" textAlign={"center"}>
-            {dateText || "Press the calendar to choose.."}
+            {dateText || "Press the calendar button to choose"}
           </Text>
           <IconButton
             shadow="2"
@@ -446,13 +477,13 @@ const PostForm = ({ navigation }) => {
 
       {/* Select category */}
       <View>
-        <Heading
-          mb={3}
-          color={colors.notBlack}
-          fontSize="lg"
-          fontWeight={"bold"}
-        >
-          Select a category
+        <Heading mb={3}>
+          <Heading color={colors.notBlack} fontSize="lg" fontWeight={"bold"}>
+            Select a category
+          </Heading>
+          <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+            *
+          </Text>
         </Heading>
         <HStack w={"100%"} justifyContent="space-between">
           <Button
