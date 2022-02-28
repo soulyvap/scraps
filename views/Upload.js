@@ -1,7 +1,8 @@
 import { Box, extendTheme, NativeBaseProvider, ScrollView } from "native-base";
 import PostForm from "../components/PostForm";
+import { colors } from "../utils/colors";
 
-const Upload = () => {
+const Upload = ({ navigation }) => {
   const theme = extendTheme({
     components: {
       Input: {
@@ -10,9 +11,14 @@ const Upload = () => {
             bgColor: "#F9F4F1",
             borderColor: "transparent",
             borderRadius: 15,
-            marginBottom: "5%",
             textAlign: "center",
+            shadow: "6",
           },
+        },
+      },
+      Button: {
+        baseStyle: {
+          borderRadius: 15,
         },
       },
     },
@@ -20,9 +26,9 @@ const Upload = () => {
 
   return (
     <NativeBaseProvider theme={theme}>
-      <Box flex="1" safeAreaTop>
-        <ScrollView px="5%" bgColor={"white"}>
-          <PostForm />
+      <Box flex="1" safeArea bgColor={"white"}>
+        <ScrollView bgColor={"white"}>
+          <PostForm navigation={navigation} />
         </ScrollView>
       </Box>
     </NativeBaseProvider>
