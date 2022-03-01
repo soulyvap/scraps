@@ -15,8 +15,6 @@ import { uploadsUrl } from "../utils/variables";
 import { useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// TODO: currently just the entire card is pressable and takes you to single item.
-// needs to be changed so that by clicking on avatar, it would take you to profile page
 const ListItem = ({ navigation, singleMedia }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
@@ -56,7 +54,7 @@ const ListItem = ({ navigation, singleMedia }) => {
   }, []);
 
   return (
-    <Pressable
+    <Box
       alignItems="center"
       onPress={() => {
         navigation.navigate("Single", { file: singleMedia });
@@ -73,18 +71,25 @@ const ListItem = ({ navigation, singleMedia }) => {
         borderWidth="1"
       >
         <Box>
-          <AspectRatio w="100%" ratio={1 / 1}>
-            <Image
-              source={{ uri: uploadsUrl + singleMedia.thumbnails?.w160 }}
-              alt="image"
-            />
-          </AspectRatio>
+          <Pressable
+            onPress={() => {
+              navigation.navigate("Single", { file: singleMedia });
+            }}
+          >
+            <AspectRatio w="100%" ratio={1 / 1}>
+              <Image
+                source={{ uri: uploadsUrl + singleMedia.thumbnails?.w160 }}
+                alt="image"
+              />
+            </AspectRatio>
+          </Pressable>
+
           <Box
             position="absolute"
             top="0"
             px="3"
             py="1.5"
-            backgroundColor="#F9f4f1"
+            backgroundColor="#F9F4F1"
             width="100%"
             height="12"
             opacity="70"
@@ -97,13 +102,22 @@ const ListItem = ({ navigation, singleMedia }) => {
             py="1.5"
             width="100%"
           >
-            <Avatar
-              marginRight="2"
-              size="sm"
-              source={{
-                uri: avatar,
+            <Pressable
+              onPress={() => {
+                navigation.navigate("Profile", {
+                  file: singleMedia,
+                  owner: owner,
+                });
               }}
-            ></Avatar>
+            >
+              <Avatar
+                marginRight="2"
+                size="sm"
+                source={{
+                  uri: avatar,
+                }}
+              ></Avatar>
+            </Pressable>
             <VStack>
               <Text color="#132A15" fontWeight="bold">
                 {owner.username}
@@ -120,12 +134,12 @@ const ListItem = ({ navigation, singleMedia }) => {
           </Heading>
         </Box>
       </Box>
-    </Pressable>
+    </Box>
   );
 };
 
 ListItem.propTypes = {
-  singleMedia: PropTypes.object,
+  // singleMedia: PropTypes.object,
   navigation: PropTypes.object.isRequired,
 };
 

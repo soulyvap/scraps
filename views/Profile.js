@@ -20,24 +20,40 @@ import {
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
 import { MainContext } from "../contexts/MainContext";
-import { useMedia, useTag } from "../hooks/ApiHooks";
+import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Profile = ({ navigation }) => {
+const Profile = ({ navigation, route }) => {
+  const { file } = route.params;
   const { user } = useContext(MainContext);
+  const { getUserById } = useUser();
+  const { getFilesByTag } = useTag();
+  const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
-  const { getFilesByTag } = useTag();
-  const { userMediaArray } = useMedia();
+  const { userMediaArray } = useMedia(file.user_id);
   const { isOpen, onToggle } = useDisclose();
+
+  const fetchOwner = async () => {
+    try {
+      // TODO: change token when login ready
+      const token = await AsyncStorage.getItem("userToken");
+      const userData = await getUserById(file.user_id, token);
+      setOwner(userData);
+    } catch (error) {
+      console.error("fetch owner error", error);
+      setOwner({ username: "[not available]" });
+    }
+  };
 
   const fetchAvatar = async () => {
     try {
-      const avatarArray = await getFilesByTag("avatar_" + user.user_id);
+      const avatarArray = await getFilesByTag("avatar_" + file.user_id);
       if (avatarArray.length === 0) {
         return;
       }
@@ -49,14 +65,14 @@ const Profile = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchAvatar();
-  }, []);
+    fetchOwner(), fetchAvatar();
+  }, [owner, avatar]);
 
   return (
     <Box flex="1">
       <VStack bgColor={"#33CA7F"} alignItems={"center"} mb={5}>
         <Text fontSize={30} fontWeight={"bold"}>
-          {user.username}
+          {owner.username}
         </Text>
         {/* rating stars */}
         <HStack marginBottom={5}>
@@ -275,6 +291,8 @@ const Profile = ({ navigation }) => {
 
 Profile.propTypes = {
   navigation: PropTypes.object,
+  singleMedia: PropTypes.object,
+  owner: PropTypes.object,
 };
 
 export default Profile;

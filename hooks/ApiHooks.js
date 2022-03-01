@@ -115,10 +115,10 @@ const useMedia = (userFilesOnly) => {
     }
   };
 
-  const loadUserMedia = async () => {
+  const loadUserMedia = async (user_id) => {
     setLoading(true);
     try {
-      const response = await fetch(baseUrl + "media/user/" + user.user_id);
+      const response = await fetch(baseUrl + "media/user/" + user_id);
       if (!response.ok) {
         throw Error(response.statusText);
       }
