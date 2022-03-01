@@ -5,6 +5,8 @@ const avatarTag = `${appId}_avatar_`;
 const userFileTag = `${appId}_`;
 const chatTag = `${appId}_chat`;
 const foodPostTag = `${appId}_post`;
+const defaultAvatar =
+  "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
 
 export {
   baseUrl,

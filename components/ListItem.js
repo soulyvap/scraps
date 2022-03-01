@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "native-base";
 import PropTypes from "prop-types";
-import { uploadsUrl } from "../utils/variables";
+import { avatarTag, uploadsUrl, defaultAvatar } from "../utils/variables";
 import { useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
@@ -21,9 +21,7 @@ const ListItem = ({ navigation, singleMedia }) => {
   const { getFilesByTag } = useTag();
   const { user } = useContext(MainContext);
   const [owner, setOwner] = useState({ username: "fetching..." });
-  const [avatar, setAvatar] = useState(
-    "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
-  );
+  const [avatar, setAvatar] = useState(defaultAvatar);
 
   const fetchOwner = async () => {
     try {
@@ -39,7 +37,7 @@ const ListItem = ({ navigation, singleMedia }) => {
 
   const fetchAvatar = async () => {
     try {
-      const avatarArray = await getFilesByTag("avatar_" + singleMedia.user_id);
+      const avatarArray = await getFilesByTag(avatarTag + singleMedia.user_id);
       if (avatarArray.length === 0) {
         return;
       }

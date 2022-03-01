@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { baseUrl } from "../utils/variables";
+import { baseUrl, foodPostTag } from "../utils/variables";
 import { MainContext } from "../contexts/MainContext";
 
 const doFetch = async (url, options) => {
@@ -73,7 +73,7 @@ const useLogin = () => {
   return { postLogin };
 };
 
-const useMedia = (userFilesOnly) => {
+const useMedia = () => {
   const [mediaArray, setMediaArray] = useState([]);
   const [userMediaArray, setUserMediaArray] = useState([]);
   const { user, update } = useContext(MainContext);
@@ -99,11 +99,7 @@ const useMedia = (userFilesOnly) => {
   const loadMedia = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${baseUrl}media`);
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      let json = await response.json();
+      let json = await useTag().getFilesByTag(foodPostTag);
       const media = await Promise.all(
         json.map(async (item) => {
           const response = await fetch(baseUrl + "media/" + item.file_id);
@@ -119,16 +115,13 @@ const useMedia = (userFilesOnly) => {
     }
   };
 
-  //fetch only one user's files
+  //fetch only user's files
   const loadUserMedia = async () => {
     setLoading(true);
 
     try {
-      const response = await fetch(baseUrl + "media/user/" + user.user_id);
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      let json = await response.json();
+      let json = await useTag().getFilesByTag(foodPostTag);
+      json = json.filter((file) => file.user_id === user.user_id);
       const media = await Promise.all(
         json.map(async (item) => {
           const response = await fetch(baseUrl + "media/" + item.file_id);

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { uploadsUrl } from "../utils/variables";
+import { uploadsUrl, defaultAvatar, avatarTag } from "../utils/variables";
 import { useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -27,9 +27,7 @@ const Single = ({ route, navigation }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
-  const [avatar, setAvatar] = useState(
-    "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
-  );
+  const [avatar, setAvatar] = useState(defaultAvatar);
   const [showModal, setShowModal] = useState(false);
   const { update, setUpdate } = useContext(MainContext);
 
@@ -57,7 +55,7 @@ const Single = ({ route, navigation }) => {
 
   const fetchAvatar = async () => {
     try {
-      const avatarArray = await getFilesByTag("avatar_" + file.user_id);
+      const avatarArray = await getFilesByTag(avatarTag + file.user_id);
       if (avatarArray.length === 0) {
         return;
       }

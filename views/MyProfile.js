@@ -14,21 +14,22 @@ import React, { useContext, useEffect, useState } from "react";
 import { MainContext } from "../contexts/MainContext";
 import { useMedia, useTag } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
-import { uploadsUrl } from "../utils/variables";
+import { avatarTag, foodPostTag, uploadsUrl } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
 
 const Profile = ({ navigation }) => {
   const { user } = useContext(MainContext);
   const { getFilesByTag } = useTag();
+  const { userBio, setUserBio } = useState();
   const [avatar, setAvatar] = useState(
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
-  const { userMediaArray } = useMedia();
+  const { userMediaArray } = useMedia(user.user_id);
 
   const fetchAvatar = async () => {
     try {
-      const avatarArray = await getFilesByTag("avatar_" + user.user_id);
+      const avatarArray = await getFilesByTag(avatarTag + user.user_id);
       if (avatarArray.length === 0) {
         return;
       }
@@ -39,7 +40,20 @@ const Profile = ({ navigation }) => {
     }
   };
 
+  // const fetchUserBio = async () => {
+  //   try {
+  //     const userFile = await getFilesByTag(`userfile_${user.user_id}`);
+  //     console.log("userFile", userFile);
+  //     const bio = JSON.parse(userFile).bio;
+  //     setUserBio(bio);
+  //     console.log("bio", userBio);
+  //   } catch (error) {
+  //     console.error(error.message);
+  //   }
+  // };
+
   useEffect(() => {
+    // fetchUserBio(),
     fetchAvatar();
   }, [avatar]);
 
@@ -118,8 +132,7 @@ const Profile = ({ navigation }) => {
             color: "#132A15",
           }}
         >
-          This is my bio. I am so awesome. I make great food. Please eat my
-          food.
+          {/* {userBio} */}
         </Box>
         <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
           <HStack>
@@ -135,6 +148,8 @@ const Profile = ({ navigation }) => {
           </HStack>
         </Button>
         {/* user's listings */}
+        {/* currently shows all, not just active */}
+        {/* TODO: show just active listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
           Active listings ({userMediaArray.length})
         </Text>

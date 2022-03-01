@@ -14,7 +14,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
-import { uploadsUrl } from "../utils/variables";
+import { avatarTag, uploadsUrl, defaultAvatar } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,10 +24,8 @@ const Profile = ({ navigation, route }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
-  const [avatar, setAvatar] = useState(
-    "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
-  );
-  const { userMediaArray } = useMedia(file.user_id);
+  const [avatar, setAvatar] = useState(defaultAvatar);
+  const { userMediaArray } = useMedia();
 
   const fetchOwner = async () => {
     try {
@@ -42,7 +40,7 @@ const Profile = ({ navigation, route }) => {
 
   const fetchAvatar = async () => {
     try {
-      const avatarArray = await getFilesByTag("avatar_" + file.user_id);
+      const avatarArray = await getFilesByTag(avatarTag + file.user_id);
       if (avatarArray.length === 0) {
         return;
       }
@@ -118,6 +116,7 @@ const Profile = ({ navigation, route }) => {
           marginBottom={5}
         ></Avatar>
         {/* user's bio */}
+        {/* doesn't work atm */}
         <Box
           alignSelf={"center"}
           backgroundColor={"#F9F4F1"}
@@ -132,8 +131,7 @@ const Profile = ({ navigation, route }) => {
             color: "#132A15",
           }}
         >
-          This is my bio. I am so awesome. I make great food. Please eat my
-          food.
+          Bio should be here.
         </Box>
         <HStack alignSelf={"center"}>
           <Button
@@ -169,7 +167,7 @@ const Profile = ({ navigation, route }) => {
             </HStack>
           </Button>
         </HStack>
-        {/* doesn't work. atm just showing user's (from maincontext) listings and not the user's who's profile it is */}
+        {/* doesn't work atm */}
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
           Active listings (0)
