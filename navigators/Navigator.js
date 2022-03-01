@@ -14,6 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Icon } from "native-base";
 import ChatSingle from "../views/ChatSingle";
 import ChatAll from "../views/ChatAll";
+import Review from "../views/Review";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -80,7 +81,7 @@ const StackScreen = () => {
     <Stack.Navigator>
       {isLoggedIn ? (
         <>
-          <Stack.Screen
+          {/* <Stack.Screen
             name="HomeScreen"
             component={TabScreen}
             options={{ headerShown: false }}
@@ -103,6 +104,11 @@ const StackScreen = () => {
           <Stack.Screen
             name="ChatSingle"
             component={ChatSingle}
+            options={{ headerShown: false }}
+          ></Stack.Screen> */}
+          <Stack.Screen
+            name="Review"
+            component={Review}
             options={{ headerShown: false }}
           ></Stack.Screen>
         </>
