@@ -114,7 +114,14 @@ const Single = ({ route, navigation }) => {
           {file.title}
         </Text>
         <HStack w={"90%"} h={"13%"} mt={5}>
-          <Box
+          <Pressable
+            onPress={() => {
+              navigation.navigate("Profile", {
+                file: file,
+              });
+            }}
+            // >
+            //   <Box
             bgColor={"#F9F4F1"}
             w={"50%"}
             h={"100%"}
@@ -148,7 +155,7 @@ const Single = ({ route, navigation }) => {
                 </Text>
               </VStack>
             </HStack>
-          </Box>
+          </Pressable>
           <Box alignSelf={"center"} width={"50%"}>
             <Button
               borderRadius={"full"}

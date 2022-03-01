@@ -106,7 +106,6 @@ const ListItem = ({ navigation, singleMedia }) => {
               onPress={() => {
                 navigation.navigate("Profile", {
                   file: singleMedia,
-                  owner: owner,
                 });
               }}
             >

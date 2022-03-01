@@ -8,41 +8,27 @@ import {
   Pressable,
   ScrollView,
   Text,
-  useDisclose,
   VStack,
 } from "native-base";
-import React, { useEffect, useState } from "react";
-import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import React, { useContext, useEffect, useState } from "react";
+import { MainContext } from "../contexts/MainContext";
+import { useMedia, useTag } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import { uploadsUrl } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Profile = ({ navigation, route }) => {
-  const { file } = route.params;
-  const { getUserById } = useUser();
+const Profile = ({ navigation }) => {
+  const { user } = useContext(MainContext);
   const { getFilesByTag } = useTag();
-  const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
-  const { userMediaArray } = useMedia(file.user_id);
-
-  const fetchOwner = async () => {
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-      const userData = await getUserById(file.user_id, token);
-      setOwner(userData);
-    } catch (error) {
-      console.error("fetch owner error", error);
-      setOwner({ username: "[not available]" });
-    }
-  };
+  const { userMediaArray } = useMedia();
 
   const fetchAvatar = async () => {
     try {
-      const avatarArray = await getFilesByTag("avatar_" + file.user_id);
+      const avatarArray = await getFilesByTag("avatar_" + user.user_id);
       if (avatarArray.length === 0) {
         return;
       }
@@ -54,8 +40,8 @@ const Profile = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    fetchOwner(), fetchAvatar();
-  }, [owner, avatar]);
+    fetchAvatar();
+  }, [avatar]);
 
   return (
     <Box flex="1">
@@ -71,7 +57,7 @@ const Profile = ({ navigation, route }) => {
       </Box>
       <VStack bgColor={"#33CA7F"} alignItems={"center"} mb={5}>
         <Text fontSize={30} fontWeight={"bold"}>
-          {owner.username}
+          {user.username}
         </Text>
         {/* rating stars */}
         <HStack marginBottom={5}>
@@ -135,41 +121,19 @@ const Profile = ({ navigation, route }) => {
           This is my bio. I am so awesome. I make great food. Please eat my
           food.
         </Box>
-        <HStack alignSelf={"center"}>
-          <Button
-            bgColor={"#FED766"}
-            w={"40%"}
-            alignSelf="center"
-            mb={5}
-            mr={5}
-          >
-            <HStack alignItems={"baseline"}>
-              <Icon
-                as={MaterialIcons}
-                name="message"
-                size={5}
-                color="#132A15"
-              ></Icon>
-              <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
-                Message
-              </Text>
-            </HStack>
-          </Button>
-          <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
-            <HStack alignItems={"baseline"}>
-              <Icon
-                as={MaterialIcons}
-                name="star"
-                size={5}
-                color="#132A15"
-              ></Icon>
-              <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
-                Review
-              </Text>
-            </HStack>
-          </Button>
-        </HStack>
-        {/* doesn't work. atm just showing user's (from maincontext) listings and not the user's who's profile it is */}
+        <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
+          <HStack>
+            <Icon
+              as={MaterialIcons}
+              name="settings"
+              size={5}
+              color="#132A15"
+            ></Icon>
+            <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
+              Edit profile
+            </Text>
+          </HStack>
+        </Button>
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
           Active listings ({userMediaArray.length})
@@ -208,7 +172,6 @@ const Profile = ({ navigation, route }) => {
 
 Profile.propTypes = {
   navigation: PropTypes.object,
-  file: PropTypes.object,
 };
 
 export default Profile;

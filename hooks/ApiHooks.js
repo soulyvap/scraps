@@ -115,10 +115,12 @@ const useMedia = (userFilesOnly) => {
     }
   };
 
-  const loadUserMedia = async (user_id) => {
+  //fetch only one user's files
+  const loadUserMedia = async () => {
     setLoading(true);
+
     try {
-      const response = await fetch(baseUrl + "media/user/" + user_id);
+      const response = await fetch(baseUrl + "media/user/" + user.user_id);
       if (!response.ok) {
         throw Error(response.statusText);
       }
@@ -130,6 +132,7 @@ const useMedia = (userFilesOnly) => {
           return mediaData;
         })
       );
+
       setUserMediaArray(media);
     } catch (error) {
       console.error("Problem fetching the data from API", error);

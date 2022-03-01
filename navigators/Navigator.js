@@ -8,6 +8,7 @@ import Single from "../views/Single";
 import Login from "../views/Login";
 import Register from "../views/Register";
 import Profile from "../views/Profile";
+import MyProfile from "../views/MyProfile";
 import { MainContext } from "../contexts/MainContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Icon } from "native-base";
@@ -24,13 +25,13 @@ const TabScreen = () => {
         tabBarInactiveTintColor: "#132A15",
         tabBarShowLabel: false,
         tabBarHideOnKeyboard: true,
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ color }) => {
           let iconName;
           if (route.name === "Home") {
             iconName = "home";
           } else if (route.name === "Upload") {
             iconName = "file-upload";
-          } else if (route.name === "Profile") {
+          } else if (route.name === "MyProfile") {
             iconName = "account-circle";
           }
           return (
@@ -54,11 +55,9 @@ const TabScreen = () => {
         options={{ headerShown: false }}
       ></Tab.Screen>
       <Tab.Screen
-        name="Profile"
-        component={Profile}
+        name="MyProfile"
+        component={MyProfile}
         options={{ headerShown: false }}
-
-        // userFilesOnly={true}
       ></Tab.Screen>
     </Tab.Navigator>
   );
@@ -78,6 +77,11 @@ const StackScreen = () => {
           ></Stack.Screen>
           <Stack.Screen
             name="Profile"
+            component={Profile}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="MyProfile"
             component={TabScreen}
             options={{ headerShown: false }}
           ></Stack.Screen>
