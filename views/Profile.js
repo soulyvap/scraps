@@ -172,9 +172,9 @@ const Profile = ({ navigation, route }) => {
         {/* doesn't work. atm just showing user's (from maincontext) listings and not the user's who's profile it is */}
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
-          Active listings ({userMediaArray.length})
+          Active listings (0)
         </Text>
-        <Box w={"90%"} alignSelf={"center"}>
+        {/* <Box w={"90%"} alignSelf={"center"}>
           <FlatGrid
             horizontal={true}
             itemDimension={200}
@@ -194,7 +194,7 @@ const Profile = ({ navigation, route }) => {
               </Pressable>
             )}
           />
-        </Box>
+        </Box> */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
           Reviews
         </Text>
