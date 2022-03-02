@@ -175,7 +175,23 @@ const useRating = () => {
     return await doFetch(baseUrl + "ratings/file/" + userFileId);
   };
 
-  return { getRatingsById };
+  const getRatingsByFileId = async (fileId) => {
+    return await doFetch(`${baseUrl}ratings/file/${fileId}`);
+  };
+
+  const postRating = async (fileId, rating, token) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token,
+      },
+      body: JSON.stringify({ file_id: fileId, rating: rating }),
+    };
+    return await doFetch(baseUrl + "ratings/", options);
+  };
+
+  return { getRatingsById, getRatingsByFileId, postRating };
 };
 
 const useComment = () => {
