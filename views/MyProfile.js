@@ -21,7 +21,7 @@ import { FlatGrid } from "react-native-super-grid";
 const Profile = ({ navigation }) => {
   const { user } = useContext(MainContext);
   const { getFilesByTag } = useTag();
-  const { userBio, setUserBio } = useState();
+  // const [userBio, setUserBio] = useState();
   const [avatar, setAvatar] = useState(
     "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
   );
@@ -43,10 +43,11 @@ const Profile = ({ navigation }) => {
   // const fetchUserBio = async () => {
   //   try {
   //     const userFile = await getFilesByTag(`userfile_${user.user_id}`);
-  //     console.log("userFile", userFile);
-  //     const bio = JSON.parse(userFile).bio;
+  //     console.log(userFile);
+  //     const descriptionData = userFile.description;
+  //     const allData = JSON.parse(descriptionData);
+  //     const bio = allData.bio;
   //     setUserBio(bio);
-  //     console.log("bio", userBio);
   //   } catch (error) {
   //     console.error(error.message);
   //   }
@@ -55,7 +56,7 @@ const Profile = ({ navigation }) => {
   useEffect(() => {
     // fetchUserBio(),
     fetchAvatar();
-  }, [avatar]);
+  }, []);
 
   return (
     <Box flex="1">
