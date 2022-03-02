@@ -17,14 +17,13 @@ import PropTypes from "prop-types";
 import { avatarTag, foodPostTag, uploadsUrl } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
+import { userFileTag } from "../utils/variables";
 
 const Profile = ({ navigation }) => {
   const { user } = useContext(MainContext);
   const { getFilesByTag } = useTag();
-  // const [userBio, setUserBio] = useState();
-  const [avatar, setAvatar] = useState(
-    "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80"
-  );
+  const [userBio, setUserBio] = useState();
+  const [avatar, setAvatar] = useState();
   const { userMediaArray } = useMedia(user.user_id);
 
   const fetchAvatar = async () => {
@@ -40,22 +39,21 @@ const Profile = ({ navigation }) => {
     }
   };
 
-  // const fetchUserBio = async () => {
-  //   try {
-  //     const userFile = await getFilesByTag(`userfile_${user.user_id}`);
-  //     console.log(userFile);
-  //     const descriptionData = userFile.description;
-  //     const allData = JSON.parse(descriptionData);
-  //     const bio = allData.bio;
-  //     setUserBio(bio);
-  //   } catch (error) {
-  //     console.error(error.message);
-  //   }
-  // };
+  const fetchUserBio = async () => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + user.user_id);
+      const userFile = userFiles[0];
+      const descriptionData = userFile.description;
+      const allData = JSON.parse(descriptionData);
+      const bio = allData.bio;
+      setUserBio(bio);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
   useEffect(() => {
-    // fetchUserBio(),
-    fetchAvatar();
+    fetchUserBio(), fetchAvatar();
   }, []);
 
   return (
@@ -133,7 +131,7 @@ const Profile = ({ navigation }) => {
             color: "#132A15",
           }}
         >
-          {/* {userBio} */}
+          {userBio}
         </Box>
         <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
           <HStack>

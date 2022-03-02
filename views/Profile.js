@@ -14,7 +14,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
-import { avatarTag, uploadsUrl, defaultAvatar } from "../utils/variables";
+import {
+  avatarTag,
+  uploadsUrl,
+  defaultAvatar,
+  userFileTag,
+} from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,6 +31,7 @@ const Profile = ({ navigation, route }) => {
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const { userMediaArray } = useMedia();
+  const [userBio, setUserBio] = useState();
 
   const fetchOwner = async () => {
     try {
@@ -51,8 +57,21 @@ const Profile = ({ navigation, route }) => {
     }
   };
 
+  const fetchUserBio = async () => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + file.user_id);
+      const userFile = userFiles[0];
+      const descriptionData = userFile.description;
+      const allData = JSON.parse(descriptionData);
+      const bio = allData.bio;
+      setUserBio(bio);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   useEffect(() => {
-    fetchOwner(), fetchAvatar();
+    fetchOwner(), fetchAvatar(), fetchUserBio();
   }, []);
 
   return (
@@ -116,7 +135,6 @@ const Profile = ({ navigation, route }) => {
           marginBottom={5}
         ></Avatar>
         {/* user's bio */}
-        {/* doesn't work atm */}
         <Box
           alignSelf={"center"}
           backgroundColor={"#F9F4F1"}
@@ -131,7 +149,7 @@ const Profile = ({ navigation, route }) => {
             color: "#132A15",
           }}
         >
-          Bio should be here.
+          {userBio}
         </Box>
         <HStack alignSelf={"center"}>
           <Button
