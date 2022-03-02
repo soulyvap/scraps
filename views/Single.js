@@ -1,6 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { uploadsUrl, defaultAvatar, avatarTag } from "../utils/variables";
+import {
+  uploadsUrl,
+  defaultAvatar,
+  avatarTag,
+  appId,
+} from "../utils/variables";
 import { useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -25,10 +30,11 @@ import { MainContext } from "../contexts/MainContext";
 const Single = ({ route, navigation }) => {
   const { file } = route.params;
   const { getUserById } = useUser();
-  const { getFilesByTag } = useTag();
+  const { getFilesByTag, getTagsByFile } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [showModal, setShowModal] = useState(false);
+  const [tags, setTags] = useState();
   const { update, setUpdate } = useContext(MainContext);
 
   const descriptionData = file.description;
@@ -54,16 +60,21 @@ const Single = ({ route, navigation }) => {
     }
   };
 
-  const tags = [
-    "vegan",
-    "vegetarian",
-    "nut-free",
-    "soy-free",
-    "gluten-free",
-    "dessert",
-    "dairy-free",
-    "egg-free",
-  ];
+  const fetchTags = async () => {
+    try {
+      const fileTags = await getTagsByFile(file.file_id);
+      for (let i = 0; i < fileTags.length; i++) {
+        if (fileTags[i].tag === `${appId}_post`) {
+          fileTags.splice(i, 1);
+          i--;
+        }
+      }
+      setTags(fileTags);
+    } catch (error) {
+      console.error("fetch tags error", error);
+      setOwner({ tags: "[not available]" });
+    }
+  };
 
   const fetchOwner = async () => {
     try {
@@ -92,6 +103,7 @@ const Single = ({ route, navigation }) => {
   useEffect(() => {
     fetchOwner();
     fetchAvatar();
+    fetchTags();
   }, []);
 
   return (
@@ -245,12 +257,13 @@ const Single = ({ route, navigation }) => {
         </Box>
 
         <FlatGrid
+          width={"90%"}
           horizontal={true}
           data={tags}
           renderItem={({ item }) => (
             <Box bgColor={"#F9F4F1"} borderRadius="10" px={2} pt={1} h={8}>
               <Text textAlign="center" color={"#898980"}>
-                {item}
+                {item.tag}
               </Text>
             </Box>
           )}

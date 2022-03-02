@@ -163,7 +163,11 @@ const useTag = () => {
     return await doFetch(baseUrl + "tags/" + tag);
   };
 
-  return { postTag, getFilesByTag };
+  const getTagsByFile = async (fileId) => {
+    return await doFetch(baseUrl + "tags/file/" + fileId);
+  };
+
+  return { postTag, getFilesByTag, getTagsByFile };
 };
 
 const useRating = () => {
