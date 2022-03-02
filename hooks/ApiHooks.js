@@ -191,7 +191,17 @@ const useRating = () => {
     return await doFetch(baseUrl + "ratings/", options);
   };
 
-  return { getRatingsById, getRatingsByFileId, postRating };
+  const deleteRating = async (fileId, token) => {
+    const options = {
+      method: "DELETE",
+      headers: {
+        "x-access-token": token,
+      },
+    };
+    return await doFetch(`${baseUrl}ratings/file/${fileId}`, options);
+  };
+
+  return { getRatingsById, getRatingsByFileId, postRating, deleteRating };
 };
 
 const useComment = () => {

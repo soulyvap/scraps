@@ -178,6 +178,9 @@ const Profile = ({ navigation, route }) => {
                 name="star"
                 size={5}
                 color="#132A15"
+                onPress={() => {
+                  navigation.navigate("Review", { targetId: file.user_id });
+                }}
               ></Icon>
               <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
                 Review

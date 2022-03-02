@@ -6,20 +6,24 @@ import {
   NativeBaseProvider,
   TextArea,
 } from "native-base";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import PropTypes from "prop-types";
 import { AirbnbRating } from "react-native-ratings";
 import { MainContext } from "../contexts/MainContext";
 import { colors } from "../utils/colors";
-import { useTag } from "../hooks/ApiHooks";
+import { useRating, useTag } from "../hooks/ApiHooks";
 import { userFileTag } from "../utils/variables";
 
+let targetFileId;
+
 const Review = ({ route, navigation }) => {
-  //const { file } = route.params;
+  const { targetId } = route.params;
   const { user } = useContext(MainContext);
   const [rating, setRating] = useState(3);
-  const [userRating, setUserRating] = useState(false);
   const { getFilesByTag } = useTag();
+  const { getRatingsByFileId, postRating, deleteRating } = useRating();
 
   const theme = extendTheme({
     components: {
@@ -42,18 +46,46 @@ const Review = ({ route, navigation }) => {
     },
   });
 
-  //TODO: implement into profile view. button should not lead to review page if user already has rated person
-  //TODO: fetch information of the userfile we're rating
+  useEffect(() => {
+    targetFileId = undefined;
+  }, []);
+
+  useEffect(() => {
+    fetchUserFile();
+  }, []);
+
   const fetchUserFile = async () => {
     try {
-      const userFiles = await getFilesByTag(userFileTag);
+      const userFiles = await getFilesByTag(userFileTag + targetId);
+      const userFile = userFiles[0];
+      targetFileId = userFile.file_id;
     } catch (error) {
       console.error(error.message);
     }
   };
 
-  const onSubmit = (data) => {
-    console.log("rating onSubmit: ", rating);
+  const onSubmit = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem("userToken");
+      const ratingArray = await getRatingsByFileId(targetFileId);
+      ratingArray
+        .filter((e) => e.user_id === user.user_id)
+        .forEach(async (rating) => {
+          await deleteRating(rating.file_id, userToken);
+        });
+      const response = await postRating(targetFileId, rating, userToken);
+      response &&
+        Alert.alert("Review saved or something", "Well done, you made it.", [
+          {
+            text: "Ok",
+            onPress: () => {
+              navigation.navigate("Home");
+            },
+          },
+        ]);
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   return (

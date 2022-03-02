@@ -81,7 +81,7 @@ const StackScreen = () => {
     <Stack.Navigator>
       {isLoggedIn ? (
         <>
-          {/* <Stack.Screen
+          <Stack.Screen
             name="HomeScreen"
             component={TabScreen}
             options={{ headerShown: false }}
@@ -105,7 +105,7 @@ const StackScreen = () => {
             name="ChatSingle"
             component={ChatSingle}
             options={{ headerShown: false }}
-          ></Stack.Screen> */}
+          ></Stack.Screen>
           <Stack.Screen
             name="Review"
             component={Review}
