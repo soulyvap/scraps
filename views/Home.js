@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
 import List from "../components/List";
 import { FlatGrid } from "react-native-super-grid";
@@ -68,7 +68,7 @@ const tagCategories = [
 ];
 
 const Home = ({ navigation }) => {
-  const { user, setIsLoggedIn } = useContext(MainContext);
+  const { user, setIsLoggedIn, coords } = useContext(MainContext);
 
   const logout = async () => {
     console.log("logout");

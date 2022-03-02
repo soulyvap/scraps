@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { baseUrl, foodPostTag } from "../utils/variables";
+import { baseUrl, foodPostTag, userFileTag } from "../utils/variables";
 import { MainContext } from "../contexts/MainContext";
 
 const doFetch = async (url, options) => {

@@ -66,7 +66,7 @@ const PostForm = ({ navigation }) => {
   const [tags, setTags] = useState(defaultTags);
   const { postMedia } = useMedia();
   const { postTag } = useTag();
-  const { update, setUpdate } = useContext(MainContext);
+  const { update, setUpdate, coords } = useContext(MainContext);
 
   const {
     control,
@@ -243,6 +243,7 @@ const PostForm = ({ navigation }) => {
         active: true,
         booked: false,
         bookedBy: null,
+        coords: coords,
       };
 
       const formData = new FormData();

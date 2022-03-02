@@ -11,14 +11,28 @@ import {
 import react, { useContext, useEffect, useState } from "react";
 import { Keyboard } from "react-native";
 import LoginForm from "../components/LoginForm";
-import { useUser } from "../hooks/ApiHooks";
+import { useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
+import { userFileTag } from "../utils/variables";
 
 const Login = ({ navigation }) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
   const { getUserByToken } = useUser();
-  const { setUser, setIsLoggedIn } = useContext(MainContext);
+  const { setUser, setIsLoggedIn, setCoords } = useContext(MainContext);
+  const { getFilesByTag } = useTag();
+
+  const fetchCoordinates = async (userId) => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + userId);
+      const userFile = userFiles.pop();
+      const description = JSON.parse(userFile.description);
+      const coords = description.coords;
+      setCoords(coords);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 
   const checkToken = async () => {
     const userToken = await AsyncStorage.getItem("userToken");
@@ -30,6 +44,7 @@ const Login = ({ navigation }) => {
         if (userData) {
           setUser(userData);
           setIsLoggedIn(true);
+          await fetchCoordinates(userData.user_id);
         }
       } catch (error) {
         throw new Error(error.message);
