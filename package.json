@@ -13,6 +13,7 @@
     "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-native-community/datetimepicker": "4.0.0",
     "@react-navigation/bottom-tabs": "^6.2.0",
+    "@react-navigation/material-top-tabs": "^6.1.1",
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.5.0",
     "@react-navigation/stack": "^6.1.1",
@@ -36,8 +37,10 @@
     "react-native-screens": "~3.10.1",
     "react-native-super-grid": "^4.2.0",
     "react-native-svg": "12.1.1",
+    "react-native-tab-view": "^3.1.1",
     "react-native-vector-icons": "^9.1.0",
-    "react-native-web": "0.17.1"
+    "react-native-web": "0.17.1",
+    "react-native-pager-view": "5.4.9"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

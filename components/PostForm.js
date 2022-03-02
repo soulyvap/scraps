@@ -17,7 +17,7 @@ import {
   VStack,
 } from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import react, { useEffect, useState } from "react";
+import react, { useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
@@ -28,6 +28,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
 import { colors } from "../utils/colors";
 import { foodPostTag } from "../utils/variables";
+import { MainContext } from "../contexts/MainContext";
 
 const PostForm = ({ navigation }) => {
   const defaultAllergens = [
@@ -65,6 +66,7 @@ const PostForm = ({ navigation }) => {
   const [tags, setTags] = useState(defaultTags);
   const { postMedia } = useMedia();
   const { postTag } = useTag();
+  const { update, setUpdate } = useContext(MainContext);
 
   const {
     control,
@@ -125,7 +127,7 @@ const PostForm = ({ navigation }) => {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        quality: 1,
+        quality: 0.5,
         aspect: [1, 1],
       });
       console.log("take pic", result.uri);
@@ -140,7 +142,7 @@ const PostForm = ({ navigation }) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      quality: 1,
+      quality: 0.5,
       aspect: [1, 1],
     });
 
@@ -239,6 +241,8 @@ const PostForm = ({ navigation }) => {
         allergens: selectedAllergens,
         category: category,
         active: true,
+        booked: false,
+        bookedBy: null,
       };
 
       const formData = new FormData();
@@ -268,6 +272,7 @@ const PostForm = ({ navigation }) => {
           Alert.alert("File added successfully");
           resetForm();
           navigation.navigate("Home");
+          setUpdate(update + 1);
         }
       } catch (error) {
         console.log(error.message);

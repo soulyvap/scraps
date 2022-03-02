@@ -204,7 +204,14 @@ const Single = ({ route, navigation }) => {
             </Box>
           )}
         ></FlatGrid>
-        <Button mt={9} borderRadius={"full"} bgColor={"#33CA7F"}>
+        <Button
+          mt={9}
+          borderRadius={"full"}
+          bgColor={"#33CA7F"}
+          onPress={() =>
+            navigation.navigate("ConfirmBooking", { fileId: file.file_id })
+          }
+        >
           <Text color="#F9F4F1" fontWeight={"bold"}>
             Book now
           </Text>

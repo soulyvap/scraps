@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { baseUrl } from "../utils/variables";
+import { baseUrl, foodPostTag } from "../utils/variables";
 import { MainContext } from "../contexts/MainContext";
 
 const doFetch = async (url, options) => {
@@ -76,6 +76,7 @@ const useLogin = () => {
 const useMedia = (userFilesOnly) => {
   const [mediaArray, setMediaArray] = useState([]);
   const [userMediaArray, setUserMediaArray] = useState([]);
+  const [scrapsMediaArray, setScrapsMediaArray] = useState([]);
   const { user, update } = useContext(MainContext);
   const [loading, setLoading] = useState(false);
 
@@ -142,12 +143,42 @@ const useMedia = (userFilesOnly) => {
     }
   };
 
+  const loadScrapsMedia = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${baseUrl}tags/${foodPostTag}`);
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      let json = await response.json();
+      const media = await Promise.all(
+        json.map(async (item) => {
+          const response = await fetch(baseUrl + "media/" + item.file_id);
+          const mediaData = await response.json();
+          return mediaData;
+        })
+      );
+      setScrapsMediaArray(media);
+    } catch (error) {
+      console.error("Problem fetching the data from API", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    loadMedia();
+    // loadMedia();
     loadUserMedia();
+    loadScrapsMedia();
   }, [update]);
 
-  return { postMedia, mediaArray, getMediaById, userMediaArray };
+  return {
+    postMedia,
+    mediaArray,
+    getMediaById,
+    userMediaArray,
+    scrapsMediaArray,
+  };
 };
 
 const useTag = () => {
@@ -167,7 +198,11 @@ const useTag = () => {
     return await doFetch(baseUrl + "tags/" + tag);
   };
 
-  return { postTag, getFilesByTag };
+  const getTagsByFileId = async (fileId) => {
+    return await doFetch(baseUrl + "tags/file/" + fileId);
+  };
+
+  return { postTag, getFilesByTag, getTagsByFileId };
 };
 
 const useRating = () => {
