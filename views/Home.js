@@ -111,7 +111,7 @@ const Home = ({ navigation }) => {
           >
             Categories:
           </Text>
-          <Flex direction="row" justifyContent="space-evenly">
+          <Flex direction="row" justifyContent="space-evenly" mb={3}>
             {/* TODO: implement onPress actions */}
             <Button>Uncooked</Button>
             <Button>Cooked</Button>

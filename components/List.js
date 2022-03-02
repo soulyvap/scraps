@@ -4,8 +4,8 @@ import ListItem from "./ListItem";
 import PropTypes from "prop-types";
 import { FlatGrid } from "react-native-super-grid";
 
-const List = ({ navigation }) => {
-  const { mediaArray } = useMedia();
+const List = ({ navigation, userFilesOnly = false }) => {
+  const { mediaArray } = useMedia(userFilesOnly);
   return (
     <FlatGrid
       itemDimension={140}
