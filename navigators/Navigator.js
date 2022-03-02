@@ -14,7 +14,7 @@ import { Icon } from "native-base";
 import ChatSingle from "../views/ChatSingle";
 import ChatAll from "../views/ChatAll";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import ConfirmBooking from "../views/ConfirmBooking";
+import Booking from "../views/Booking";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -103,8 +103,8 @@ const StackScreen = () => {
             options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen
-            name="ConfirmBooking"
-            component={ConfirmBooking}
+            name="Booking"
+            component={Booking}
             options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen

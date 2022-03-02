@@ -15,9 +15,15 @@ import {
   View,
   VStack,
 } from "native-base";
-import react, { useEffect, useState } from "react";
+import react, { useContext, useEffect, useState } from "react";
 import ListingCardLg from "../components/ListingCardLg";
-import { useMedia, useRating, useTag, useUser } from "../hooks/ApiHooks";
+import {
+  useComment,
+  useMedia,
+  useRating,
+  useTag,
+  useUser,
+} from "../hooks/ApiHooks";
 import {
   avatarTag,
   foodPostTag,
@@ -26,7 +32,7 @@ import {
 } from "../utils/variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Chip } from "react-native-paper";
-import { SafeAreaView, TouchableOpacity } from "react-native";
+import { Alert, SafeAreaView, TouchableOpacity } from "react-native";
 import { FlatGrid } from "react-native-super-grid";
 import { colors } from "../utils/colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -34,13 +40,17 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { set } from "react-hook-form";
 import BackButton from "../components/BackButton";
 import Tag from "../components/Tag";
+import { listingStatus } from "../components/PostForm";
+import { MainContext } from "../contexts/MainContext";
 
 const ConfirmBooking = ({ navigation, route }) => {
   const fileId = route.params.fileId;
   const { getMediaById } = useMedia();
   const { getUserById } = useUser();
-  const { getFilesByTag, getTagsByFileId } = useTag();
+  const { getFilesByTag, getTagsByFileId, postTag } = useTag();
+  const { postComment } = useComment();
   const { getRatingsById } = useRating();
+  const { user } = useContext(MainContext);
 
   const [listing, setListing] = useState();
   const [username, setUsername] = useState();
@@ -54,10 +64,62 @@ const ConfirmBooking = ({ navigation, route }) => {
   const [time, setTime] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
-  const [dateText, setDateText] = useState("Select date");
+  const [dateText, setDateText] = useState();
   const [dateSelected, setDateSelected] = useState(false);
   const [pickupMethod, setPickupMethod] = useState();
   const [contactless, setContactless] = useState(false);
+
+  const checkForm = () => {
+    if (!dateText) {
+      Alert.alert("Please select a pickup time");
+      return false;
+    }
+    if (!pickupMethod) {
+      Alert.alert("Please select a pickup method");
+      return false;
+    }
+    return true;
+  };
+
+  const submit = async () => {
+    const formValid = checkForm();
+
+    if (formValid) {
+      const token = await AsyncStorage.getItem("userToken");
+      const pickupInfo = {
+        pickupTime: dateText,
+        pickupMethod: pickupMethod,
+        contactless: contactless,
+        bookedBy: user.user_id,
+      };
+      const listingLog = {
+        status: listingStatus.booked,
+        pickupInfo: pickupInfo,
+      };
+      const commentData = {
+        file_id: fileId,
+        comment: listingLog,
+      };
+      const tagData = {
+        file_id: fileId,
+        tag: listingStatus.booked,
+      };
+
+      try {
+        const commentResponse = await postComment(commentData, token);
+        const tagResponse = await postTag(tagData, token);
+
+        console.log(commentResponse);
+        console.log(tagResponse);
+
+        if (commentResponse && tagResponse) {
+          Alert.alert("Booking successful", `${username} now has to accept it`);
+        }
+      } catch (error) {
+        console.error("submit confirm booking", error);
+      }
+    }
+  };
 
   const fetchMedia = async () => {
     try {
@@ -68,11 +130,11 @@ const ConfirmBooking = ({ navigation, route }) => {
         description: listingFetched.description,
       };
       setListing(listingInfo);
-      const moreData = JSON.parse(listingInfo.description);
-      const allergensFetched = moreData.allergens;
+      const moreDataFetched = JSON.parse(listingInfo.description);
+      const allergensFetched = moreDataFetched.allergens;
       setAllergens(allergensFetched);
-      setLatestPickup(moreData.latestPickup);
-      setTimeSlot(moreData.suitableTimeSlot);
+      setLatestPickup(moreDataFetched.latestPickup);
+      setTimeSlot(moreDataFetched.suitableTimeSlot);
       const userId = listingFetched.user_id;
       await fetchAvatar(userId);
       await fetchUsername(userId);
@@ -166,7 +228,7 @@ const ConfirmBooking = ({ navigation, route }) => {
 
   const formatTime = (date) => {
     let day = date.getDate();
-    let month = date.getMonth();
+    let month = date.getMonth() + 1;
     const year = date.getFullYear();
     let hours = date.getHours();
     let minutes = date.getMinutes();
@@ -187,7 +249,7 @@ const ConfirmBooking = ({ navigation, route }) => {
         }}
       />
       <Heading textAlign={"center"} fontSize={"lg"} py={3}>
-        Confirm booking
+        Book listing
       </Heading>
       <ScrollView nestedScrollEnabled>
         <VStack borderRadius={10} shadow="6" bgColor={"white"} mx={4}>
@@ -266,7 +328,7 @@ const ConfirmBooking = ({ navigation, route }) => {
               <HStack w={"100%"} alignItems="center" space={5}>
                 <TouchableOpacity onPress={showDatepicker}>
                   <View py={2} px={5} bgColor={colors.beige} borderRadius={15}>
-                    <Text fontSize={14}>{dateText}</Text>
+                    <Text fontSize={14}>{dateText || "Select date"}</Text>
                   </View>
                 </TouchableOpacity>
 
@@ -305,20 +367,30 @@ const ConfirmBooking = ({ navigation, route }) => {
                 accessibilityLabel="Choose a pickup method"
                 placeholder="Choose a pickup method"
                 variant="rounded"
+                onValueChange={(value) => {
+                  setPickupMethod(value);
+                }}
               >
                 <Select.Item
                   label="Left at the building door"
-                  value="building-door"
+                  value="Left at the building door"
                 />
-                <Select.Item label="Left at the door" value="door" />
-                <Select.Item label="Ring the doorbell" value="doorbell" />
-                <Select.Item label="Call me" value="call" />
+                <Select.Item
+                  label="Left at the door"
+                  value="Left at the door"
+                />
+                <Select.Item
+                  label="Ring the doorbell"
+                  value="Ring the doorbell"
+                />
+                <Select.Item label="Call me" value="Call me" />
               </Select>
             </View>
             <HStack w={"100%"} mt={3}>
               <Checkbox
                 _checked={{ bgColor: colors.grey, borderColor: colors.grey }}
                 value={contactless}
+                onChange={(checked) => setContactless(checked)}
               >
                 <Text ml={3}>No contact pickup</Text>
               </Checkbox>
@@ -331,6 +403,7 @@ const ConfirmBooking = ({ navigation, route }) => {
             w={"35%"}
             alignSelf="center"
             mt={10}
+            onPress={submit}
           >
             Confirm
           </Button>

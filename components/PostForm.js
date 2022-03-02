@@ -30,6 +30,13 @@ import { colors } from "../utils/colors";
 import { foodPostTag } from "../utils/variables";
 import { MainContext } from "../contexts/MainContext";
 
+export const listingStatus = {
+  listed: "listed",
+  booked: "booked",
+  confirmed: "confirmed",
+  pickedUp: "picked-up",
+};
+
 const PostForm = ({ navigation }) => {
   const defaultAllergens = [
     { text: "dairy", active: false },
@@ -241,8 +248,6 @@ const PostForm = ({ navigation }) => {
         allergens: selectedAllergens,
         category: category,
         active: true,
-        booked: false,
-        bookedBy: null,
       };
 
       const formData = new FormData();

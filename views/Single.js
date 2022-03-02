@@ -209,7 +209,7 @@ const Single = ({ route, navigation }) => {
           borderRadius={"full"}
           bgColor={"#33CA7F"}
           onPress={() =>
-            navigation.navigate("ConfirmBooking", { fileId: file.file_id })
+            navigation.navigate("Booking", { fileId: file.file_id })
           }
         >
           <Text color="#F9F4F1" fontWeight={"bold"}>
