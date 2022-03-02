@@ -19,7 +19,6 @@ import {
   Image,
   Modal,
   Pressable,
-  ScrollView,
   Text,
   VStack,
 } from "native-base";
@@ -153,8 +152,6 @@ const Single = ({ route, navigation }) => {
                 file: file,
               });
             }}
-            // >
-            //   <Box
             bgColor={"#F9F4F1"}
             w={"50%"}
             h={"100%"}
@@ -223,11 +220,9 @@ const Single = ({ route, navigation }) => {
           borderTopRightRadius="10"
           shadow={9}
         >
-          <ScrollView showsVerticalScrollIndicator>
-            <Text m={3} fontSize={16} color={"#132A15"}>
-              {description}
-            </Text>
-          </ScrollView>
+          <Text m={3} fontSize={16} color={"#132A15"}>
+            {description}
+          </Text>
         </Box>
         <Box
           bgColor={"#F9F4F1"}

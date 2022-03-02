@@ -1,13 +1,12 @@
 import React, { useContext, useState } from "react";
 import { SafeAreaView } from "react-native";
 import List from "../components/List";
-import { FlatGrid } from "react-native-super-grid";
 import PropTypes from "prop-types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MainContext } from "../contexts/MainContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  Avatar,
+  Box,
   Button,
   extendTheme,
   FlatList,
@@ -18,55 +17,8 @@ import {
   NativeBaseProvider,
   Text,
   View,
-  VStack,
 } from "native-base";
-
-// TODO: tag categories are currently hardcoded
-// need to decide on the categories/tags before this can be changed
-const tagCategories = [
-  {
-    key: 1,
-    title: "vegan",
-    image:
-      "https://images.pexels.com/photos/35629/bing-cherries-ripe-red-fruit.jpg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    key: 2,
-    title: "vegetarian",
-    image:
-      "https://images.pexels.com/photos/35629/bing-cherries-ripe-red-fruit.jpg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    key: 3,
-    title: "gluten-free",
-    image:
-      "https://images.pexels.com/photos/35629/bing-cherries-ripe-red-fruit.jpg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    key: 4,
-    title: "nut-free",
-    image:
-      "https://images.pexels.com/photos/35629/bing-cherries-ripe-red-fruit.jpg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    key: 5,
-    title: "egg-free",
-    image:
-      "https://images.pexels.com/photos/35629/bing-cherries-ripe-red-fruit.jpg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    key: 6,
-    title: "lactose-free",
-    image:
-      "https://images.pexels.com/photos/35629/bing-cherries-ripe-red-fruit.jpg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    key: 7,
-    title: "dairy-free",
-    image:
-      "https://images.pexels.com/photos/35629/bing-cherries-ripe-red-fruit.jpg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-];
+import { defaultTags } from "../utils/variables";
 
 const Home = ({ navigation }) => {
   const { user, setIsLoggedIn } = useContext(MainContext);
@@ -76,6 +28,7 @@ const Home = ({ navigation }) => {
     await AsyncStorage.clear();
     setIsLoggedIn(false);
   };
+
   return (
     <>
       <SafeAreaView flex={1}>
@@ -100,7 +53,6 @@ const Home = ({ navigation }) => {
               Logout
             </Button>
           </View>
-
           {/* TODO: implement search functionality */}
           <Input
             alignSelf="center"
@@ -123,23 +75,42 @@ const Home = ({ navigation }) => {
               />
             }
           ></Input>
-          <FlatGrid
-            marginTop={10}
-            marginBottom={10}
-            fixed={true}
-            itemDimension={120}
-            height={90}
-            width={"90%"}
-            horizontal={true}
+          <Text
+            ml={"5%"}
+            fontSize={17}
+            fontWeight={"bold"}
+            mt={1}
+            color={"#132A15"}
+          >
+            Tags:
+          </Text>
+          <FlatList
+            horizontal
+            w={"90%"}
             alignSelf={"center"}
-            data={tagCategories}
+            data={defaultTags}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <VStack alignItems="center" mx={2}>
-                <Avatar source={{ uri: item.image }} />
-                <Text color={"#132A15"}>{item.title}</Text>
-              </VStack>
+              <Box mx={1} my={3} p={1} alignSelf="center" height={10}>
+                <Text
+                  color={"#33CA7F"}
+                  textAlign={"center"}
+                  fontWeight={"bold"}
+                >
+                  {item.text}
+                </Text>
+              </Box>
             )}
-          ></FlatGrid>
+          ></FlatList>
+          <Text
+            ml={"5%"}
+            fontSize={17}
+            fontWeight={"bold"}
+            mb={2}
+            color={"#132A15"}
+          >
+            Categories:
+          </Text>
           <Flex direction="row" justifyContent="space-evenly">
             {/* TODO: implement onPress actions */}
             <Button>Uncooked</Button>
