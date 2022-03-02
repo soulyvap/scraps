@@ -31,7 +31,9 @@
     "react-native-google-places-autocomplete": "^2.4.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-maps": "0.29.4",
+    "react-native-pager-view": "5.4.9",
     "react-native-paper": "^4.11.2",
+    "react-native-popup-menu": "^0.15.12",
     "react-native-ratings": "^8.1.0",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
@@ -39,8 +41,7 @@
     "react-native-svg": "12.1.1",
     "react-native-tab-view": "^3.1.1",
     "react-native-vector-icons": "^9.1.0",
-    "react-native-web": "0.17.1",
-    "react-native-pager-view": "5.4.9"
+    "react-native-web": "0.17.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

@@ -98,7 +98,7 @@ const ConfirmBooking = ({ navigation, route }) => {
       };
       const commentData = {
         file_id: fileId,
-        comment: listingLog,
+        comment: JSON.stringify(listingLog),
       };
       const tagData = {
         file_id: fileId,

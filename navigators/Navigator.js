@@ -15,19 +15,28 @@ import ChatSingle from "../views/ChatSingle";
 import ChatAll from "../views/ChatAll";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Booking from "../views/Booking";
+import MyBookings from "../views/MyBookings";
+import MyListings from "../views/MyListings";
+import { colors } from "../utils/colors";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
-// export const TopTabScreen = () => {
-//   return (
-//     <TopTab.Navigator>
-//       <TopTab.Screen name="My bookings" component={myBookings} />
-//       <TopTab.Screen name="My listings" component={myListings} />
-//     </TopTab.Navigator>
-//   );
-// };
+const TopTabScreen = () => {
+  return (
+    <TopTab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: colors.green,
+        tabBarInactiveTintColor: colors.grey,
+        tabBarIndicatorStyle: { backgroundColor: colors.green },
+      }}
+    >
+      <TopTab.Screen name="My bookings" component={MyBookings} />
+      <TopTab.Screen name="My listings" component={MyListings} />
+    </TopTab.Navigator>
+  );
+};
 
 const TabScreen = () => {
   return (
@@ -46,10 +55,12 @@ const TabScreen = () => {
             iconName = "file-upload";
           } else if (route.name === "Profile") {
             iconName = "account-circle";
-          }
-          if (route.name === "Chat") {
+          } else if (route.name === "Chat") {
             iconName = "chat";
+          } else if (route.name === "BookingsListings") {
+            iconName = "bookmark";
           }
+
           return (
             <Icon
               as={<MaterialIcons name={iconName} />}
@@ -80,6 +91,11 @@ const TabScreen = () => {
         component={Profile}
         options={{ headerShown: false }}
         // userFilesOnly={true}
+      ></Tab.Screen>
+      <Tab.Screen
+        name="BookingsListings"
+        component={TopTabScreen}
+        options={{ headerShown: false }}
       ></Tab.Screen>
     </Tab.Navigator>
   );
