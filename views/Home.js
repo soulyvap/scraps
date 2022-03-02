@@ -10,6 +10,7 @@ import {
   Avatar,
   Button,
   extendTheme,
+  FlatList,
   Flex,
   Heading,
   Icon,
@@ -84,7 +85,7 @@ const Home = ({ navigation }) => {
             justifyContent={"space-between"}
             alignItems={"center"}
           >
-            <Heading fontSize="xl" p="4" pb="3" color={"#132A15"}>
+            <Heading fontSize="xl" p="4" pb="3" color={"#132A15"} ml={1}>
               Hi, {user.username}!
             </Heading>
             <Button
@@ -106,7 +107,7 @@ const Home = ({ navigation }) => {
             placeholder="Search..."
             placeholderTextColor={"#898980"}
             color={"#132A15"}
-            w="95%"
+            w="90%"
             h={9}
             variant="rounded"
             size="md"
@@ -123,24 +124,29 @@ const Home = ({ navigation }) => {
             }
           ></Input>
           <FlatGrid
-            itemDimension={60}
-            height={120}
+            marginTop={10}
+            marginBottom={10}
+            fixed={true}
+            itemDimension={120}
+            height={90}
+            width={"90%"}
             horizontal={true}
+            alignSelf={"center"}
             data={tagCategories}
             renderItem={({ item }) => (
-              <VStack alignItems="center">
+              <VStack alignItems="center" mx={2}>
                 <Avatar source={{ uri: item.image }} />
                 <Text color={"#132A15"}>{item.title}</Text>
               </VStack>
             )}
           ></FlatGrid>
-          <Flex direction="row" justifyContent="space-evenly" mt={2} mb={2}>
+          <Flex direction="row" justifyContent="space-evenly">
             {/* TODO: implement onPress actions */}
             <Button>Uncooked</Button>
             <Button>Cooked</Button>
             <Button>Frozen</Button>
           </Flex>
-          <List flex={1} navigation={navigation} />
+          <List navigation={navigation} />
         </NativeBaseProvider>
       </SafeAreaView>
     </>

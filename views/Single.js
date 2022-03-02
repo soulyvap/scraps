@@ -31,6 +31,29 @@ const Single = ({ route, navigation }) => {
   const [showModal, setShowModal] = useState(false);
   const { update, setUpdate } = useContext(MainContext);
 
+  const descriptionData = file.description;
+  const allData = JSON.parse(descriptionData);
+  const description = allData.description;
+  const latestPickup = allData.latestPickup;
+  const suitableTimeSlot = allData.suitableTimeSlot;
+  const allergens = allData.allergens;
+
+  const DisplayAllergens = () => {
+    if (allergens.length === 0) {
+      return (
+        <Text color="#132A15" fontSize={16}>
+          {owner.username} didn't list any allergens
+        </Text>
+      );
+    } else {
+      return (
+        <Text color="#132A15" fontSize={16}>
+          {allergens.join(", ")}
+        </Text>
+      );
+    }
+  };
+
   const tags = [
     "vegan",
     "vegetarian",
@@ -176,9 +199,7 @@ const Single = ({ route, navigation }) => {
               <Modal.CloseButton />
               <Modal.Header>Allergens</Modal.Header>
               <Modal.Body>
-                <Text color="#132A15" fontSize={16}>
-                  {owner.username} didn't list any allergens
-                </Text>
+                <DisplayAllergens />
               </Modal.Body>
             </Modal.Content>
           </Modal>
@@ -186,18 +207,43 @@ const Single = ({ route, navigation }) => {
         <Box
           bgColor={"#F9F4F1"}
           w={"90%"}
-          h={"40%"}
+          minH={"15%"}
           borderTopRightRadius="10"
-          borderBottomLeftRadius="10"
-          borderBottomRightRadius="10"
           shadow={9}
         >
           <ScrollView showsVerticalScrollIndicator>
-            <Text m={2} fontSize={"16"} color={"#132A15"}>
-              {file.description}
+            <Text m={3} fontSize={16} color={"#132A15"}>
+              {description}
             </Text>
           </ScrollView>
         </Box>
+        <Box
+          bgColor={"#F9F4F1"}
+          shadow={9}
+          w={"90%"}
+          alignSelf={"flex-start"}
+          ml={"5%"}
+          borderTopWidth={1}
+          borderTopColor={"#898980"}
+        >
+          <Text m={3} fontSize={13} color={"#132A15"}>
+            Latest pickup date: {latestPickup}.
+          </Text>
+        </Box>
+        <Box
+          bgColor={"#F9F4F1"}
+          w={"90%"}
+          shadow={9}
+          alignSelf={"flex-start"}
+          ml={"5%"}
+          borderBottomLeftRadius="10"
+          borderBottomRightRadius="10"
+        >
+          <Text m={3} fontSize={13} color={"#132A15"}>
+            Suitable timeslots: {suitableTimeSlot}.
+          </Text>
+        </Box>
+
         <FlatGrid
           horizontal={true}
           data={tags}
