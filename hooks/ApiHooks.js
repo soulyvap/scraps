@@ -73,10 +73,12 @@ const useLogin = () => {
   return { postLogin };
 };
 
-const useMedia = (tagSelected) => {
+const useMedia = (tagSelected, isCategorySelected) => {
   const [mediaArray, setMediaArray] = useState([]);
   const [userMediaArray, setUserMediaArray] = useState([]);
-  const { user, update } = useContext(MainContext);
+  const { user, update, setUpdate } = useContext(MainContext);
+  const { categoryMedia, setCategoryMedia } = useContext(MainContext);
+
   const [loading, setLoading] = useState(false);
 
   const postMedia = async (formData, token) => {
@@ -129,8 +131,7 @@ const useMedia = (tagSelected) => {
           return mediaData;
         })
       );
-
-      setUserMediaArray(media);
+      setUserMediaArray(media) && setUpdate(update + 1);
     } catch (error) {
       console.error("Problem fetching the data from API", error);
     } finally {

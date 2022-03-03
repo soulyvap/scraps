@@ -10,19 +10,25 @@ import {
   Button,
   extendTheme,
   FlatList,
-  Flex,
   Heading,
-  Icon,
-  Input,
+  HStack,
   NativeBaseProvider,
   Pressable,
   Text,
   View,
 } from "native-base";
-import { defaultTags, foodPostTag } from "../utils/variables";
+import { foodPostTag, defaultTags } from "../utils/variables";
 
 const Home = ({ navigation }) => {
-  const { user, update, setUpdate } = useContext(MainContext);
+  const {
+    user,
+    update,
+    setUpdate,
+    categorySelected,
+    setCategorySelected,
+    isCategorySelected,
+    setIsCategorySelected,
+  } = useContext(MainContext);
   const [tagSelected, setTagSelected] = useState(foodPostTag);
 
   const logout = async () => {
@@ -35,76 +41,120 @@ const Home = ({ navigation }) => {
     <>
       <SafeAreaView flex={1}>
         <NativeBaseProvider theme={theme}>
-          <View
-            flexDirection={"row"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-          >
-            <Heading fontSize="xl" p="4" pb="3" color={"#132A15"} ml={1}>
-              Hi, {user.username}!
-            </Heading>
-            <Button
-              bgColor={"#132A15"}
-              paddingY={2}
-              mr={3}
-              shadow={3}
-              _text={{ color: "#F9F4F1", fontWeight: "bold" }}
-              borderRadius="full"
-              onPress={() => logout()}
+          <Box>
+            <View
+              flexDirection={"row"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
             >
-              Logout
-            </Button>
-          </View>
-          <Text
-            ml={"5%"}
-            fontSize={17}
-            fontWeight={"bold"}
-            mt={1}
-            color={"#132A15"}
-          >
-            Tags:
-          </Text>
-          <FlatList
-            horizontal
-            w={"90%"}
-            alignSelf={"center"}
-            data={defaultTags}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Pressable
+              <Heading fontSize="xl" p="4" pb="3" color={"#132A15"} ml={1}>
+                Hi, {user.username}!
+              </Heading>
+              <Button
+                bgColor={"#132A15"}
+                paddingY={2}
+                mr={3}
+                shadow={3}
+                _text={{ color: "#F9F4F1", fontWeight: "bold" }}
+                borderRadius="full"
+                onPress={() => logout()}
+              >
+                Logout
+              </Button>
+            </View>
+            <Text
+              ml={"5%"}
+              fontSize={17}
+              fontWeight={"bold"}
+              mt={1}
+              color={"#132A15"}
+            >
+              Tags:
+            </Text>
+            <FlatList
+              horizontal
+              w={"90%"}
+              alignSelf={"center"}
+              data={defaultTags}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => {
+                    if (item.text === "all") {
+                      setTagSelected(foodPostTag);
+                    } else {
+                      setTagSelected(item.text);
+                    }
+                    console.log(tagSelected);
+                    setUpdate(update + 1);
+                  }}
+                >
+                  <Box mx={1} mt={1} p={1} alignSelf="center" height={10}>
+                    <Text
+                      color={"#33CA7F"}
+                      textAlign={"center"}
+                      fontWeight={"bold"}
+                      fontSize={16}
+                    >
+                      {item.text}
+                    </Text>
+                  </Box>
+                </Pressable>
+              )}
+            ></FlatList>
+            <Text ml={"5%"} fontSize={17} fontWeight={"bold"} color={"#132A15"}>
+              Categories:
+            </Text>
+            <HStack
+              w={"90%"}
+              alignSelf={"center"}
+              justifyContent={"space-evenly"}
+              my={3}
+            >
+              <Button
                 onPress={() => {
-                  setTagSelected(item.text);
-                  console.log(tagSelected);
+                  setTagSelected(foodPostTag);
+                  setCategorySelected("");
+                  setIsCategorySelected(false);
                   setUpdate(update + 1);
                 }}
               >
-                <Box mx={1} my={3} p={1} alignSelf="center" height={10}>
-                  <Text
-                    color={"#33CA7F"}
-                    textAlign={"center"}
-                    fontWeight={"bold"}
-                  >
-                    {item.text}
-                  </Text>
-                </Box>
-              </Pressable>
-            )}
-          ></FlatList>
-          <Text
-            ml={"5%"}
-            fontSize={17}
-            fontWeight={"bold"}
-            mb={2}
-            color={"#132A15"}
-          >
-            Categories:
-          </Text>
-          <Flex direction="row" justifyContent="space-evenly" mb={3}>
-            <Button>Uncooked</Button>
-            <Button>Cooked</Button>
-            <Button>Frozen</Button>
-          </Flex>
-          <List navigation={navigation} tagSelected={tagSelected} />
+                All
+              </Button>
+              <Button
+                onPress={() => {
+                  setCategorySelected("cooked");
+                  setIsCategorySelected(true);
+                  setUpdate(update + 1);
+                }}
+              >
+                Cooked
+              </Button>
+              <Button
+                onPress={() => {
+                  setCategorySelected("uncooked");
+                  setIsCategorySelected(true);
+                  setUpdate(update + 1);
+                }}
+              >
+                Uncooked
+              </Button>
+              <Button
+                onPress={() => {
+                  setCategorySelected("frozen");
+                  setIsCategorySelected(true);
+                  setUpdate(update + 1);
+                }}
+              >
+                Frozen
+              </Button>
+            </HStack>
+          </Box>
+          <List
+            navigation={navigation}
+            tagSelected={tagSelected}
+            isCategorySelected={isCategorySelected}
+          />
         </NativeBaseProvider>
       </SafeAreaView>
     </>
@@ -115,7 +165,6 @@ const theme = extendTheme({
   components: {
     Button: {
       baseStyle: {
-        w: "25%",
         shadow: 3,
         _text: { color: "#F9F4F1", fontWeight: "bold" },
         borderRadius: "full",

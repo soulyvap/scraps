@@ -1,21 +1,21 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useMedia, useTag } from "../hooks/ApiHooks";
+import React from "react";
+import { useMedia } from "../hooks/ApiHooks";
 import ListItem from "./ListItem";
 import PropTypes from "prop-types";
-import { FlatGrid } from "react-native-super-grid";
-import { MainContext } from "../contexts/MainContext";
-import { foodPostTag } from "../utils/variables";
 
-const List = ({ navigation, tagSelected }) => {
-  const { update, setUpdate } = useContext(MainContext);
-  const { mediaArray } = useMedia(tagSelected);
+import { FlatList } from "native-base";
 
-  // useEffect(() => {}, [update, tagSelected]);
+const List = ({ navigation, tagSelected, isCategorySelected }) => {
+  const { mediaArray } = useMedia(tagSelected, isCategorySelected);
 
   return (
-    <FlatGrid
-      itemDimension={140}
+    <FlatList
+      width={"90%"}
+      alignSelf={"center"}
+      // itemDimension={140}
+      numColumns={2}
       data={mediaArray}
+      columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 20 }}
       keyExtractor={(item) => item.file_id.toString()}
       renderItem={({ item }) => (
         <ListItem navigation={navigation} singleMedia={item} />
@@ -27,6 +27,7 @@ const List = ({ navigation, tagSelected }) => {
 List.propTypes = {
   navigation: PropTypes.object,
   tagSelected: PropTypes.string,
+  categorySelected: PropTypes.bool,
 };
 
 export default List;

@@ -21,14 +21,15 @@ const ListItem = ({ navigation, singleMedia }) => {
   const { getFilesByTag } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
-  const { update, setUpdate, user } = useContext(MainContext);
+  const { update, setUpdate, user, categorySelected, isCategorySelected } =
+    useContext(MainContext);
 
   const fetchOwner = async () => {
     try {
       // TODO: change token when login ready
       const token = await AsyncStorage.getItem("userToken");
       const userData = await getUserById(singleMedia.user_id, token);
-      setOwner(userData) && setUpdate(true);
+      setOwner(userData) && setUpdate(update + 1);
     } catch (error) {
       console.error("fetch owner error", error);
       setOwner({ username: "[not available]" });
@@ -42,7 +43,7 @@ const ListItem = ({ navigation, singleMedia }) => {
         return;
       }
       const avatar = avatarArray.pop();
-      setAvatar(uploadsUrl + avatar.filename) && setUpdate(true);
+      setAvatar(uploadsUrl + avatar.filename) && setUpdate(update + 1);
     } catch (error) {
       console.error(error.message);
     }
@@ -51,7 +52,17 @@ const ListItem = ({ navigation, singleMedia }) => {
   useEffect(() => {
     fetchOwner();
     fetchAvatar();
-  }, []);
+  }, [update]);
+
+  const descriptionData = singleMedia.description;
+  const allData = JSON.parse(descriptionData);
+  const category = allData.category;
+  let displayPost = true;
+
+  if (isCategorySelected && categorySelected !== category) {
+    displayPost = false;
+    return null;
+  }
 
   return (
     <Box

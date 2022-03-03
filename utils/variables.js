@@ -7,14 +7,16 @@ const chatTag = `${appId}_chat`;
 const foodPostTag = `${appId}_post`;
 const defaultAvatar =
   "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
+
 const defaultTags = [
-  { id: 1, text: "dairy-free", active: false },
-  { id: 2, text: "egg-free", active: false },
-  { id: 3, text: "gluten-free", active: false },
-  { id: 4, text: "keto", active: false },
-  { id: 5, text: "nut-free", active: false },
-  { id: 6, text: "vegan", active: false },
-  { id: 7, text: "vegetarian", active: false },
+  { id: 1, text: "all" },
+  { id: 2, text: "dairy-free" },
+  { id: 3, text: "egg-free" },
+  { id: 4, text: "gluten-free" },
+  { id: 5, text: "keto" },
+  { id: 6, text: "nut-free" },
+  { id: 7, text: "vegan" },
+  { id: 8, text: "vegetarian" },
 ];
 
 export {

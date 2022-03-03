@@ -188,7 +188,7 @@ const Profile = ({ navigation, route }) => {
         {/* doesn't work atm */}
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
-          Active listings (0)
+          Active listings ()
         </Text>
         {/* <Box w={"90%"} alignSelf={"center"}>
           <FlatGrid
