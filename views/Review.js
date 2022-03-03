@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   extendTheme,
+  FormControl,
   Heading,
   NativeBaseProvider,
   TextArea,
@@ -15,15 +16,28 @@ import { MainContext } from "../contexts/MainContext";
 import { colors } from "../utils/colors";
 import { useRating, useTag } from "../hooks/ApiHooks";
 import { userFileTag } from "../utils/variables";
+import { Controller, useForm } from "react-hook-form";
 
 let targetFileId;
 
 const Review = ({ route, navigation }) => {
-  const { targetId } = route.params;
+  const { targetId, targetUser } = route.params;
   const { user } = useContext(MainContext);
   const [rating, setRating] = useState(3);
   const { getFilesByTag } = useTag();
   const { getRatingsByFileId, postRating, deleteRating } = useRating();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    getValues,
+  } = useForm({
+    defaultValues: {
+      review: "",
+    },
+  });
 
   const theme = extendTheme({
     components: {
@@ -48,6 +62,8 @@ const Review = ({ route, navigation }) => {
 
   useEffect(() => {
     targetFileId = undefined;
+    console.log("route.params: ", targetId);
+    console.log("route.params user: ", targetUser);
   }, []);
 
   useEffect(() => {
@@ -99,7 +115,7 @@ const Review = ({ route, navigation }) => {
           width={"90%"}
         >
           <Heading color={colors.notBlack} marginY={"5%"} px={4}>
-            Give a review for
+            Give a review for {targetUser}
           </Heading>
           <AirbnbRating
             showRating={false}
@@ -108,12 +124,27 @@ const Review = ({ route, navigation }) => {
             }}
             selectedColor={colors.yellow}
           />
-          <TextArea
-            bgColor={"white"}
-            borderWidth={0}
-            marginY={"5%"}
-            p={3}
-            width={"90%"}
+          <Controller
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl isInvalid={errors.review}>
+                <TextArea
+                  alignSelf={"center"}
+                  autoCapitalize="none"
+                  bgColor={"white"}
+                  borderWidth={0}
+                  marginY={"5%"}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  p={3}
+                  size="lg"
+                  value={value}
+                  textAlign={"left"}
+                  width={"90%"}
+                />
+              </FormControl>
+            )}
+            name="review"
           />
           <Button
             alignSelf={"flex-end"}

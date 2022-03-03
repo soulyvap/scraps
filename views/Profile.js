@@ -171,16 +171,24 @@ const Profile = ({ navigation, route }) => {
               </Text>
             </HStack>
           </Button>
-          <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
+          <Button
+            bgColor={"#FED766"}
+            w={"40%"}
+            alignSelf="center"
+            mb={5}
+            onPress={() => {
+              navigation.navigate("Review", {
+                targetId: file.user_id,
+                targetUser: owner.username,
+              });
+            }}
+          >
             <HStack alignItems={"baseline"}>
               <Icon
                 as={MaterialIcons}
                 name="star"
                 size={5}
                 color="#132A15"
-                onPress={() => {
-                  navigation.navigate("Review", { targetId: file.user_id });
-                }}
               ></Icon>
               <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
                 Review
