@@ -43,7 +43,7 @@ import Tag from "../components/Tag";
 import { listingStatus } from "../components/PostForm";
 import { MainContext } from "../contexts/MainContext";
 
-const ConfirmBooking = ({ navigation, route }) => {
+const Booking = ({ navigation, route }) => {
   const fileId = route.params.fileId;
   const { getMediaById } = useMedia();
   const { getUserById } = useUser();
@@ -413,4 +413,4 @@ const ConfirmBooking = ({ navigation, route }) => {
   );
 };
 
-export default ConfirmBooking;
+export default Booking;

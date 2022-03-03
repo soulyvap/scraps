@@ -4,6 +4,7 @@ import { MainProvider } from "./contexts/MainContext";
 import Navigator from "./navigators/Navigator";
 import ChatAll from "./views/ChatAll";
 import ChatSingle from "./views/ChatSingle";
+import ConfirmBooking from "./views/ConfirmBooking";
 
 const App = () => {
   return (
@@ -11,6 +12,7 @@ const App = () => {
       <NativeBaseProvider>
         <Box flex={1} safeArea bgColor={"white"}>
           <Navigator />
+          {/* <ConfirmBooking /> */}
         </Box>
       </NativeBaseProvider>
     </MainProvider>

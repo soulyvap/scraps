@@ -7,7 +7,7 @@ import { useComment, useTag } from "../hooks/ApiHooks";
 import { colors } from "../utils/colors";
 import { foodPostTag } from "../utils/variables";
 
-const MyBookings = () => {
+const MyBookings = ({ navigation }) => {
   const { getFilesByTag } = useTag();
   const { getCommentsById } = useComment();
   const { user } = useContext(MainContext);
@@ -82,6 +82,7 @@ const MyBookings = () => {
                 fileId={item.file_id}
                 status={status}
                 pickupInfo={pickupInfo}
+                onPressTile={() => {}}
               />
             );
           }}

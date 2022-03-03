@@ -23,6 +23,7 @@ const BookingTile = ({
   messageAlign = "left",
   onPressTile,
   onPressDots,
+  menuShown = true,
 }) => {
   const { getMediaById } = useMedia();
   const [pic, setPic] = useState();
@@ -41,6 +42,8 @@ const BookingTile = ({
         break;
       case listingStatus.pickedUp:
         requiredMessage = "Picked up";
+      case listingStatus.listed:
+        requiredMessage = "Listed";
       default:
         break;
     }
@@ -80,7 +83,6 @@ const BookingTile = ({
           <Image
             style={{ aspectRatio: 1, height: 100, width: undefined }}
             source={{ uri: pic }}
-            borderStyle="solid"
             borderWidth={0.1}
             borderColor={colors.grey}
             alt="food-image"
@@ -94,18 +96,25 @@ const BookingTile = ({
               </Heading>
             )}
 
-            <IconButton
-              onPress={onPressDots}
-              size={5}
-              _icon={{
-                as: MaterialCommunityIcons,
-                name: "dots-horizontal",
-                size: 5,
-              }}
-            />
+            {menuShown && (
+              <IconButton
+                onPress={onPressDots}
+                size={5}
+                _icon={{
+                  as: MaterialCommunityIcons,
+                  name: "dots-horizontal",
+                  size: 5,
+                }}
+              />
+            )}
           </HStack>
 
-          <View flex={0.6} bgColor={colors.beige} borderRadius={5} p={1.5}>
+          <View
+            flex={0.6}
+            bgColor={active ? colors.beige : "white"}
+            borderRadius={5}
+            p={1.5}
+          >
             <Text fontSize={10} numberOfLines={3}>
               {description}
             </Text>
