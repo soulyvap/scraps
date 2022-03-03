@@ -19,16 +19,16 @@ import { MainContext } from "../contexts/MainContext";
 const ListItem = ({ navigation, singleMedia }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
-  const { user } = useContext(MainContext);
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
+  const { update, setUpdate, user } = useContext(MainContext);
 
   const fetchOwner = async () => {
     try {
       // TODO: change token when login ready
       const token = await AsyncStorage.getItem("userToken");
       const userData = await getUserById(singleMedia.user_id, token);
-      setOwner(userData);
+      setOwner(userData) && setUpdate(true);
     } catch (error) {
       console.error("fetch owner error", error);
       setOwner({ username: "[not available]" });
@@ -42,7 +42,7 @@ const ListItem = ({ navigation, singleMedia }) => {
         return;
       }
       const avatar = avatarArray.pop();
-      setAvatar(uploadsUrl + avatar.filename);
+      setAvatar(uploadsUrl + avatar.filename) && setUpdate(true);
     } catch (error) {
       console.error(error.message);
     }

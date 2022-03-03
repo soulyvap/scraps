@@ -15,13 +15,15 @@ import {
   Icon,
   Input,
   NativeBaseProvider,
+  Pressable,
   Text,
   View,
 } from "native-base";
-import { defaultTags } from "../utils/variables";
+import { defaultTags, foodPostTag } from "../utils/variables";
 
 const Home = ({ navigation }) => {
-  const { user, setIsLoggedIn } = useContext(MainContext);
+  const { user, update, setUpdate } = useContext(MainContext);
+  const [tagSelected, setTagSelected] = useState(foodPostTag);
 
   const logout = async () => {
     console.log("logout");
@@ -53,28 +55,6 @@ const Home = ({ navigation }) => {
               Logout
             </Button>
           </View>
-          {/* TODO: implement search functionality */}
-          <Input
-            alignSelf="center"
-            placeholder="Search..."
-            placeholderTextColor={"#898980"}
-            color={"#132A15"}
-            w="90%"
-            h={9}
-            variant="rounded"
-            size="md"
-            paddingLeft="5"
-            bgColor="#F9F4F1"
-            InputRightElement={
-              <Icon
-                as={<MaterialIcons name="search" />}
-                size={5}
-                mr="3"
-                color="#898980"
-                onPress={() => console.log("Execute search")}
-              />
-            }
-          ></Input>
           <Text
             ml={"5%"}
             fontSize={17}
@@ -91,15 +71,23 @@ const Home = ({ navigation }) => {
             data={defaultTags}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <Box mx={1} my={3} p={1} alignSelf="center" height={10}>
-                <Text
-                  color={"#33CA7F"}
-                  textAlign={"center"}
-                  fontWeight={"bold"}
-                >
-                  {item.text}
-                </Text>
-              </Box>
+              <Pressable
+                onPress={() => {
+                  setTagSelected(item.text);
+                  console.log(tagSelected);
+                  setUpdate(update + 1);
+                }}
+              >
+                <Box mx={1} my={3} p={1} alignSelf="center" height={10}>
+                  <Text
+                    color={"#33CA7F"}
+                    textAlign={"center"}
+                    fontWeight={"bold"}
+                  >
+                    {item.text}
+                  </Text>
+                </Box>
+              </Pressable>
             )}
           ></FlatList>
           <Text
@@ -112,12 +100,11 @@ const Home = ({ navigation }) => {
             Categories:
           </Text>
           <Flex direction="row" justifyContent="space-evenly" mb={3}>
-            {/* TODO: implement onPress actions */}
             <Button>Uncooked</Button>
             <Button>Cooked</Button>
             <Button>Frozen</Button>
           </Flex>
-          <List navigation={navigation} />
+          <List navigation={navigation} tagSelected={tagSelected} />
         </NativeBaseProvider>
       </SafeAreaView>
     </>

@@ -73,7 +73,7 @@ const useLogin = () => {
   return { postLogin };
 };
 
-const useMedia = () => {
+const useMedia = (tagSelected) => {
   const [mediaArray, setMediaArray] = useState([]);
   const [userMediaArray, setUserMediaArray] = useState([]);
   const { user, update } = useContext(MainContext);
@@ -99,7 +99,7 @@ const useMedia = () => {
   const loadMedia = async () => {
     setLoading(true);
     try {
-      let json = await useTag().getFilesByTag(foodPostTag);
+      let json = await useTag().getFilesByTag(tagSelected);
       const media = await Promise.all(
         json.map(async (item) => {
           const response = await fetch(baseUrl + "media/" + item.file_id);
