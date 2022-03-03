@@ -18,6 +18,7 @@ import {
   View,
 } from "native-base";
 import { foodPostTag, defaultTags } from "../utils/variables";
+import { colors } from "../utils/colors";
 
 const Home = ({ navigation }) => {
   const {
@@ -112,6 +113,9 @@ const Home = ({ navigation }) => {
               my={3}
             >
               <Button
+                bgColor={
+                  categorySelected === "" ? colors.notBlack : colors.green
+                }
                 onPress={() => {
                   setTagSelected(foodPostTag);
                   setCategorySelected("");
@@ -122,6 +126,9 @@ const Home = ({ navigation }) => {
                 All
               </Button>
               <Button
+                bgColor={
+                  categorySelected === "cooked" ? colors.notBlack : colors.green
+                }
                 onPress={() => {
                   setCategorySelected("cooked");
                   setIsCategorySelected(true);
@@ -131,6 +138,11 @@ const Home = ({ navigation }) => {
                 Cooked
               </Button>
               <Button
+                bgColor={
+                  categorySelected === "uncooked"
+                    ? colors.notBlack
+                    : colors.green
+                }
                 onPress={() => {
                   setCategorySelected("uncooked");
                   setIsCategorySelected(true);
@@ -140,6 +152,9 @@ const Home = ({ navigation }) => {
                 Uncooked
               </Button>
               <Button
+                bgColor={
+                  categorySelected === "frozen" ? colors.notBlack : colors.green
+                }
                 onPress={() => {
                   setCategorySelected("frozen");
                   setIsCategorySelected(true);
