@@ -6,10 +6,11 @@ const MainContext = React.createContext({});
 const MainProvider = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState({});
-  const [update, setUpdate] = useState(false);
   const [owner, setOwner] = useState({});
   const [isCategorySelected, setIsCategorySelected] = useState(false);
   const [categorySelected, setCategorySelected] = useState({});
+  const [update, setUpdate] = useState(0);
+  const [coords, setCoords] = useState({});
 
   return (
     <MainContext.Provider
@@ -20,12 +21,14 @@ const MainProvider = (props) => {
         setUser,
         owner,
         setOwner,
-        update,
-        setUpdate,
         categorySelected,
         setCategorySelected,
         isCategorySelected,
         setIsCategorySelected,
+        update,
+        setUpdate,
+        coords,
+        setCoords,
       }}
     >
       {props.children}

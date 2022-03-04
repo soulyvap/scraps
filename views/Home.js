@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
 import List from "../components/List";
 import PropTypes from "prop-types";
@@ -24,7 +24,9 @@ const Home = ({ navigation }) => {
   const {
     user,
     update,
+    coords,
     setUpdate,
+    setIsLoggedIn,
     categorySelected,
     setCategorySelected,
     isCategorySelected,

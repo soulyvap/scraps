@@ -29,7 +29,7 @@ import { MainContext } from "../contexts/MainContext";
 const Single = ({ route, navigation }) => {
   const { file } = route.params;
   const { getUserById } = useUser();
-  const { getFilesByTag, getTagsByFile } = useTag();
+  const { getFilesByTag, getTagsByFileId } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [showModal, setShowModal] = useState(false);
@@ -61,7 +61,7 @@ const Single = ({ route, navigation }) => {
 
   const fetchTags = async () => {
     try {
-      const fileTags = await getTagsByFile(file.file_id);
+      const fileTags = await getTagsByFileId(file.file_id);
       for (let i = 0; i < fileTags.length; i++) {
         if (fileTags[i].tag === `${appId}_post`) {
           fileTags.splice(i, 1);
@@ -263,7 +263,14 @@ const Single = ({ route, navigation }) => {
             </Box>
           )}
         ></FlatGrid>
-        <Button mt={9} borderRadius={"full"} bgColor={"#33CA7F"}>
+        <Button
+          mt={9}
+          borderRadius={"full"}
+          bgColor={"#33CA7F"}
+          onPress={() =>
+            navigation.navigate("ConfirmBooking", { fileId: file.file_id })
+          }
+        >
           <Text color="#F9F4F1" fontWeight={"bold"}>
             Book now
           </Text>

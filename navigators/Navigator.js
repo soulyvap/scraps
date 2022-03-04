@@ -14,9 +14,21 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Icon } from "native-base";
 import ChatSingle from "../views/ChatSingle";
 import ChatAll from "../views/ChatAll";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import ConfirmBooking from "../views/ConfirmBooking";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const TopTab = createMaterialTopTabNavigator();
+
+// export const TopTabScreen = () => {
+//   return (
+//     <TopTab.Navigator>
+//       <TopTab.Screen name="My bookings" component={myBookings} />
+//       <TopTab.Screen name="My listings" component={myListings} />
+//     </TopTab.Navigator>
+//   );
+// };
 
 const TabScreen = () => {
   return (
@@ -98,6 +110,11 @@ const StackScreen = () => {
           <Stack.Screen
             name="MyProfile"
             component={TabScreen}
+            options={{ headerShown: false }}
+            ></Stack.Screen>
+           <Stack.Screen
+            name="ConfirmBooking"
+            component={ConfirmBooking}
             options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen
