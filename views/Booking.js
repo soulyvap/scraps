@@ -113,7 +113,11 @@ const Booking = ({ navigation, route }) => {
         console.log(tagResponse);
 
         if (commentResponse && tagResponse) {
-          Alert.alert("Booking successful", `${username} now has to accept it`);
+          Alert.alert(
+            "Booking successful",
+            `Awaiting ${username}'s confirmation`
+          );
+          navigation.navigate("BookingsListings");
         }
       } catch (error) {
         console.error("submit confirm booking", error);

@@ -1,4 +1,4 @@
-import { FlatList, HStack, Text, View } from "native-base";
+import { FlatList, HStack, SectionList, Text, View } from "native-base";
 import react, { useContext, useEffect, useState } from "react";
 import BookingTile from "../components/BookingTile";
 import { listingStatus } from "../components/PostForm";
@@ -10,10 +10,9 @@ import { foodPostTag } from "../utils/variables";
 const MyBookings = ({ navigation }) => {
   const { getFilesByTag } = useTag();
   const { getCommentsById } = useComment();
-  const { user } = useContext(MainContext);
+  const { user, update } = useContext(MainContext);
 
-  const [activeBookings, setActiveBookings] = useState([]);
-  const [inactiveBookings, setInactiveBookings] = useState([]);
+  const [data, setData] = useState([]);
 
   const fetchBookings = async () => {
     const active = [];
@@ -37,21 +36,30 @@ const MyBookings = ({ navigation }) => {
       console.log("booked", listingsBooked);
       listingsBooked.forEach((listing) => {
         const lastComment = listing.lastComment;
-        if (lastComment.user_id === user.user_id) {
-          active.push(listing);
-        } else {
-          const info = JSON.parse(lastComment.comment);
-          if (info.bookedBy === user.user_id) {
-            if (info.status === listingStatus.pickedUp) {
-              inactive.push(listing);
-            } else {
-              active.push(listing);
-            }
+        const info = JSON.parse(lastComment.comment);
+        if (info.pickupInfo.bookedBy === user.user_id) {
+          if (info.status === listingStatus.pickedUp) {
+            inactive.push(listing);
+          } else if (
+            info.status !== listingStatus.cancelled &&
+            info.status !== listingStatus.deleted
+          ) {
+            active.push(listing);
           }
         }
-        console.log("active", active);
-        setActiveBookings([...active]);
-        setInactiveBookings([...inactive]);
+
+        const data = [
+          {
+            title: "Active ",
+            data: active,
+          },
+          {
+            title: "Archived ",
+            data: inactive,
+          },
+        ];
+
+        setData([...data]);
       });
     } catch (error) {
       console.error("fetchBookings", error);
@@ -60,53 +68,44 @@ const MyBookings = ({ navigation }) => {
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [update]);
+
+  const renderItem = (item) => {
+    const info = JSON.parse(item.lastComment.comment);
+    const status = info.status;
+    const pickupInfo = info.pickupInfo;
+    const active = status !== listingStatus.pickedUp;
+    return (
+      <BookingTile
+        active={active}
+        fileId={item.file_id}
+        status={status}
+        pickupInfo={pickupInfo}
+        navigation={navigation}
+        own={false}
+      />
+    );
+  };
+
+  const SectionHeader = ({ section }) => {
+    return (
+      <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
+        <Text>{`${section.title}(${section.data.length})`}</Text>
+        <View h={0.4} bgColor={colors.grey} flex={1} />
+      </HStack>
+    );
+  };
 
   return (
     <View flex={1}>
-      <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
-        <Text>{`Active (${activeBookings.length})`}</Text>
-        <View h={0.4} bgColor={colors.grey} flex={1} />
-      </HStack>
-      {activeBookings.length > 0 && (
-        <FlatList
-          data={activeBookings}
-          keyExtractor={(item) => item.fileId}
-          renderItem={({ item }) => {
-            const info = JSON.parse(item.lastComment.comment);
-            const status = info.status;
-            const pickupInfo = info.pickupInfo;
-            return (
-              <BookingTile
-                active={true}
-                fileId={item.file_id}
-                status={status}
-                pickupInfo={pickupInfo}
-                onPressTile={() => {}}
-              />
-            );
-          }}
-        />
-      )}
-      <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
-        <Text>{`Archived (${inactiveBookings.length})`}</Text>
-        <View h={0.4} bgColor={colors.grey} flex={1} />
-      </HStack>
-      {inactiveBookings.length > 0 && (
-        <FlatList
-          data={inactiveBookings}
-          keyExtractor={(item) => item.fileId}
-          renderItem={({ item }) => {
-            const info = JSON.parse(item.lastComment.comment);
-            const status = info.status;
-            const pickupInfo = info.pickupInfo;
-            <BookingTile
-              active={false}
-              fileId={item.file_id}
-              status={status}
-              pickupInfo={pickupInfo}
-            />;
-          }}
+      {data && (
+        <SectionList
+          sections={data}
+          keyExtractor={(item, index) => index}
+          renderItem={({ item }) => renderItem(item)}
+          renderSectionHeader={({ section }) => (
+            <SectionHeader section={section} />
+          )}
         />
       )}
     </View>

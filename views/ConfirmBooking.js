@@ -9,7 +9,7 @@ import {
   View,
   VStack,
 } from "native-base";
-import react, { useEffect, useState } from "react";
+import react, { useContext, useEffect, useState } from "react";
 import BackButton from "../components/BackButton";
 import BookingTile from "../components/BookingTile";
 import Tag from "../components/Tag";
@@ -19,10 +19,11 @@ import { avatarTag, uploadsUrl } from "../utils/variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import { listingStatus } from "../components/PostForm";
+import { MainContext } from "../contexts/MainContext";
 
 const ConfirmBooking = ({ navigation, route }) => {
   const fileId = route.params.fileId;
-  const { getCommentsById } = useComment();
+  const { getCommentsById, postComment } = useComment();
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
 
@@ -31,16 +32,37 @@ const ConfirmBooking = ({ navigation, route }) => {
   const [userId, setUserId] = useState();
   const [avatar, setAvatar] = useState();
   const [pickupInfo, setPickupInfo] = useState();
+  const [bookingInfo, setBookingInfo] = useState();
+  const { update, setUpdate } = useContext(MainContext);
+
+  const updateStatus = async (newStatus) => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    try {
+      let updatedInfo = bookingInfo;
+      updatedInfo.status = newStatus;
+      const comment = JSON.stringify(updatedInfo);
+      const commentData = {
+        file_id: fileId,
+        comment: comment,
+      };
+      const commentResponse = await postComment(commentData, userToken);
+      console.log(commentResponse);
+      setUpdate(update + 1);
+    } catch (error) {
+      console.error("confirm", error);
+    }
+  };
 
   const fetchBooking = async () => {
     try {
       const comments = await getCommentsById(fileId);
       const booking = comments.pop();
       const info = JSON.parse(booking.comment);
+      setBookingInfo(info);
       setPickupInfo(info.pickupInfo);
       console.log(info);
       setStatus(info.status);
-      const userIdFetched = booking.user_id;
+      const userIdFetched = info.pickupInfo.bookedBy;
       setUserId(userIdFetched);
       await fetchUsername(userIdFetched);
       await fetchAvatar(userIdFetched);
@@ -94,9 +116,13 @@ const ConfirmBooking = ({ navigation, route }) => {
           navigation.goBack();
         }}
       />
-      <Heading textAlign={"center"} fontSize={"lg"} py={3}>
-        Confirm booking
-      </Heading>
+      {status && (
+        <Heading textAlign={"center"} fontSize={"lg"} py={3}>
+          {status === listingStatus.booked
+            ? "Approve booking"
+            : "Booking review"}
+        </Heading>
+      )}
 
       {fileId && pickupInfo && status && (
         <BookingTile
@@ -125,8 +151,9 @@ const ConfirmBooking = ({ navigation, route }) => {
         {pickupInfo && username && (
           <VStack mx={"10%"} space={3}>
             <Text fontSize={20}>{`${username} chose:`}</Text>
-            {pickupInfo.contactless && <Text>{`📏 No contact pickup`}</Text>}
+
             <VStack space={2} ml={8}>
+              {pickupInfo.contactless && <Text>{`❌ No contact pickup`}</Text>}
               <Text fontSize={12}>{`${methodEmoji(pickupInfo.pickupMethod)}  ${
                 pickupInfo.pickupMethod
               }`}</Text>
@@ -140,22 +167,32 @@ const ConfirmBooking = ({ navigation, route }) => {
         {status && (
           <VStack alignItems={"center"} space={6} w="100%">
             <HStack space={6}>
-              <Button
-                bgColor={colors.green}
-                shadow="6"
-                borderRadius={15}
-                w={"30%"}
-              >
-                {status === listingStatus.confirmed
-                  ? "Marked Picked Up"
-                  : "Accept"}
-              </Button>
+              {status !== listingStatus.pickedUp && (
+                <Button
+                  bgColor={colors.green}
+                  shadow="6"
+                  borderRadius={15}
+                  w={"30%"}
+                  onPress={async () => {
+                    if (status === listingStatus.booked) {
+                      await updateStatus(listingStatus.confirmed);
+                    } else if (status === listingStatus.confirmed) {
+                      await updateStatus(listingStatus.pickedUp);
+                    }
+                  }}
+                  _text={{ fontSize: 13 }}
+                >
+                  {status === listingStatus.confirmed
+                    ? "Mark Picked Up"
+                    : "Accept"}
+                </Button>
+              )}
               <Button
                 bgColor={colors.yellow}
                 shadow="6"
                 borderRadius={15}
                 w={"30%"}
-                _text={{ color: colors.notBlack }}
+                _text={{ color: colors.notBlack, fontSize: 13 }}
                 onPress={() =>
                   navigation.navigate("ChatSingle", { userId2: userId })
                 }
@@ -163,9 +200,18 @@ const ConfirmBooking = ({ navigation, route }) => {
                 Message
               </Button>
             </HStack>
-            <Button bgColor={colors.red} shadow="6" borderRadius={15} w={"30%"}>
-              {status === listingStatus.confirmed ? "Cancel" : "Decline"}
-            </Button>
+            {status !== listingStatus.pickedUp && (
+              <Button
+                bgColor={colors.red}
+                shadow="6"
+                borderRadius={15}
+                w={"30%"}
+                _text={{ fontSize: 13 }}
+                onPress={() => updateStatus(listingStatus.cancelled)}
+              >
+                {status === listingStatus.confirmed ? "Cancel" : "Decline"}
+              </Button>
+            )}
           </VStack>
         )}
       </Center>

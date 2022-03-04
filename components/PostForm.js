@@ -35,6 +35,8 @@ export const listingStatus = {
   booked: "booked",
   confirmed: "confirmed",
   pickedUp: "picked-up",
+  cancelled: "cancelled",
+  deleted: "deleted",
 };
 
 const PostForm = ({ navigation }) => {

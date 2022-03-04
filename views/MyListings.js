@@ -1,4 +1,4 @@
-import { FlatList, HStack, Text, View } from "native-base";
+import { FlatList, HStack, SectionList, Text, View } from "native-base";
 import react, { useContext, useEffect, useState } from "react";
 import BookingTile from "../components/BookingTile";
 import { listingStatus } from "../components/PostForm";
@@ -11,10 +11,8 @@ const MyListings = ({ navigation }) => {
   const { getFilesByTag } = useTag();
   const { getCommentsById } = useComment();
   const { getMediaById } = useMedia();
-  const { user } = useContext(MainContext);
-
-  const [activeListings, setActiveListings] = useState([]);
-  const [inactiveListings, setInactiveListings] = useState([]);
+  const { user, update } = useContext(MainContext);
+  const [data, setData] = useState([]);
 
   const fetchListings = async () => {
     const active = [];
@@ -43,13 +41,23 @@ const MyListings = ({ navigation }) => {
           const info = JSON.parse(lastComment.comment);
           if (info.status === listingStatus.pickedUp) {
             inactive.push(listing);
-          } else {
+          } else if (info.status !== listingStatus.deleted) {
             active.push(listing);
           }
         }
       });
-      setActiveListings([...active]);
-      setInactiveListings([...inactive]);
+      const data = [
+        {
+          title: "Active ",
+          data: active,
+        },
+        {
+          title: "Archived ",
+          data: inactive,
+        },
+      ];
+
+      setData([...data]);
     } catch (error) {
       console.error("fetchListings", error);
     }
@@ -57,70 +65,56 @@ const MyListings = ({ navigation }) => {
 
   useEffect(() => {
     fetchListings();
-  }, []);
+  }, [update]);
+
+  const renderItem = (item) => {
+    if (!item.lastComment) {
+      return (
+        <BookingTile
+          active={true}
+          fileId={item.file_id}
+          status={listingStatus.listed}
+          navigation={navigation}
+          own={true}
+        />
+      );
+    } else {
+      const info = JSON.parse(item.lastComment.comment);
+      const status = info.status;
+      const pickupInfo = info.pickupInfo;
+      const active = status !== listingStatus.pickedUp;
+      return (
+        <BookingTile
+          active={active}
+          fileId={item.file_id}
+          status={status}
+          pickupInfo={pickupInfo}
+          navigation={navigation}
+          own={true}
+        />
+      );
+    }
+  };
+
+  const SectionHeader = ({ section }) => {
+    return (
+      <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
+        <Text>{`${section.title}(${section.data.length})`}</Text>
+        <View h={0.4} bgColor={colors.grey} flex={1} />
+      </HStack>
+    );
+  };
 
   return (
     <View flex={1}>
-      <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
-        <Text>{`Active (${activeListings.length})`}</Text>
-        <View h={0.4} bgColor={colors.grey} flex={1} />
-      </HStack>
-      {activeListings.length > 0 && (
-        <FlatList
-          data={activeListings}
-          keyExtractor={(item) => item.fileId}
-          renderItem={({ item }) => {
-            if (!item.lastComment) {
-              return (
-                <BookingTile
-                  active={true}
-                  fileId={item.file_id}
-                  status={listingStatus.listed}
-                  own={true}
-                  onPressTile={() => {}}
-                />
-              );
-            } else {
-              const info = JSON.parse(item.lastComment.comment);
-              const status = info.status;
-              const pickupInfo = info.pickupInfo;
-              return (
-                <BookingTile
-                  active={true}
-                  fileId={item.file_id}
-                  status={status}
-                  own={true}
-                  pickupInfo={pickupInfo}
-                  onPressTile={() => {
-                    navigation.navigate("ConfirmBooking", {
-                      fileId: item.file_id,
-                    });
-                  }}
-                />
-              );
-            }
-          }}
-        />
-      )}
-      <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
-        <Text>{`Archived (${inactiveListings.length})`}</Text>
-        <View h={0.4} bgColor={colors.grey} flex={1} />
-      </HStack>
-      {inactiveListings.length > 0 && (
-        <FlatList
-          data={inactiveListings}
-          keyExtractor={(item) => item.fileId}
-          renderItem={({ item }) => {
-            const info = JSON.parse(item.lastComment.comment);
-            const status = info.status;
-            const pickupInfo = info.pickupInfo;
-            <BookingTile
-              active={false}
-              fileId={item.file_id}
-              status={status}
-              pickupInfo={pickupInfo}
-            />;
-          }}
+      {data && (
+        <SectionList
+          sections={data}
+          keyExtractor={(item, index) => index}
+          renderItem={({ item }) => renderItem(item)}
+          renderSectionHeader={({ section }) => (
+            <SectionHeader section={section} />
+          )}
         />
       )}
     </View>

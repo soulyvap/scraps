@@ -19,6 +19,7 @@ import MyBookings from "../views/MyBookings";
 import MyListings from "../views/MyListings";
 import { colors } from "../utils/colors";
 import ConfirmBooking from "../views/ConfirmBooking";
+import BookingSummary from "../views/BookingSummary";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -132,6 +133,11 @@ const StackScreen = () => {
           <Stack.Screen
             name="ConfirmBooking"
             component={ConfirmBooking}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="BookingSummary"
+            component={BookingSummary}
             options={{ headerShown: false }}
           ></Stack.Screen>
         </>

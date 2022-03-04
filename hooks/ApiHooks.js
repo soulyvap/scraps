@@ -97,6 +97,16 @@ const useMedia = (userFilesOnly) => {
     return await doFetch(baseUrl + "media/" + fileId);
   };
 
+  const deleteMediaById = async (fileId, token) => {
+    const options = {
+      method: "DELETE",
+      headers: {
+        "x-access-token": token,
+      },
+    };
+    return await doFetch(baseUrl + "media/" + fileId, options);
+  };
+
   const loadMedia = async () => {
     setLoading(true);
     try {
@@ -178,6 +188,7 @@ const useMedia = (userFilesOnly) => {
     getMediaById,
     userMediaArray,
     scrapsMediaArray,
+    deleteMediaById,
   };
 };
 
