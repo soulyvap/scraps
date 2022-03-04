@@ -57,7 +57,7 @@ const ChatSingle = ({ route, navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       const interval = setInterval(() => {
-        setUpdate(update + 1);
+        chatFileId && setUpdate(update + 1);
       }, 7000);
 
       return () => {
@@ -75,9 +75,9 @@ const ChatSingle = ({ route, navigation }) => {
 
   //set other user info
 
-  useEffect(async () => {
+  useEffect(() => {
     if (update > 0) {
-      chatFileId && (await fetchMessages(chatFileId));
+      chatFileId && fetchMessages(chatFileId);
     }
   }, [update]);
 
@@ -136,14 +136,16 @@ const ChatSingle = ({ route, navigation }) => {
     try {
       const chatFiles = await getFilesByTag(chatTag);
       const currentChatFile = findChatFile(chatFiles);
-      const currentChatFileId = currentChatFile.file_id;
       if (currentChatFile) {
+        const currentChatFileId = currentChatFile.file_id;
         setChatFileId(currentChatFileId);
         await fetchMessages(currentChatFileId);
       } else {
         console.log("need to create chat file");
       }
-    } catch (error) {}
+    } catch (error) {
+      throw new Error(error.message);
+    }
   };
 
   const createChatFile = async () => {
@@ -160,8 +162,10 @@ const ChatSingle = ({ route, navigation }) => {
     try {
       const response = await postMedia(formData, userToken);
       if (response) {
-        const tagResponse = await addChatTag(response.file_id);
-        tagResponse && setChatFileId(response.file_id);
+        await addChatTag(response.file_id);
+        console.log("create", response.file_id);
+        setChatFileId(response.file_id);
+        await sendMessage(inputValue, response.file_id);
       }
     } catch (error) {
       throw new Error(error.message);
@@ -203,23 +207,24 @@ const ChatSingle = ({ route, navigation }) => {
 
   const handleSend = async () => {
     if (chatFileId) {
-      await sendMessage();
+      await sendMessage(inputValue, chatFileId);
     } else {
+      console.log("create");
       await createChatFile();
-      await sendMessage();
     }
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (text, fileId) => {
     const userToken = await AsyncStorage.getItem("userToken");
+    console.log(fileId);
     try {
-      if (inputValue.length > 0) {
+      if (text.length > 0) {
         const commentData = {
-          file_id: chatFileId,
-          comment: inputValue,
+          file_id: fileId,
+          comment: text,
         };
-        const response = await postComment(commentData, userToken);
-        response && setUpdate(update + 1);
+        await postComment(commentData, userToken);
+        await fetchMessages(fileId);
       }
     } catch (error) {
       throw new Error(error.message);
@@ -283,7 +288,7 @@ const ChatSingle = ({ route, navigation }) => {
         </Heading>
       )}
       <View flex={0.9} mt={3}>
-        {messages && username && (
+        {messages && username && chatFileId && (
           <ChatBubbleList messages={messages} username={username} />
         )}
       </View>
