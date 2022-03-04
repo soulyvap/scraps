@@ -47,6 +47,7 @@ const ConfirmBooking = ({ navigation, route }) => {
       };
       const commentResponse = await postComment(commentData, userToken);
       console.log(commentResponse);
+      navigation.goBack();
       setUpdate(update + 1);
     } catch (error) {
       console.error("confirm", error);
@@ -207,7 +208,10 @@ const ConfirmBooking = ({ navigation, route }) => {
                 borderRadius={15}
                 w={"30%"}
                 _text={{ fontSize: 13 }}
-                onPress={() => updateStatus(listingStatus.cancelled)}
+                onPress={() => {
+                  updateStatus(listingStatus.cancelled);
+                  navigation.goBack();
+                }}
               >
                 {status === listingStatus.confirmed ? "Cancel" : "Decline"}
               </Button>

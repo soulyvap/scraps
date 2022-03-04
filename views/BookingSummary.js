@@ -25,7 +25,7 @@ import { MainContext } from "../contexts/MainContext";
 
 const BookingSummary = ({ navigation, route }) => {
   const fileId = route.params.fileId;
-  const { getCommentsById } = useComment();
+  const { getCommentsById, postComment } = useComment();
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
   const { getMediaById } = useMedia();
@@ -301,7 +301,10 @@ const BookingSummary = ({ navigation, route }) => {
                 shadow="5"
                 borderRadius={15}
                 w={"30%"}
-                onPress={() => updateStatus(listingStatus.cancelled)}
+                onPress={() => {
+                  updateStatus(listingStatus.cancelled);
+                  navigation.goBack();
+                }}
               >
                 Cancel
               </Button>

@@ -33,12 +33,6 @@ import { MainContext } from "../contexts/MainContext";
 import { Image, Keyboard } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
-let userFileId;
-let chatFileId;
-let username;
-let rating;
-let avatar;
-
 const ChatSingle = ({ route, navigation }) => {
   const userId2 = route.params.userId2;
 
@@ -47,6 +41,11 @@ const ChatSingle = ({ route, navigation }) => {
   const [update, setUpdate] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [keyboardShowing, setKeyboardShowing] = useState(false);
+  const [userFileId, setUserFileId] = useState();
+  const [chatFileId, setChatFileId] = useState();
+  const [username, setUsername] = useState();
+  const [rating, setRating] = useState();
+  const [avatar, setAvatar] = useState();
 
   const { getUserById } = useUser();
   const { getFilesByTag, postTag } = useTag();
@@ -54,15 +53,6 @@ const ChatSingle = ({ route, navigation }) => {
   const { postMedia } = useMedia();
   const { getCommentsById, postComment } = useComment();
   const { user } = useContext(MainContext);
-
-  //set current user info
-  useEffect(() => {
-    userFileId = undefined;
-    chatFileId = undefined;
-    username = undefined;
-    rating = undefined;
-    avatar = undefined;
-  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -76,21 +66,18 @@ const ChatSingle = ({ route, navigation }) => {
     })
   );
 
-  useEffect(async () => {
+  useEffect(() => {
     fetchUsername();
     fetchAvatar();
     fetchUserFile();
-    fetchRating();
-    await fetchChatFile();
-    await fetchMessages();
+    fetchChatFile();
   }, []);
 
   //set other user info
 
   useEffect(async () => {
-    console.log("update", update);
     if (update > 0) {
-      chatFileId && (await fetchMessages());
+      chatFileId && (await fetchMessages(chatFileId));
     }
   }, [update]);
 
@@ -98,8 +85,7 @@ const ChatSingle = ({ route, navigation }) => {
     try {
       const userToken = await AsyncStorage.getItem("userToken");
       const user = await getUserById(userId2, userToken);
-      username = user.full_name || user.username;
-      // setUsername(user.full_name || user.username);
+      setUsername(user.full_name || user.username);
     } catch (error) {
       console.error("fetchUsername", error);
     }
@@ -109,8 +95,7 @@ const ChatSingle = ({ route, navigation }) => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + userId2);
       const avatarFetched = await avatarArray.pop();
-      avatar = uploadsUrl + avatarFetched.filename;
-      // setAvatar(uploadsUrl + avatarFetched.filename);
+      setAvatar(uploadsUrl + avatarFetched.filename);
     } catch (error) {
       console.error("fetchAvatar", error.message);
     }
@@ -120,20 +105,19 @@ const ChatSingle = ({ route, navigation }) => {
     try {
       const userFiles = await getFilesByTag(userFileTag + userId2);
       const userFile = userFiles[0];
-      // setUserFileId(userFile.file_id);
-      userFileId = userFile.file_id;
+      setUserFileId(userFile.file_id);
+      await fetchRating(userFile.file_id);
     } catch (error) {
       console.error("fetchUserFile", error.message);
     }
   };
 
-  const fetchRating = async () => {
+  const fetchRating = async (userFileId) => {
     try {
       const ratingList = await getRatingsById(userFileId);
       const ratings = ratingList.map((rating) => rating.rating);
       const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-      rating = average;
-      // setRating(average);
+      setRating(average);
     } catch (error) {
       console.error("fetchRating", error.message);
     }
@@ -154,9 +138,8 @@ const ChatSingle = ({ route, navigation }) => {
       const currentChatFile = findChatFile(chatFiles);
       const currentChatFileId = currentChatFile.file_id;
       if (currentChatFile) {
-        // setChatFileId(currentChatFileId);
-        chatFileId = currentChatFileId;
-        setUpdate(update + 1);
+        setChatFileId(currentChatFileId);
+        await fetchMessages(currentChatFileId);
       } else {
         console.log("need to create chat file");
       }
@@ -177,8 +160,8 @@ const ChatSingle = ({ route, navigation }) => {
     try {
       const response = await postMedia(formData, userToken);
       if (response) {
-        addChatTag(response.file_id);
-        chatFileId = response.file_id;
+        const tagResponse = await addChatTag(response.file_id);
+        tagResponse && setChatFileId(response.file_id);
       }
     } catch (error) {
       throw new Error(error.message);
@@ -199,7 +182,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (chatFileId) => {
     const currentUserId = user.user_id;
     try {
       const fetchedComments = await getCommentsById(chatFileId);
@@ -211,7 +194,7 @@ const ChatSingle = ({ route, navigation }) => {
             content: comment.comment,
           };
         });
-        setMessages(formattedMessages);
+        setMessages([...formattedMessages]);
       }
     } catch (error) {
       throw new Error(error.message);
@@ -275,15 +258,17 @@ const ChatSingle = ({ route, navigation }) => {
           justifyContent="center"
           space={6}
         >
-          <Avatar
-            size="xl"
-            shadow="6"
-            source={{
-              uri: avatar,
-            }}
-          />
+          {avatar && (
+            <Avatar
+              size="xl"
+              shadow="6"
+              source={{
+                uri: avatar,
+              }}
+            />
+          )}
           <VStack>
-            <Heading fontSize="2xl">{username}</Heading>
+            {username && <Heading fontSize="2xl">{username}</Heading>}
             {rating ? (
               <Rating readonly={true} startingValue={rating} imageSize={15} />
             ) : (
@@ -298,7 +283,9 @@ const ChatSingle = ({ route, navigation }) => {
         </Heading>
       )}
       <View flex={0.9} mt={3}>
-        <ChatBubbleList messages={messages} username={username} />
+        {messages && username && (
+          <ChatBubbleList messages={messages} username={username} />
+        )}
       </View>
 
       <View

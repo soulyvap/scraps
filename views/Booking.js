@@ -50,7 +50,7 @@ const Booking = ({ navigation, route }) => {
   const { getFilesByTag, getTagsByFileId, postTag } = useTag();
   const { postComment } = useComment();
   const { getRatingsById } = useRating();
-  const { user } = useContext(MainContext);
+  const { user, update, setUpdate } = useContext(MainContext);
 
   const [listing, setListing] = useState();
   const [username, setUsername] = useState();
@@ -117,6 +117,7 @@ const Booking = ({ navigation, route }) => {
             "Booking successful",
             `Awaiting ${username}'s confirmation`
           );
+          setUpdate(update + 1);
           navigation.navigate("BookingsListings");
         }
       } catch (error) {
@@ -133,16 +134,18 @@ const Booking = ({ navigation, route }) => {
         title: listingFetched.title,
         description: listingFetched.description,
       };
-      setListing(listingInfo);
-      const moreDataFetched = JSON.parse(listingInfo.description);
-      const allergensFetched = moreDataFetched.allergens;
-      setAllergens(allergensFetched);
-      setLatestPickup(moreDataFetched.latestPickup);
-      setTimeSlot(moreDataFetched.suitableTimeSlot);
       const userId = listingFetched.user_id;
       await fetchAvatar(userId);
       await fetchUsername(userId);
       await fetchUserFile(userId);
+      setListing(listingInfo);
+      const moreDataFetched = JSON.parse(listingInfo.description);
+      const allergensFetched = moreDataFetched.allergens;
+      console.log(moreDataFetched);
+      console.log(allergensFetched);
+      allergensFetched.length > 0 && setAllergens(allergensFetched);
+      setLatestPickup(moreDataFetched.latestPickup);
+      setTimeSlot(moreDataFetched.suitableTimeSlot.toString());
     } catch (error) {
       console.error("fetchMedia", error);
     }
@@ -194,12 +197,12 @@ const Booking = ({ navigation, route }) => {
     try {
       const tagArray = await getTagsByFileId(fileId);
       const filteredTags = tagArray.filter((tag) => tag.tag !== foodPostTag);
-      setTags(filteredTags);
+      filteredTags.length > 0 && setTags(filteredTags);
     } catch (error) {}
   };
 
-  useEffect(() => {
-    fetchMedia();
+  useEffect(async () => {
+    await fetchMedia();
     fetchTags();
   }, []);
 
@@ -259,31 +262,31 @@ const Booking = ({ navigation, route }) => {
         <VStack borderRadius={10} shadow="6" bgColor={"white"} mx={4}>
           {listing && <ListingCardLg listing={listing} />}
           <VStack space={3} p={2}>
-            {username && avatar && (
-              <HStack w={"100%"}>
-                <Text w={"40%"}>Posted by</Text>
-                <HStack
-                  px={2}
-                  py={1}
-                  space={3}
-                  alignItems="center"
-                  borderRadius={10}
-                  bgColor={colors.beige}
-                  shadow="2"
-                >
+            <HStack w={"100%"}>
+              <Text w={"40%"}>Posted by</Text>
+              <HStack
+                px={2}
+                py={1}
+                space={3}
+                alignItems="center"
+                borderRadius={10}
+                bgColor={colors.beige}
+                shadow="2"
+              >
+                {avatar && (
                   <Avatar
                     size={10}
                     source={{
                       uri: avatar,
                     }}
                   />
-                  <VStack>
-                    <Text fontSize={12}>{username}</Text>
-                    <Text fontSize={12}>⭐ {rating || "no ratings"}</Text>
-                  </VStack>
-                </HStack>
+                )}
+                <VStack>
+                  {username && <Text fontSize={12}>{username}</Text>}
+                  <Text fontSize={12}>⭐ {rating || "no ratings"}</Text>
+                </VStack>
               </HStack>
-            )}
+            </HStack>
             {tags && (
               <HStack w={"100%"}>
                 <Text w={"40%"}>Tags</Text>
@@ -312,14 +315,12 @@ const Booking = ({ navigation, route }) => {
                 </Text>
               </HStack>
             )}
-            {timeSlot && (
-              <HStack>
-                <Text w={"40%"}>Pickup timeslot</Text>
-                <Text flex={1} fontSize={12} mt={1}>
-                  {timeSlot}
-                </Text>
-              </HStack>
-            )}
+            <HStack>
+              <Text w={"40%"}>Pickup timeslot</Text>
+              <Text flex={1} fontSize={12} mt={1}>
+                {timeSlot || "No defined"}
+              </Text>
+            </HStack>
           </VStack>
         </VStack>
 

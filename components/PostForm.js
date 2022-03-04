@@ -2,22 +2,18 @@ import {
   Avatar,
   Box,
   Button,
-  Center,
   FormControl,
   Heading,
   HStack,
   IconButton,
-  Image,
   Input,
-  Pressable,
-  ScrollView,
   Text,
   TextArea,
   View,
   VStack,
 } from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import react, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
@@ -96,10 +92,9 @@ const PostForm = ({ navigation }) => {
   };
 
   const onChanged = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
     setShow(false);
-    setDate(currentDate);
-    split(currentDate);
+    setDate(selectedDate);
+    split(selectedDate);
   };
 
   // Converts original DatePicker value to more pleasant one,

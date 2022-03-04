@@ -1,5 +1,8 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { FlatList, HStack, SectionList, Text, View } from "native-base";
+import React from "react";
 import react, { useContext, useEffect, useState } from "react";
+import { RefreshControl } from "react-native";
 import BookingTile from "../components/BookingTile";
 import { listingStatus } from "../components/PostForm";
 import { MainContext } from "../contexts/MainContext";
@@ -10,9 +13,15 @@ import { foodPostTag } from "../utils/variables";
 const MyBookings = ({ navigation }) => {
   const { getFilesByTag } = useTag();
   const { getCommentsById } = useComment();
-  const { user, update } = useContext(MainContext);
-
+  const { user, update, setUpdate } = useContext(MainContext);
   const [data, setData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    setData([]);
+    await fetchBookings();
+  };
 
   const fetchBookings = async () => {
     const active = [];
@@ -60,6 +69,7 @@ const MyBookings = ({ navigation }) => {
         ];
 
         setData([...data]);
+        setRefreshing(false);
       });
     } catch (error) {
       console.error("fetchBookings", error);
@@ -83,6 +93,7 @@ const MyBookings = ({ navigation }) => {
         pickupInfo={pickupInfo}
         navigation={navigation}
         own={false}
+        refresh={refresh}
       />
     );
   };
@@ -106,6 +117,9 @@ const MyBookings = ({ navigation }) => {
           renderSectionHeader={({ section }) => (
             <SectionHeader section={section} />
           )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+          }
         />
       )}
     </View>

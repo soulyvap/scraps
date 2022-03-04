@@ -1,5 +1,6 @@
 import { FlatList, HStack, SectionList, Text, View } from "native-base";
 import react, { useContext, useEffect, useState } from "react";
+import { RefreshControl } from "react-native";
 import BookingTile from "../components/BookingTile";
 import { listingStatus } from "../components/PostForm";
 import { MainContext } from "../contexts/MainContext";
@@ -13,6 +14,13 @@ const MyListings = ({ navigation }) => {
   const { getMediaById } = useMedia();
   const { user, update } = useContext(MainContext);
   const [data, setData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    setData([]);
+    await fetchListings();
+  };
 
   const fetchListings = async () => {
     const active = [];
@@ -56,8 +64,8 @@ const MyListings = ({ navigation }) => {
           data: inactive,
         },
       ];
-
       setData([...data]);
+      setRefreshing(false);
     } catch (error) {
       console.error("fetchListings", error);
     }
@@ -76,6 +84,7 @@ const MyListings = ({ navigation }) => {
           status={listingStatus.listed}
           navigation={navigation}
           own={true}
+          refresh={refresh}
         />
       );
     } else {
@@ -91,6 +100,7 @@ const MyListings = ({ navigation }) => {
           pickupInfo={pickupInfo}
           navigation={navigation}
           own={true}
+          refresh={refresh}
         />
       );
     }
@@ -115,6 +125,9 @@ const MyListings = ({ navigation }) => {
           renderSectionHeader={({ section }) => (
             <SectionHeader section={section} />
           )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+          }
         />
       )}
     </View>

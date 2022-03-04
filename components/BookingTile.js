@@ -12,7 +12,7 @@ import react, { useContext, useEffect, useRef, useState } from "react";
 import { Alert, TouchableOpacity } from "react-native";
 import { colors } from "../utils/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useMedia, useUser } from "../hooks/ApiHooks";
+import { useComment, useMedia, useUser } from "../hooks/ApiHooks";
 import { uploadsUrl } from "../utils/variables";
 import { listingStatus } from "./PostForm";
 import {
@@ -35,8 +35,10 @@ const BookingTile = ({
   menuShown = true,
   navigation,
   own,
+  refresh,
 }) => {
   const { getMediaById, deleteMediaById } = useMedia();
+  const { postComment } = useComment();
   const [pic, setPic] = useState();
   const [title, setTitle] = useState();
   const [description, setDescription] = useState();
@@ -45,13 +47,30 @@ const BookingTile = ({
   const [user, setUser] = useState();
   const menuRef = useRef();
   const { getUserById } = useUser();
-  const { update, setUpdate } = useContext(MainContext);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     return () => menuRef.current.isOpen && menuRef.current.close();
-  //   }, [])
-  // );
+  const updateStatus = async (newStatus) => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    try {
+      let updatedInfo = {
+        status: newStatus,
+        pickupInfo: pickupInfo,
+      };
+      const comment = JSON.stringify(updatedInfo);
+      const commentData = {
+        file_id: fileId,
+        comment: comment,
+      };
+      const commentResponse = await postComment(commentData, userToken);
+      console.log(commentResponse);
+      await refresh();
+    } catch (error) {
+      console.error("confirm", error);
+    }
+  };
+
+  const toChat = () => {
+    navigation.navigate("ChatSingle", { userId2: user.user_id });
+  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -72,7 +91,7 @@ const BookingTile = ({
     try {
       const response = await deleteMediaById(fileId, userToken);
       response && console.log(response);
-      setUpdate(update + 1);
+      await refresh();
     } catch (error) {
       console.error(`Delete ${fileId}`, error);
     }
@@ -99,9 +118,9 @@ const BookingTile = ({
 
   const selectView = (status) =>
     !own
-      ? "ConfirmBooking"
-      : status === listingStatus.confirmed
       ? "BookingSummary"
+      : status === listingStatus.confirmed
+      ? "ConfirmBooking"
       : "Single";
 
   const selectData = (destination) => {
@@ -198,12 +217,26 @@ const BookingTile = ({
                 </MenuTrigger>
                 {own ? (
                   <MenuOptions>
-                    <MenuOption text={`Message ${user.username}`} />
-                    <MenuOption text="Delete" onSelect={handleDelete} />
+                    <MenuOption
+                      text={`💬 Chat with ${user.username}`}
+                      onSelect={toChat}
+                    />
+                    <MenuOption
+                      text={`❌ Cancel booking`}
+                      onSelect={() => updateStatus(listingStatus.cancelled)}
+                    />
+                    <MenuOption text="🗑️ Delete" onSelect={handleDelete} />
                   </MenuOptions>
                 ) : (
                   <MenuOptions>
-                    <MenuOption text={`Message ${user.username}`} />
+                    <MenuOption
+                      text={`💬 Chat with ${user.username}`}
+                      onSelect={toChat}
+                    />
+                    <MenuOption
+                      text={`❌ Cancel booking`}
+                      onSelect={() => updateStatus(listingStatus.cancelled)}
+                    />
                   </MenuOptions>
                 )}
               </Menu>
@@ -217,7 +250,7 @@ const BookingTile = ({
                   />
                 </MenuTrigger>
                 <MenuOptions>
-                  <MenuOption text="Delete" onSelect={handleDelete} />
+                  <MenuOption text="🗑️ Delete" onSelect={handleDelete} />
                 </MenuOptions>
               </Menu>
             )}
