@@ -120,7 +120,6 @@ const Home = ({ navigation }) => {
                   setTagSelected(foodPostTag);
                   setCategorySelected("");
                   setIsCategorySelected(false);
-                  setUpdate(update + 1);
                 }}
               >
                 All
@@ -132,7 +131,6 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("cooked");
                   setIsCategorySelected(true);
-                  setUpdate(update + 1);
                 }}
               >
                 Cooked
@@ -146,7 +144,6 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("uncooked");
                   setIsCategorySelected(true);
-                  setUpdate(update + 1);
                 }}
               >
                 Uncooked
@@ -158,7 +155,6 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("frozen");
                   setIsCategorySelected(true);
-                  setUpdate(update + 1);
                 }}
               >
                 Frozen

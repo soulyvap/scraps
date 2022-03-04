@@ -21,8 +21,7 @@ const ListItem = ({ navigation, singleMedia }) => {
   const { getFilesByTag } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
-  const { update, setUpdate, user, categorySelected, isCategorySelected } =
-    useContext(MainContext);
+  const { update, setUpdate, user } = useContext(MainContext);
 
   const fetchOwner = async () => {
     try {
@@ -52,17 +51,7 @@ const ListItem = ({ navigation, singleMedia }) => {
   useEffect(() => {
     fetchOwner();
     fetchAvatar();
-  }, [update]);
-
-  const descriptionData = singleMedia.description;
-  const allData = JSON.parse(descriptionData);
-  const category = allData.category;
-  let displayPost = true;
-
-  if (isCategorySelected && categorySelected !== category) {
-    displayPost = false;
-    return null;
-  }
+  }, []);
 
   return (
     <Box
