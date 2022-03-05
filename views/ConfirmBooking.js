@@ -1,181 +1,112 @@
 import {
   Avatar,
-  Box,
   Button,
   Center,
-  Checkbox,
-  FlatList,
   Heading,
   HStack,
-  IconButton,
-  Input,
-  ScrollView,
-  Select,
+  Icon,
   Text,
   View,
   VStack,
 } from "native-base";
-import react, { useEffect, useState } from "react";
-import ListingCardLg from "../components/ListingCardLg";
-import { useMedia, useRating, useTag, useUser } from "../hooks/ApiHooks";
-import {
-  avatarTag,
-  foodPostTag,
-  uploadsUrl,
-  userFileTag,
-} from "../utils/variables";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Chip } from "react-native-paper";
-import { SafeAreaView, TouchableOpacity } from "react-native";
-import { FlatGrid } from "react-native-super-grid";
-import { colors } from "../utils/colors";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { MaterialIcons } from "@expo/vector-icons";
-import { set } from "react-hook-form";
+import react, { useContext, useEffect, useState } from "react";
 import BackButton from "../components/BackButton";
+import BookingTile from "../components/BookingTile";
 import Tag from "../components/Tag";
+import { useComment, useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import { colors } from "../utils/colors";
+import { avatarTag, uploadsUrl } from "../utils/variables";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Feather } from "@expo/vector-icons";
+import { listingStatus } from "../components/PostForm";
+import { MainContext } from "../contexts/MainContext";
 
 const ConfirmBooking = ({ navigation, route }) => {
   const fileId = route.params.fileId;
-  const { getMediaById } = useMedia();
+  const { getCommentsById, postComment } = useComment();
   const { getUserById } = useUser();
-  const { getFilesByTag, getTagsByFileId } = useTag();
-  const { getRatingsById } = useRating();
+  const { getFilesByTag } = useTag();
 
-  const [listing, setListing] = useState();
+  const [status, setStatus] = useState();
   const [username, setUsername] = useState();
+  const [userId, setUserId] = useState();
   const [avatar, setAvatar] = useState();
-  const [rating, setRating] = useState();
-  const [tags, setTags] = useState();
-  const [allergens, setAllergens] = useState();
-  const [latestPickup, setLatestPickup] = useState();
-  const [timeSlot, setTimeSlot] = useState();
-  const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState(new Date());
-  const [mode, setMode] = useState("date");
-  const [show, setShow] = useState(false);
-  const [dateText, setDateText] = useState("Select date");
-  const [dateSelected, setDateSelected] = useState(false);
-  const [pickupMethod, setPickupMethod] = useState();
-  const [contactless, setContactless] = useState(false);
+  const [pickupInfo, setPickupInfo] = useState();
+  const [bookingInfo, setBookingInfo] = useState();
+  const { update, setUpdate } = useContext(MainContext);
 
-  const fetchMedia = async () => {
+  const updateStatus = async (newStatus) => {
+    const userToken = await AsyncStorage.getItem("userToken");
     try {
-      const listingFetched = await getMediaById(fileId);
-      const listingInfo = {
-        filename: listingFetched.filename,
-        title: listingFetched.title,
-        description: listingFetched.description,
+      let updatedInfo = bookingInfo;
+      updatedInfo.status = newStatus;
+      const comment = JSON.stringify(updatedInfo);
+      const commentData = {
+        file_id: fileId,
+        comment: comment,
       };
-      setListing(listingInfo);
-      const moreData = JSON.parse(listingInfo.description);
-      const allergensFetched = moreData.allergens;
-      setAllergens(allergensFetched);
-      setLatestPickup(moreData.latestPickup);
-      setTimeSlot(moreData.suitableTimeSlot);
-      const userId = listingFetched.user_id;
-      await fetchAvatar(userId);
-      await fetchUsername(userId);
-      await fetchUserFile(userId);
+      const commentResponse = await postComment(commentData, userToken);
+      console.log(commentResponse);
+      navigation.goBack();
+      setUpdate(update + 1);
     } catch (error) {
-      console.error("fetchMedia", error);
+      console.error("confirm", error);
+    }
+  };
+
+  const fetchBooking = async () => {
+    try {
+      const comments = await getCommentsById(fileId);
+      const booking = comments.pop();
+      const info = JSON.parse(booking.comment);
+      setBookingInfo(info);
+      setPickupInfo(info.pickupInfo);
+      console.log(info);
+      setStatus(info.status);
+      const userIdFetched = info.pickupInfo.bookedBy;
+      setUserId(userIdFetched);
+      await fetchUsername(userIdFetched);
+      await fetchAvatar(userIdFetched);
+    } catch (error) {
+      console.error("fetchBooking", error);
+    }
+  };
+
+  const fetchUsername = async (userId) => {
+    try {
+      const userToken = await AsyncStorage.getItem("userToken");
+      const user = await getUserById(userId, userToken);
+      setUsername(user.full_name || user.username);
+    } catch (error) {
+      console.error("fetchUsername", error);
     }
   };
 
   const fetchAvatar = async (userId) => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + userId);
-      const avatarLast = await avatarArray.pop();
-      setAvatar(uploadsUrl + avatarLast.filename);
+      const avatarFetched = await avatarArray.pop();
+      setAvatar(uploadsUrl + avatarFetched.filename);
     } catch (error) {
       console.error("fetchAvatar", error.message);
     }
   };
 
-  const fetchUsername = async (userId) => {
-    const token = await AsyncStorage.getItem("userToken");
-    try {
-      const user = await getUserById(userId, token);
-      const username = user.full_name || user.username;
-      setUsername(username);
-    } catch (error) {
-      console.error("fetchUsername", error.message);
+  const methodEmoji = (method) => {
+    if (method.includes("door")) {
+      return "🚪";
     }
-  };
-
-  const fetchUserFile = async (userId) => {
-    try {
-      const userFiles = await getFilesByTag(userFileTag + userId);
-      const userFile = userFiles[0];
-      await fetchRating(userFile.file_id);
-    } catch (error) {
-      console.error("fetchUserFile", error.message);
+    if (method.includes("call")) {
+      return "📞";
     }
-  };
-
-  const fetchRating = async (userFileId) => {
-    try {
-      const ratingList = await getRatingsById(userFileId);
-      const ratings = ratingList.map((rating) => rating.rating);
-      const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-      setRating(average);
-    } catch (error) {
-      console.error("fetchRating", error.message);
+    if (method.includes("bell")) {
+      return "🔔";
     }
-  };
-
-  const fetchTags = async () => {
-    try {
-      const tagArray = await getTagsByFileId(fileId);
-      const filteredTags = tagArray.filter((tag) => tag.tag !== foodPostTag);
-      setTags(filteredTags);
-    } catch (error) {}
   };
 
   useEffect(() => {
-    fetchMedia();
-    fetchTags();
+    fetchBooking();
   }, []);
-
-  useEffect(() => {
-    console.log(show);
-  }, [show]);
-
-  const showDatepicker = () => {
-    setShow(true);
-  };
-
-  const onChanged = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    switch (mode) {
-      case "date":
-        setDate(currentDate);
-        setMode("time");
-        break;
-      case "time":
-        setShow(false);
-        setDate(currentDate);
-        setMode("date");
-        setDateSelected(true);
-        setDateText(formatTime(currentDate));
-        break;
-      default:
-        break;
-    }
-  };
-
-  const formatTime = (date) => {
-    let day = date.getDate();
-    let month = date.getMonth();
-    const year = date.getFullYear();
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    day < 10 && (day = `0${day}`);
-    month < 10 && (month = `0${month}`);
-    hours < 10 && (hours = `0${hours}`);
-    minutes < 10 && (minutes = `0${minutes}`);
-    return `${day}/${month}/${year} at ${hours}.${minutes}`;
-  };
 
   return (
     <View flex={1} bgColor="white">
@@ -186,156 +117,108 @@ const ConfirmBooking = ({ navigation, route }) => {
           navigation.goBack();
         }}
       />
-      <Heading textAlign={"center"} fontSize={"lg"} py={3}>
-        Confirm booking
-      </Heading>
-      <ScrollView nestedScrollEnabled>
-        <VStack borderRadius={10} shadow="6" bgColor={"white"} mx={4}>
-          {listing && <ListingCardLg listing={listing} />}
-          <VStack space={3} p={2}>
-            {username && avatar && (
-              <HStack w={"100%"}>
-                <Text w={"40%"}>Posted by</Text>
-                <HStack
-                  px={2}
-                  py={1}
-                  space={3}
-                  alignItems="center"
-                  borderRadius={10}
-                  bgColor={colors.beige}
-                  shadow="2"
+      {status && (
+        <Heading textAlign={"center"} fontSize={"lg"} py={3}>
+          {status === listingStatus.booked
+            ? "Approve booking"
+            : "Booking review"}
+        </Heading>
+      )}
+
+      {fileId && pickupInfo && status && (
+        <BookingTile
+          active={false}
+          fileId={fileId}
+          status={status}
+          pickupInfo={pickupInfo}
+          menuShown={false}
+        />
+      )}
+
+      <VStack flex={0.5} space={7} mt={7}>
+        {username && avatar && (
+          <HStack alignItems={"center"} space={3} mx={"10%"}>
+            <Icon
+              mr={2}
+              as={<Feather name={"check-circle"} />}
+              size={9}
+              color={colors.notBlack}
+            />
+            <Text>{`Booked by ${username}`}</Text>
+            <Avatar source={{ uri: avatar }} size={"sm"} />
+          </HStack>
+        )}
+
+        {pickupInfo && username && (
+          <VStack mx={"10%"} space={3}>
+            <Text fontSize={20}>{`${username} chose:`}</Text>
+
+            <VStack space={2} ml={8}>
+              {pickupInfo.contactless && <Text>{`❌ No contact pickup`}</Text>}
+              <Text fontSize={12}>{`${methodEmoji(pickupInfo.pickupMethod)}  ${
+                pickupInfo.pickupMethod
+              }`}</Text>
+              <Text fontSize={12}>{`🕒  ${pickupInfo.pickupTime}`}</Text>
+            </VStack>
+          </VStack>
+        )}
+      </VStack>
+
+      <Center flex={0.5}>
+        {status && (
+          <VStack alignItems={"center"} space={6} w="100%">
+            <HStack space={6}>
+              {status !== listingStatus.pickedUp && (
+                <Button
+                  bgColor={colors.green}
+                  shadow="6"
+                  borderRadius={15}
+                  w={"30%"}
+                  onPress={async () => {
+                    if (status === listingStatus.booked) {
+                      await updateStatus(listingStatus.confirmed);
+                    } else if (status === listingStatus.confirmed) {
+                      await updateStatus(listingStatus.pickedUp);
+                    }
+                  }}
+                  _text={{ fontSize: 13 }}
                 >
-                  <Avatar
-                    size={10}
-                    source={{
-                      uri: avatar,
-                    }}
-                  />
-                  <VStack>
-                    <Text fontSize={12}>{username}</Text>
-                    <Text fontSize={12}>⭐ {rating || "no ratings"}</Text>
-                  </VStack>
-                </HStack>
-              </HStack>
-            )}
-            {tags && (
-              <HStack w={"100%"}>
-                <Text w={"40%"}>Tags</Text>
-                <HStack flex={1} flexWrap="wrap">
-                  {tags.map((tag) => (
-                    <Tag name={tag.tag} />
-                  ))}
-                </HStack>
-              </HStack>
-            )}
-            {allergens && (
-              <HStack w={"100%"}>
-                <Text w={"40%"}>Allergens</Text>
-                <HStack flex={1} flexWrap="wrap">
-                  {allergens.map((tag) => (
-                    <Tag name={tag} />
-                  ))}
-                </HStack>
-              </HStack>
-            )}
-            {latestPickup && (
-              <HStack>
-                <Text w={"40%"}>Latest pickup</Text>
-                <Text fontSize={12} mt={1}>
-                  {latestPickup}
-                </Text>
-              </HStack>
-            )}
-            {timeSlot && (
-              <HStack>
-                <Text w={"40%"}>Pickup timeslot</Text>
-                <Text flex={1} fontSize={12} mt={1}>
-                  {timeSlot}
-                </Text>
-              </HStack>
+                  {status === listingStatus.confirmed
+                    ? "Mark Picked Up"
+                    : "Accept"}
+                </Button>
+              )}
+              <Button
+                bgColor={colors.yellow}
+                shadow="6"
+                borderRadius={15}
+                w={"30%"}
+                _text={{ color: colors.notBlack, fontSize: 13 }}
+                onPress={() =>
+                  navigation.navigate("ChatSingle", { userId2: userId })
+                }
+              >
+                Message
+              </Button>
+            </HStack>
+            {status !== listingStatus.pickedUp && (
+              <Button
+                bgColor={colors.red}
+                shadow="6"
+                borderRadius={15}
+                w={"30%"}
+                _text={{ fontSize: 13 }}
+                onPress={() => {
+                  updateStatus(listingStatus.cancelled);
+                  navigation.goBack();
+                }}
+              >
+                {status === listingStatus.confirmed ? "Cancel" : "Decline"}
+              </Button>
             )}
           </VStack>
-        </VStack>
-
-        <View flex={1} my={5} justifyContent={"space-between"} mx={4}>
-          <View>
-            <View mb={5}>
-              <Heading fontSize={"lg"} mb={3}>
-                When
-              </Heading>
-              <HStack w={"100%"} alignItems="center" space={5}>
-                <TouchableOpacity onPress={showDatepicker}>
-                  <View py={2} px={5} bgColor={colors.beige} borderRadius={15}>
-                    <Text fontSize={14}>{dateText}</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <IconButton
-                  shadow="2"
-                  bgColor={colors.yellow}
-                  borderRadius="full"
-                  onPress={showDatepicker}
-                  _icon={{ as: MaterialIcons, name: "calendar-today", size: 5 }}
-                />
-                {show && (
-                  <DateTimePicker
-                    is24Hour
-                    display="default"
-                    mode={mode}
-                    onChange={onChanged}
-                    testID="dateTimePicker"
-                    value={date}
-                  />
-                )}
-              </HStack>
-            </View>
-            <View>
-              <Heading fontSize={"lg"} my={3}>
-                How
-              </Heading>
-              <Select
-                fontSize={14}
-                borderRadius={15}
-                bgColor={colors.beige}
-                borderColor={colors.beige}
-                py={1}
-                px={5}
-                w={"100%"}
-                selectedValue={pickupMethod}
-                accessibilityLabel="Choose a pickup method"
-                placeholder="Choose a pickup method"
-                variant="rounded"
-              >
-                <Select.Item
-                  label="Left at the building door"
-                  value="building-door"
-                />
-                <Select.Item label="Left at the door" value="door" />
-                <Select.Item label="Ring the doorbell" value="doorbell" />
-                <Select.Item label="Call me" value="call" />
-              </Select>
-            </View>
-            <HStack w={"100%"} mt={3}>
-              <Checkbox
-                _checked={{ bgColor: colors.grey, borderColor: colors.grey }}
-                value={contactless}
-              >
-                <Text ml={3}>No contact pickup</Text>
-              </Checkbox>
-            </HStack>
-          </View>
-
-          <Button
-            bgColor={colors.green}
-            borderRadius={15}
-            w={"35%"}
-            alignSelf="center"
-            mt={10}
-          >
-            Confirm
-          </Button>
-        </View>
-      </ScrollView>
+        )}
+      </Center>
     </View>
   );
 };

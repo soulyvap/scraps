@@ -15,20 +15,31 @@ import { Icon } from "native-base";
 import ChatSingle from "../views/ChatSingle";
 import ChatAll from "../views/ChatAll";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import Booking from "../views/Booking";
+import MyBookings from "../views/MyBookings";
+import MyListings from "../views/MyListings";
+import { colors } from "../utils/colors";
 import ConfirmBooking from "../views/ConfirmBooking";
+import BookingSummary from "../views/BookingSummary";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
-// export const TopTabScreen = () => {
-//   return (
-//     <TopTab.Navigator>
-//       <TopTab.Screen name="My bookings" component={myBookings} />
-//       <TopTab.Screen name="My listings" component={myListings} />
-//     </TopTab.Navigator>
-//   );
-// };
+const TopTabScreen = () => {
+  return (
+    <TopTab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: colors.green,
+        tabBarInactiveTintColor: colors.grey,
+        tabBarIndicatorStyle: { backgroundColor: colors.green },
+      }}
+    >
+      <TopTab.Screen name="My bookings" component={MyBookings} />
+      <TopTab.Screen name="My listings" component={MyListings} />
+    </TopTab.Navigator>
+  );
+};
 
 const TabScreen = () => {
   return (
@@ -47,10 +58,12 @@ const TabScreen = () => {
             iconName = "file-upload";
           } else if (route.name === "MyProfile") {
             iconName = "account-circle";
-          }
-          if (route.name === "Chat") {
+          } else if (route.name === "Chat") {
             iconName = "chat";
+          } else if (route.name === "BookingsListings") {
+            iconName = "bookmark";
           }
+
           return (
             <Icon
               as={<MaterialIcons name={iconName} />}
@@ -79,6 +92,11 @@ const TabScreen = () => {
       <Tab.Screen
         name="MyProfile"
         component={MyProfile}
+        options={{ headerShown: false }}
+      ></Tab.Screen>
+      <Tab.Screen
+        name="BookingsListings"
+        component={TopTabScreen}
         options={{ headerShown: false }}
       ></Tab.Screen>
     </Tab.Navigator>
@@ -116,10 +134,25 @@ const StackScreen = () => {
             name="ConfirmBooking"
             component={ConfirmBooking}
             options={{ headerShown: false }}
+            ></Stack.Screen>
+            <Stack.Screen
+            name="Booking"
+            component={Booking}
+            options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen
             name="ChatSingle"
             component={ChatSingle}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="ConfirmBooking"
+            component={ConfirmBooking}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="BookingSummary"
+            component={BookingSummary}
             options={{ headerShown: false }}
           ></Stack.Screen>
         </>

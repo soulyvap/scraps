@@ -15,7 +15,7 @@ import { Chip } from "react-native-paper";
 import { colors } from "../utils/colors";
 import { uploadsUrl } from "../utils/variables";
 
-const ListingCardLg = ({ avatar, username, rating, listing }) => {
+const ListingCardLg = ({ listing }) => {
   const [description, setDescription] = useState();
 
   useEffect(async () => {
@@ -44,7 +44,7 @@ const ListingCardLg = ({ avatar, username, rating, listing }) => {
           nestedScrollEnabled
           my={2}
         >
-          <Text fontSize={12}>{description}</Text>
+          <Text fontSize={12}>{description || "No description"}</Text>
         </ScrollView>
       </VStack>
     </HStack>

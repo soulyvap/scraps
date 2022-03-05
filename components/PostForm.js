@@ -2,22 +2,18 @@ import {
   Avatar,
   Box,
   Button,
-  Center,
   FormControl,
   Heading,
   HStack,
   IconButton,
-  Image,
   Input,
-  Pressable,
-  ScrollView,
   Text,
   TextArea,
   View,
   VStack,
 } from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import react, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
@@ -29,6 +25,15 @@ import { Camera } from "expo-camera";
 import { colors } from "../utils/colors";
 import { foodPostTag } from "../utils/variables";
 import { MainContext } from "../contexts/MainContext";
+
+export const listingStatus = {
+  listed: "listed",
+  booked: "booked",
+  confirmed: "confirmed",
+  pickedUp: "picked-up",
+  cancelled: "cancelled",
+  deleted: "deleted",
+};
 
 const PostForm = ({ navigation }) => {
   const defaultAllergens = [
@@ -87,10 +92,9 @@ const PostForm = ({ navigation }) => {
   };
 
   const onChanged = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
     setShow(false);
-    setDate(currentDate);
-    split(currentDate);
+    setDate(selectedDate);
+    split(selectedDate);
   };
 
   // Converts original DatePicker value to more pleasant one,
@@ -241,9 +245,6 @@ const PostForm = ({ navigation }) => {
         allergens: selectedAllergens,
         category: category,
         active: true,
-        booked: false,
-        bookedBy: null,
-        coords: coords,
       };
 
       const formData = new FormData();

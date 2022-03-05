@@ -9,105 +9,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../utils/colors";
 import { useFocusEffect } from "@react-navigation/native";
 
-// const chatData = [
-//   {
-//     id: 0,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 1,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: true,
-//   },
-//   {
-//     id: 2,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: true,
-//   },
-//   {
-//     id: 3,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 4,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 5,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 6,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 7,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 8,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 9,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 10,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-//   {
-//     id: 11,
-//     avatar:
-//       "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
-//     name: "Sara",
-//     message: "Thanks!",
-//     read: false,
-//   },
-// ];
-
 const ChatAll = ({ navigation }) => {
   const { getFilesByTag } = useTag();
   const [userToken, setUserToken] = useState();
@@ -180,7 +81,11 @@ const ChatAll = ({ navigation }) => {
         const userChatFiles = await filesFormatted.filter((file) => {
           return file.title.split("_").includes(currentUserId.toString());
         });
-        setChatArray(userChatFiles);
+        const secondFilter = userChatFiles.filter((file) => {
+          const ids = file.title.split("_");
+          return ids[0] !== ids[1];
+        });
+        setChatArray(secondFilter);
       }
     } catch (error) {
       throw new Error(error.message);
@@ -189,7 +94,6 @@ const ChatAll = ({ navigation }) => {
 
   return (
     <View flex={1} px={3} bgColor={"white"}>
-      <Text>Current user: {currentUserId}</Text>
       <Center h={"22%"}>
         <Image
           source={require("../assets/message.png")}
