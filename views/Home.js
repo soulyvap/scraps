@@ -33,6 +33,7 @@ const Home = ({ navigation }) => {
     setIsCategorySelected,
   } = useContext(MainContext);
   const [tagSelected, setTagSelected] = useState(foodPostTag);
+  const [tag, setTag] = useState("all");
 
   const logout = async () => {
     console.log("logout");
@@ -72,7 +73,7 @@ const Home = ({ navigation }) => {
               mt={1}
               color={"#132A15"}
             >
-              Tags:
+              Search by tags
             </Text>
             <FlatList
               horizontal
@@ -85,16 +86,17 @@ const Home = ({ navigation }) => {
                   onPress={() => {
                     if (item.text === "all") {
                       setTagSelected(foodPostTag);
+                      setTag("all");
                     } else {
                       setTagSelected(item.text);
+                      setTag(item.text);
                     }
-                    console.log(tagSelected);
                     setUpdate(update + 1);
                   }}
                 >
                   <Box mx={1} mt={1} p={1} alignSelf="center" height={10}>
                     <Text
-                      color={"#33CA7F"}
+                      color={tag === item.text ? colors.notBlack : colors.green}
                       textAlign={"center"}
                       fontWeight={"bold"}
                       fontSize={16}
@@ -106,7 +108,7 @@ const Home = ({ navigation }) => {
               )}
             ></FlatList>
             <Text ml={"5%"} fontSize={17} fontWeight={"bold"} color={"#132A15"}>
-              Categories:
+              Select a category
             </Text>
             <HStack
               w={"90%"}
@@ -119,9 +121,10 @@ const Home = ({ navigation }) => {
                   categorySelected === "" ? colors.notBlack : colors.green
                 }
                 onPress={() => {
-                  setTagSelected(foodPostTag);
                   setCategorySelected("");
                   setIsCategorySelected(false);
+                  console.log("category selected", categorySelected);
+                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 All
@@ -133,6 +136,8 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("cooked");
                   setIsCategorySelected(true);
+                  console.log("category selected", categorySelected);
+                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 Cooked
@@ -146,6 +151,8 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("uncooked");
                   setIsCategorySelected(true);
+                  console.log("category selected", categorySelected);
+                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 Uncooked
@@ -157,17 +164,15 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("frozen");
                   setIsCategorySelected(true);
+                  console.log("category selected", categorySelected);
+                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 Frozen
               </Button>
             </HStack>
           </Box>
-          <List
-            navigation={navigation}
-            tagSelected={tagSelected}
-            isCategorySelected={isCategorySelected}
-          />
+          <List navigation={navigation} tagSelected={tagSelected} />
         </NativeBaseProvider>
       </SafeAreaView>
     </>

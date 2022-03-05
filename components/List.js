@@ -2,38 +2,89 @@ import React, { useState, useEffect, useContext } from "react";
 import { useMedia } from "../hooks/ApiHooks";
 import ListItem from "./ListItem";
 import PropTypes from "prop-types";
-
 import { FlatList } from "native-base";
 import { MainContext } from "../contexts/MainContext";
+import { getDistance } from "geolib";
 
-const List = ({ navigation, tagSelected, isCategorySelected }) => {
-  const { mediaArray } = useMedia(tagSelected, isCategorySelected);
-  const { categorySelected } = useContext(MainContext);
-
+const List = ({ navigation, tagSelected }) => {
+  const { mediaArray } = useMedia(tagSelected);
+  const { categorySelected, isCategorySelected, coords } =
+    useContext(MainContext);
   const [filteredItems, setFilteredItems] = useState([]);
+
+  const myCoords = { latitude: coords.latitude, longitude: coords.longitude };
+  const meters = 10000;
+
+  // // filter only those posts that are within 500 meter radius
+  // const filterByDistance = () => {
+  //   const newArray = mediaArray.filter((item) => {
+  //     const descriptionData = item.description;
+  //     const allData = JSON.parse(descriptionData);
+  //     const postCoordsLat = 60.170622411146574;
+  //     const postCoordsLong = 24.94413216537968;
+  //     const postCoords = { latitude: postCoordsLat, longitude: postCoordsLong };
+  //     const distance = getDistance(myCoords, postCoords);
+  //     // console.log("distance", distance);
+  //     if (distance < meters) {
+  //       return item;
+  //     }
+  //   });
+  //   setFilteredItems(newArray);
+  // };
+
+  // filter items out based on category selected
+  const filterItems = (category) => {
+    // categorySelected is "" when ALL buttons is clicked
+    // in that case the whole array needs to be displayed
+    if (!isCategorySelected) {
+      // setFilteredItems(mediaArray);
+      const newArray = mediaArray.filter((item) => {
+        const descriptionData = item.description;
+        const allData = JSON.parse(descriptionData);
+        const postCoordsLat = 60.170622411146574;
+        const postCoordsLong = 24.94413216537968;
+        const postCoords = {
+          latitude: postCoordsLat,
+          longitude: postCoordsLong,
+        };
+        const distance = getDistance(myCoords, postCoords);
+        // console.log("distance", distance);
+        if (distance < meters) {
+          return item;
+        }
+      });
+      setFilteredItems(newArray);
+    } else if (isCategorySelected) {
+      const newArray = mediaArray.filter((item) => {
+        const descriptionData = item.description;
+        const allData = JSON.parse(descriptionData);
+        const postCoordsLat = 60.170622411146574;
+        const postCoordsLong = 24.94413216537968;
+        const postCoords = {
+          latitude: postCoordsLat,
+          longitude: postCoordsLong,
+        };
+        const distance = getDistance(myCoords, postCoords);
+        // console.log("distance", distance);
+        if (allData.category === category && distance < meters) {
+          return item;
+        }
+      });
+      setFilteredItems(newArray);
+    }
+  };
 
   useEffect(() => {
     setFilteredItems(mediaArray);
-  }, [mediaArray]);
+  }, [mediaArray, tagSelected]);
 
   useEffect(() => {
     filterItems(categorySelected);
-  }, [categorySelected]);
+  }, [isCategorySelected, tagSelected, mediaArray, categorySelected]);
 
-  const filterItems = (category) => {
-    if (categorySelected === "") {
-      setFilteredItems(mediaArray);
-      return;
-    }
-    const newArray = mediaArray.filter((item) => {
-      const descriptionData = item.description;
-      const allData = JSON.parse(descriptionData);
-      if (allData.category === category) {
-        return item;
-      }
-    });
-    setFilteredItems(newArray);
-  };
+  // useEffect(() => {
+  //   filterByDistance();
+  // }, [coords, mediaArray]);
 
   return (
     <FlatList

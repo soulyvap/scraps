@@ -19,6 +19,7 @@ import {
   Image,
   Modal,
   Pressable,
+  ScrollView,
   Text,
   VStack,
 } from "native-base";
@@ -43,7 +44,7 @@ const Single = ({ route, navigation }) => {
   const suitableTimeSlot = allData.suitableTimeSlot;
   const allergens = allData.allergens;
 
-  const DisplayAllergens = () => {
+  const AllergenDisplay = () => {
     if (allergens.length === 0) {
       return (
         <Text color="#132A15" fontSize={16}>
@@ -208,22 +209,23 @@ const Single = ({ route, navigation }) => {
               <Modal.CloseButton />
               <Modal.Header>Allergens</Modal.Header>
               <Modal.Body>
-                <DisplayAllergens />
+                <AllergenDisplay />
               </Modal.Body>
             </Modal.Content>
           </Modal>
         </HStack>
-        <Box
+        <ScrollView
           bgColor={"#F9F4F1"}
           w={"90%"}
           minH={"15%"}
+          maxH={"25%"}
           borderTopRightRadius="10"
           shadow={9}
         >
           <Text m={3} fontSize={16} color={"#132A15"}>
             {description}
           </Text>
-        </Box>
+        </ScrollView>
         <Box
           bgColor={"#F9F4F1"}
           shadow={9}

@@ -8,7 +8,7 @@ const MainProvider = (props) => {
   const [user, setUser] = useState({});
   const [owner, setOwner] = useState({});
   const [isCategorySelected, setIsCategorySelected] = useState(false);
-  const [categorySelected, setCategorySelected] = useState({});
+  const [categorySelected, setCategorySelected] = useState("");
   const [update, setUpdate] = useState(0);
   const [coords, setCoords] = useState({});
 

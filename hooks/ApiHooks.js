@@ -73,11 +73,10 @@ const useLogin = () => {
   return { postLogin };
 };
 
-const useMedia = (tagSelected, isCategorySelected) => {
+const useMedia = (tagSelected) => {
   const [mediaArray, setMediaArray] = useState([]);
   const [userMediaArray, setUserMediaArray] = useState([]);
   const { user, update, setUpdate } = useContext(MainContext);
-  const { categoryMedia, setCategoryMedia } = useContext(MainContext);
   const [scrapsMediaArray, setScrapsMediaArray] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -164,8 +163,8 @@ const useMedia = (tagSelected, isCategorySelected) => {
 
   useEffect(() => {
     loadMedia();
-    // loadUserMedia();
-    loadScrapsMedia();
+    loadUserMedia();
+    // loadScrapsMedia();
   }, [update]);
 
   return {
