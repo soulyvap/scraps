@@ -123,8 +123,6 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("");
                   setIsCategorySelected(false);
-                  console.log("category selected", categorySelected);
-                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 All
@@ -136,8 +134,6 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("cooked");
                   setIsCategorySelected(true);
-                  console.log("category selected", categorySelected);
-                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 Cooked
@@ -151,8 +147,6 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("uncooked");
                   setIsCategorySelected(true);
-                  console.log("category selected", categorySelected);
-                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 Uncooked
@@ -164,8 +158,6 @@ const Home = ({ navigation }) => {
                 onPress={() => {
                   setCategorySelected("frozen");
                   setIsCategorySelected(true);
-                  console.log("category selected", categorySelected);
-                  console.log("is category selected", isCategorySelected);
                 }}
               >
                 Frozen
