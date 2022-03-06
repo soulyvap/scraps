@@ -14,7 +14,7 @@ import PropTypes from "prop-types";
 import { AirbnbRating } from "react-native-ratings";
 import { MainContext } from "../contexts/MainContext";
 import { colors } from "../utils/colors";
-import { useRating, useTag } from "../hooks/ApiHooks";
+import { useComment, useRating, useTag } from "../hooks/ApiHooks";
 import { userFileTag } from "../utils/variables";
 import { Controller, useForm } from "react-hook-form";
 
@@ -26,6 +26,7 @@ const Review = ({ route, navigation }) => {
   const [rating, setRating] = useState(3);
   const { getFilesByTag } = useTag();
   const { getRatingsByFileId, postRating, deleteRating } = useRating();
+  const { getCommentsById, postComment } = useComment();
 
   const {
     control,
@@ -80,17 +81,40 @@ const Review = ({ route, navigation }) => {
     }
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     try {
+      //RATING
+      console.log("review text: ", data.review);
       const userToken = await AsyncStorage.getItem("userToken");
       const ratingArray = await getRatingsByFileId(targetFileId);
+      const commentArray = await getCommentsById(targetFileId);
       ratingArray
         .filter((e) => e.user_id === user.user_id)
         .forEach(async (rating) => {
           await deleteRating(rating.file_id, userToken);
         });
-      const response = await postRating(targetFileId, rating, userToken);
-      response &&
+      commentArray
+        .filter((e) => e.user_id === user.user_id)
+        .forEach(async (comment) => {
+          await deleteComment(comment.file_id, userToken);
+        });
+
+      console.log("ratingArray: ", ratingArray);
+      console.log("commentArray: ", commentArray);
+      const ratingResponse = await postRating(targetFileId, rating, userToken);
+      console.log("ratingResponse: ", ratingResponse);
+      if (data.review.length > 0) {
+        const commentData = {
+          file_id: targetFileId,
+          comment: data.review,
+        };
+        const commentResponse = await postComment(commentData, userToken);
+        console.log("commentResponse: ", commentResponse);
+      }
+
+      //COMMENT
+
+      /* response &&
         Alert.alert("Review saved or something", "Well done, you made it.", [
           {
             text: "Ok",
@@ -98,7 +122,7 @@ const Review = ({ route, navigation }) => {
               navigation.navigate("Home");
             },
           },
-        ]);
+        ]); */
     } catch (error) {
       console.error(error.message);
     }
@@ -152,7 +176,7 @@ const Review = ({ route, navigation }) => {
             borderRadius={15}
             marginBottom={"5%"}
             marginRight={"5%"}
-            onPress={onSubmit}
+            onPress={handleSubmit(onSubmit)}
             padding={"3%"}
             width={"40%"}
           >

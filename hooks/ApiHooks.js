@@ -191,14 +191,14 @@ const useRating = () => {
     return await doFetch(baseUrl + "ratings/", options);
   };
 
-  const deleteRating = async (fileId, token) => {
+  const deleteRating = async (ratingId, token) => {
     const options = {
       method: "DELETE",
       headers: {
         "x-access-token": token,
       },
     };
-    return await doFetch(`${baseUrl}ratings/file/${fileId}`, options);
+    return await doFetch(`${baseUrl}ratings/file/${ratingId}`, options);
   };
 
   return { getRatingsById, getRatingsByFileId, postRating, deleteRating };
@@ -221,7 +221,17 @@ const useComment = () => {
     return doFetch(baseUrl + "comments", options);
   };
 
-  return { getCommentsById, postComment };
+  const deleteComment = async (commentId, token) => {
+    const options = {
+      method: "DELETE",
+      headers: {
+        "x-access-token": token,
+      },
+    };
+    return await doFetch(`${baseUrl}comments/file/${commentId}`, options);
+  };
+
+  return { getCommentsById, postComment, deleteComment };
 };
 
 export { useMedia, useLogin, useUser, useTag, useRating, useComment };
