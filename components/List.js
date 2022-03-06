@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useMedia } from "../hooks/ApiHooks";
+import { useMedia, useTag } from "../hooks/ApiHooks";
 import ListItem from "./ListItem";
 import PropTypes from "prop-types";
 import { FlatList } from "native-base";
 import { MainContext } from "../contexts/MainContext";
 import { getDistance } from "geolib";
+import { foodPostTag } from "../utils/variables";
 
 const List = ({ navigation, tagSelected }) => {
-  const { mediaArray } = useMedia(tagSelected);
+  const { mediaArray } = useMedia(foodPostTag);
+  const { getFilesByTag, getTagsByFileId } = useTag();
   const { categorySelected, isCategorySelected, coords } =
     useContext(MainContext);
   const [filteredItems, setFilteredItems] = useState([]);
@@ -15,9 +17,34 @@ const List = ({ navigation, tagSelected }) => {
   const myCoords = { latitude: coords.latitude, longitude: coords.longitude };
   const meters = 100000000;
 
-  // filter items based on category and distance
-  const filterItems = (category) => {
-    const newArray = mediaArray.filter((item) => {
+  const filterItems = async (category) => {
+    // posts with tagSelected
+    const foodPostsByTag = await getFilesByTag(tagSelected);
+    // keep only matches between mediaArray and foodPostsByTag
+    // this ensures that only items that have scraps2022 tag are shown
+    const tagIntersect = mediaArray.filter(function (o1) {
+      return foodPostsByTag.some(function (o2) {
+        return o1.file_id === o2.file_id;
+      });
+    });
+
+    // fetch all tags under each post and only add those
+    // that don't have 'booked' tag as last tag
+    const activeListings = [];
+    const active = await Promise.all(
+      tagIntersect.map(async (post) => {
+        const fileId = post.file_id;
+        const tags = await getTagsByFileId(fileId);
+        const lastTag = tags.pop();
+        if (lastTag.tag !== "booked") {
+          console.log(fileId, lastTag.tag);
+          activeListings.push(post);
+        }
+      })
+    );
+
+    // filter items further by distance and category selected
+    const newArray = activeListings.filter((item) => {
       const descriptionData = item.description;
       const allData = JSON.parse(descriptionData);
       const postCoordsLat = 60.170622411146574;
@@ -36,6 +63,7 @@ const List = ({ navigation, tagSelected }) => {
         return item;
       }
     });
+
     setFilteredItems(newArray);
   };
 
@@ -45,7 +73,7 @@ const List = ({ navigation, tagSelected }) => {
 
   useEffect(() => {
     filterItems(categorySelected);
-  }, [isCategorySelected, mediaArray, categorySelected]);
+  }, [mediaArray, isCategorySelected, categorySelected]);
 
   return (
     <FlatList

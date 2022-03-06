@@ -171,6 +171,10 @@ const useMedia = (tagSelected) => {
     }
   };
 
+  const getMediaByFileId = async (fileId) => {
+    return await doFetch(baseUrl + "media/" + fileId);
+  };
+
   useEffect(() => {
     loadMedia();
     loadUserMedia();
@@ -184,6 +188,7 @@ const useMedia = (tagSelected) => {
     userMediaArray,
     scrapsMediaArray,
     deleteMediaById,
+    getMediaByFileId,
   };
 };
 

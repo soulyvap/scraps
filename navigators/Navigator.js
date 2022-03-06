@@ -129,13 +129,8 @@ const StackScreen = () => {
             name="MyProfile"
             component={TabScreen}
             options={{ headerShown: false }}
-            ></Stack.Screen>
-           <Stack.Screen
-            name="ConfirmBooking"
-            component={ConfirmBooking}
-            options={{ headerShown: false }}
-            ></Stack.Screen>
-            <Stack.Screen
+          ></Stack.Screen>
+          <Stack.Screen
             name="Booking"
             component={Booking}
             options={{ headerShown: false }}
