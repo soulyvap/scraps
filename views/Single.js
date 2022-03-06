@@ -64,7 +64,11 @@ const Single = ({ route, navigation }) => {
     try {
       const fileTags = await getTagsByFileId(file.file_id);
       for (let i = 0; i < fileTags.length; i++) {
-        if (fileTags[i].tag === `${appId}_post`) {
+        if (
+          fileTags[i].tag === `${appId}_post` ||
+          fileTags[i].tag === "booked" ||
+          fileTags[i].tag === "cancelled"
+        ) {
           fileTags.splice(i, 1);
           i--;
         }

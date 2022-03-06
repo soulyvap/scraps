@@ -36,7 +36,7 @@ const List = ({ navigation, tagSelected }) => {
         const fileId = post.file_id;
         const tags = await getTagsByFileId(fileId);
         const lastTag = tags.pop();
-        if (lastTag.tag !== "booked") {
+        if (lastTag.tag === "booked") {
           console.log(fileId, lastTag.tag);
           activeListings.push(post);
         }
