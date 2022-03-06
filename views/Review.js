@@ -88,6 +88,8 @@ const Review = ({ route, navigation }) => {
       const userToken = await AsyncStorage.getItem("userToken");
       const ratingArray = await getRatingsByFileId(targetFileId);
       const commentArray = await getCommentsById(targetFileId);
+
+      // go through existing ratings and delete previous ones
       ratingArray
         .filter((e) => e.user_id === user.user_id)
         .forEach(async (rating) => {
@@ -101,8 +103,10 @@ const Review = ({ route, navigation }) => {
 
       console.log("ratingArray: ", ratingArray);
       console.log("commentArray: ", commentArray);
+      // post the rating int 1-5
       const ratingResponse = await postRating(targetFileId, rating, userToken);
       console.log("ratingResponse: ", ratingResponse);
+      // if text area has something written, posting the comment too
       if (data.review.length > 0) {
         const commentData = {
           file_id: targetFileId,
@@ -112,9 +116,8 @@ const Review = ({ route, navigation }) => {
         console.log("commentResponse: ", commentResponse);
       }
 
-      //COMMENT
-
-      /* response &&
+      //  redirecting back to home when rating successfull
+      ratingResponse &&
         Alert.alert("Review saved or something", "Well done, you made it.", [
           {
             text: "Ok",
@@ -122,7 +125,7 @@ const Review = ({ route, navigation }) => {
               navigation.navigate("Home");
             },
           },
-        ]); */
+        ]);
     } catch (error) {
       console.error(error.message);
     }
