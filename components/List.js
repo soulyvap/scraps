@@ -18,7 +18,7 @@ import { getDistance } from "geolib";
 import { foodPostTag } from "../utils/variables";
 import { RefreshControl } from "react-native";
 import { colors } from "../utils/colors";
-import LottieAnimation from "./LottieAnimation";
+import LottieView from "lottie-react-native";
 
 const List = ({ navigation, tagSelected }) => {
   const { mediaArray } = useMedia(foodPostTag);
@@ -60,7 +60,6 @@ const List = ({ navigation, tagSelected }) => {
         const tags = await getTagsByFileId(fileId);
         const lastTag = tags.pop();
         if (lastTag.tag !== "booked") {
-          console.log(fileId, lastTag.tag);
           activeListings.push(post);
         }
       })
@@ -120,14 +119,19 @@ const List = ({ navigation, tagSelected }) => {
           <RefreshControl refreshing={refreshing} onRefresh={refresh} />
         }
         ListEmptyComponent={
-          <Text
-            color={colors.notBlack}
-            fontSize={15}
-            alignSelf={"center"}
-            mt={"60%"}
-          >
-            There are no posts matching your criteria
-          </Text>
+          <View alignItems={"center"} justifyContent={"center"} flex={1}>
+            <LottieView
+              autoPlay
+              loop={false}
+              style={{ width: 200, height: 200 }}
+              source={require("../assets/loading-2.json")}
+              speed={1}
+            />
+
+            <Text color={colors.notBlack} fontSize={15} alignSelf={"center"}>
+              There are no posts matching your criteria
+            </Text>
+          </View>
         }
         width={"90%"}
         alignSelf={"center"}
@@ -145,15 +149,15 @@ const List = ({ navigation, tagSelected }) => {
     );
   } else {
     return (
-      // <View>
-      //   <LottieAnimation />
-      // </View>
-      <HStack space={2} alignSelf="center" mt={"50%"}>
-        <Spinner accessibilityLabel="Loading posts" />
-        <Heading color={colors.green} fontSize="xl">
-          Loading
-        </Heading>
-      </HStack>
+      <View alignItems={"center"} justifyContent={"center"} flex={1}>
+        <LottieView
+          autoPlay
+          loop
+          style={{ width: 200, height: 200 }}
+          source={require("../assets/loading-3.json")}
+          speed={2}
+        />
+      </View>
     );
   }
 };

@@ -127,12 +127,12 @@ const useMedia = (tagSelected) => {
   };
 
   //fetch only user's files
-  const loadUserMedia = async () => {
+  const loadUserMedia = async (userId) => {
     setLoading(true);
 
     try {
       let json = await useTag().getFilesByTag(foodPostTag);
-      json = json.filter((file) => file.user_id === user.user_id);
+      json = json.filter((file) => file.user_id === userId);
       const media = await Promise.all(
         json.map(async (item) => {
           const response = await fetch(baseUrl + "media/" + item.file_id);
@@ -142,7 +142,7 @@ const useMedia = (tagSelected) => {
       );
       setUserMediaArray(media) && setUpdate(update + 1);
     } catch (error) {
-      console.error("Problem fetching the data from API", error);
+      console.error("Problem fetching user files from API", error);
     } finally {
       setLoading(false);
     }

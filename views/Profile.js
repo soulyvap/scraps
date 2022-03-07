@@ -30,7 +30,7 @@ const Profile = ({ navigation, route }) => {
   const { getFilesByTag } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
-  const { userMediaArray } = useMedia();
+  const { userMediaArray } = useMedia(file.user_id);
   const [userBio, setUserBio] = useState();
 
   const fetchOwner = async () => {
@@ -196,12 +196,11 @@ const Profile = ({ navigation, route }) => {
             </HStack>
           </Button>
         </HStack>
-        {/* doesn't work atm */}
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
           Active listings ()
         </Text>
-        {/* <Box w={"90%"} alignSelf={"center"}>
+        <Box w={"90%"} alignSelf={"center"}>
           <FlatGrid
             horizontal={true}
             itemDimension={200}
@@ -221,7 +220,7 @@ const Profile = ({ navigation, route }) => {
               </Pressable>
             )}
           />
-        </Box> */}
+        </Box>
         <Text fontSize={20} fontWeight={"bold"} px={5}>
           Reviews
         </Text>
