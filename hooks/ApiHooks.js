@@ -221,7 +221,33 @@ const useRating = () => {
     return await doFetch(baseUrl + "ratings/file/" + userFileId);
   };
 
-  return { getRatingsById };
+  const getRatingsByFileId = async (fileId) => {
+    return await doFetch(`${baseUrl}ratings/file/${fileId}`);
+  };
+
+  const postRating = async (fileId, rating, token) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token,
+      },
+      body: JSON.stringify({ file_id: fileId, rating: rating }),
+    };
+    return await doFetch(baseUrl + "ratings/", options);
+  };
+
+  const deleteRating = async (ratingId, token) => {
+    const options = {
+      method: "DELETE",
+      headers: {
+        "x-access-token": token,
+      },
+    };
+    return await doFetch(`${baseUrl}ratings/file/${ratingId}`, options);
+  };
+
+  return { getRatingsById, getRatingsByFileId, postRating, deleteRating };
 };
 
 const useComment = () => {
@@ -241,7 +267,17 @@ const useComment = () => {
     return doFetch(baseUrl + "comments", options);
   };
 
-  return { getCommentsById, postComment };
+  const deleteComment = async (commentId, token) => {
+    const options = {
+      method: "DELETE",
+      headers: {
+        "x-access-token": token,
+      },
+    };
+    return await doFetch(`${baseUrl}comments/file/${commentId}`, options);
+  };
+
+  return { getCommentsById, postComment, deleteComment };
 };
 
 export { useMedia, useLogin, useUser, useTag, useRating, useComment };
