@@ -7,13 +7,14 @@ import {
   HStack,
   IconButton,
   Input,
+  ScrollView,
   Text,
   TextArea,
   View,
   VStack,
 } from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
@@ -73,6 +74,7 @@ const PostForm = ({ navigation }) => {
   const { postMedia } = useMedia();
   const { postTag } = useTag();
   const { update, setUpdate, coords } = useContext(MainContext);
+  const scrollRef = useRef();
 
   const {
     control,
@@ -194,6 +196,7 @@ const PostForm = ({ navigation }) => {
     setAllergenChips(defaultAllergens);
     setTags(defaultTags);
     setCategory(null);
+    scrollRef.current.scrollTo({ y: 0, animation: true });
   };
 
   const tagsToArray = (tags) =>
@@ -293,294 +296,300 @@ const PostForm = ({ navigation }) => {
   };
 
   return (
-    <VStack flex={1} px={4} py={5} space={10}>
-      {/* Add picture */}
+    <ScrollView ref={scrollRef}>
+      <VStack flex={1} px={4} py={5} space={10}>
+        {/* Add picture */}
 
-      <View>
-        <Heading>
+        <View>
+          <Heading>
+            <Heading
+              mb={3}
+              color={colors.notBlack}
+              fontSize="lg"
+              fontWeight={"bold"}
+            >
+              Add an image
+            </Heading>
+            <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+              *
+            </Text>
+          </Heading>
+
+          <VStack
+            space={3}
+            alignItems={"center"}
+            justifyContent="space-between"
+          >
+            <Avatar
+              source={{ uri: image }}
+              alt="food-image"
+              size={200}
+              resizeMode="contain"
+            />
+            <HStack space={2}>
+              <Button bgColor={colors.grey} onPress={() => pickImage()}>
+                Choose File
+              </Button>
+              <Button bgColor={colors.grey} onPress={() => takePicture()}>
+                Take a Picture
+              </Button>
+            </HStack>
+          </VStack>
+        </View>
+
+        {/* Add title */}
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormControl isInvalid={errors.title}>
+              <Heading mb={3}>
+                <Heading
+                  color={colors.notBlack}
+                  fontSize="lg"
+                  fontWeight={"bold"}
+                >
+                  Add a title
+                </Heading>
+                <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+                  *
+                </Text>
+              </Heading>
+              <Input
+                autoCapitalize="none"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                placeholder={"Green salad"}
+                size="lg"
+                value={value}
+                variant={"basic"}
+              />
+              {errors.title && (
+                <FormControl.ErrorMessage my={0}>
+                  {errors.title.message}
+                </FormControl.ErrorMessage>
+              )}
+            </FormControl>
+          )}
+          name="title"
+        />
+
+        {/* Date selection */}
+        <View>
+          <Heading mb={3}>
+            <Heading color={colors.notBlack} fontSize="lg" fontWeight={"bold"}>
+              Set a latest pickup date
+            </Heading>
+            <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+              *
+            </Text>
+          </Heading>
+          <HStack w={"100%"} alignItems="center">
+            <Text w="100%" textAlign={"center"}>
+              {dateText || "Press the calendar button to choose"}
+            </Text>
+            <IconButton
+              shadow="2"
+              bgColor={colors.yellow}
+              borderRadius="full"
+              position={"absolute"}
+              onPress={showDatepicker}
+              right={1}
+              _icon={{ as: MaterialIcons, name: "calendar-today", size: 5 }}
+            />
+            {show && (
+              <DateTimePicker
+                display="default"
+                mode={mode}
+                onChange={onChanged}
+                testID="dateTimePicker"
+                value={date}
+              />
+            )}
+          </HStack>
+        </View>
+
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormControl isInvalid={errors.time}>
+              <FormControl.Label
+                _text={{
+                  color: "#132A15",
+                  fontWeight: "bold",
+                  fontSize: "lg",
+                }}
+              >
+                Set the times you are usually available
+              </FormControl.Label>
+              <View>
+                <Input
+                  alignSelf={"flex-start"}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  placeholder="e.g. any time between 4PM and 9PM"
+                  size={"lg"}
+                  value={value}
+                  variant={"basic"}
+                  width={"100%"}
+                />
+              </View>
+            </FormControl>
+          )}
+          name="time"
+        />
+
+        {/* Add description */}
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormControl isInvalid={errors.description}>
+              <FormControl.Label
+                _text={{
+                  color: "#132A15",
+                  fontWeight: "bold",
+                  fontSize: "lg",
+                }}
+              >
+                Add a description
+              </FormControl.Label>
+              <TextArea
+                p={3}
+                autoCapitalize="none"
+                onBlur={onBlur}
+                value={value}
+                onChangeText={onChange}
+                size="lg"
+                variant={"basic"}
+                textAlign={"left"}
+              />
+            </FormControl>
+          )}
+          name="description"
+        />
+
+        {/* Add allergens */}
+        <View>
           <Heading
             mb={3}
             color={colors.notBlack}
             fontSize="lg"
             fontWeight={"bold"}
           >
-            Add an image
+            Add allergens
           </Heading>
-          <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
-            *
-          </Text>
-        </Heading>
+          <HStack w={"100%"} justifyContent="space-between">
+            <Box bgColor={colors.beige} borderRadius={15} flex={1} p={1}>
+              <HStack flexWrap={"wrap"} px={4}>
+                {allergenChips.map((chip, i) => {
+                  return (
+                    <Chip
+                      style={{ marginVertical: 3, marginRight: 3 }}
+                      key={i}
+                      mode={"flat"}
+                      onPress={() => {
+                        toggleAllergenChip(chip);
+                      }}
+                      selected={chip.active}
+                    >
+                      {chip.text}
+                    </Chip>
+                  );
+                })}
+              </HStack>
+            </Box>
+          </HStack>
+        </View>
 
-        <VStack space={3} alignItems={"center"} justifyContent="space-between">
-          <Avatar
-            source={{ uri: image }}
-            alt="food-image"
-            size={200}
-            resizeMode="contain"
-          />
-          <HStack space={2}>
-            <Button bgColor={colors.grey} onPress={() => pickImage()}>
-              Choose File
+        {/* Select category */}
+        <View>
+          <Heading mb={3}>
+            <Heading color={colors.notBlack} fontSize="lg" fontWeight={"bold"}>
+              Select a category
+            </Heading>
+            <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
+              *
+            </Text>
+          </Heading>
+          <HStack w={"100%"} justifyContent="space-between">
+            <Button
+              bgColor={category === "uncooked" ? colors.green : colors.notBlack}
+              borderRadius={15}
+              onPress={() => {
+                setCategory("uncooked");
+              }}
+              width={"30%"}
+            >
+              Uncooked
             </Button>
-            <Button bgColor={colors.grey} onPress={() => takePicture()}>
-              Take a Picture
+            <Button
+              bgColor={category === "cooked" ? colors.green : colors.notBlack}
+              borderRadius={15}
+              onPress={() => {
+                setCategory("cooked");
+              }}
+              width={"30%"}
+            >
+              Cooked
+            </Button>
+            <Button
+              bgColor={category === "frozen" ? colors.green : colors.notBlack}
+              borderRadius={15}
+              onPress={() => {
+                setCategory("frozen");
+              }}
+              width={"30%"}
+            >
+              Frozen
             </Button>
           </HStack>
-        </VStack>
-      </View>
+        </View>
 
-      {/* Add title */}
-      <Controller
-        control={control}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isInvalid={errors.title}>
-            <Heading mb={3}>
-              <Heading
-                color={colors.notBlack}
-                fontSize="lg"
-                fontWeight={"bold"}
-              >
-                Add a title
-              </Heading>
-              <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
-                *
-              </Text>
-            </Heading>
-            <Input
-              autoCapitalize="none"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              placeholder={"Green salad"}
-              size="lg"
-              value={value}
-              variant={"basic"}
-            />
-            {errors.title && (
-              <FormControl.ErrorMessage my={0}>
-                {errors.title.message}
-              </FormControl.ErrorMessage>
-            )}
-          </FormControl>
-        )}
-        name="title"
-      />
+        {/* Add tags */}
 
-      {/* Date selection */}
-      <View>
-        <Heading mb={3}>
-          <Heading color={colors.notBlack} fontSize="lg" fontWeight={"bold"}>
-            Set a latest pickup date
+        <View>
+          <Heading
+            mb={3}
+            color={colors.notBlack}
+            fontSize="lg"
+            fontWeight={"bold"}
+          >
+            Add tags
           </Heading>
-          <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
-            *
-          </Text>
-        </Heading>
-        <HStack w={"100%"} alignItems="center">
-          <Text w="100%" textAlign={"center"}>
-            {dateText || "Press the calendar button to choose"}
-          </Text>
-          <IconButton
-            shadow="2"
-            bgColor={colors.yellow}
-            borderRadius="full"
-            position={"absolute"}
-            onPress={showDatepicker}
-            right={1}
-            _icon={{ as: MaterialIcons, name: "calendar-today", size: 5 }}
-          />
-          {show && (
-            <DateTimePicker
-              display="default"
-              mode={mode}
-              onChange={onChanged}
-              testID="dateTimePicker"
-              value={date}
-            />
-          )}
-        </HStack>
-      </View>
+          <HStack w={"100%"} justifyContent="space-between">
+            <Box bgColor={colors.beige} borderRadius={15} flex={1} p={1}>
+              <HStack flexWrap={"wrap"} px={4}>
+                {tags.map((tag, i) => {
+                  return (
+                    <Chip
+                      style={{ marginVertical: 3, marginRight: 3 }}
+                      key={i}
+                      mode={"flat"}
+                      onPress={() => {
+                        toggleTag(tag);
+                      }}
+                      selected={tag.active}
+                    >
+                      {tag.text}
+                    </Chip>
+                  );
+                })}
+              </HStack>
+            </Box>
+          </HStack>
+        </View>
 
-      <Controller
-        control={control}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isInvalid={errors.time}>
-            <FormControl.Label
-              _text={{
-                color: "#132A15",
-                fontWeight: "bold",
-                fontSize: "lg",
-              }}
-            >
-              Set the times you are usually available
-            </FormControl.Label>
-            <View>
-              <Input
-                alignSelf={"flex-start"}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                placeholder="e.g. any time between 4PM and 9PM"
-                size={"lg"}
-                value={value}
-                variant={"basic"}
-                width={"100%"}
-              />
-            </View>
-          </FormControl>
-        )}
-        name="time"
-      />
-
-      {/* Add description */}
-      <Controller
-        control={control}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isInvalid={errors.description}>
-            <FormControl.Label
-              _text={{
-                color: "#132A15",
-                fontWeight: "bold",
-                fontSize: "lg",
-              }}
-            >
-              Add a description
-            </FormControl.Label>
-            <TextArea
-              p={3}
-              autoCapitalize="none"
-              onBlur={onBlur}
-              value={value}
-              onChangeText={onChange}
-              size="lg"
-              variant={"basic"}
-              textAlign={"left"}
-            />
-          </FormControl>
-        )}
-        name="description"
-      />
-
-      {/* Add allergens */}
-      <View>
-        <Heading
-          mb={3}
-          color={colors.notBlack}
-          fontSize="lg"
-          fontWeight={"bold"}
+        <Button
+          alignSelf={"center"}
+          bgColor={colors.green}
+          borderRadius={15}
+          onPress={handleSubmit(onSubmit)}
+          padding={"3%"}
+          width={"40%"}
         >
-          Add allergens
-        </Heading>
-        <HStack w={"100%"} justifyContent="space-between">
-          <Box bgColor={colors.beige} borderRadius={15} flex={1} p={1}>
-            <HStack flexWrap={"wrap"} px={4}>
-              {allergenChips.map((chip, i) => {
-                return (
-                  <Chip
-                    style={{ marginVertical: 3, marginRight: 3 }}
-                    key={i}
-                    mode={"flat"}
-                    onPress={() => {
-                      toggleAllergenChip(chip);
-                    }}
-                    selected={chip.active}
-                  >
-                    {chip.text}
-                  </Chip>
-                );
-              })}
-            </HStack>
-          </Box>
-        </HStack>
-      </View>
-
-      {/* Select category */}
-      <View>
-        <Heading mb={3}>
-          <Heading color={colors.notBlack} fontSize="lg" fontWeight={"bold"}>
-            Select a category
-          </Heading>
-          <Text alignSelf={"flex-start"} color={colors.red} fontSize="lg">
-            *
-          </Text>
-        </Heading>
-        <HStack w={"100%"} justifyContent="space-between">
-          <Button
-            bgColor={category === "uncooked" ? colors.green : colors.notBlack}
-            borderRadius={15}
-            onPress={() => {
-              setCategory("uncooked");
-            }}
-            width={"30%"}
-          >
-            Uncooked
-          </Button>
-          <Button
-            bgColor={category === "cooked" ? colors.green : colors.notBlack}
-            borderRadius={15}
-            onPress={() => {
-              setCategory("cooked");
-            }}
-            width={"30%"}
-          >
-            Cooked
-          </Button>
-          <Button
-            bgColor={category === "frozen" ? colors.green : colors.notBlack}
-            borderRadius={15}
-            onPress={() => {
-              setCategory("frozen");
-            }}
-            width={"30%"}
-          >
-            Frozen
-          </Button>
-        </HStack>
-      </View>
-
-      {/* Add tags */}
-
-      <View>
-        <Heading
-          mb={3}
-          color={colors.notBlack}
-          fontSize="lg"
-          fontWeight={"bold"}
-        >
-          Add tags
-        </Heading>
-        <HStack w={"100%"} justifyContent="space-between">
-          <Box bgColor={colors.beige} borderRadius={15} flex={1} p={1}>
-            <HStack flexWrap={"wrap"} px={4}>
-              {tags.map((tag, i) => {
-                return (
-                  <Chip
-                    style={{ marginVertical: 3, marginRight: 3 }}
-                    key={i}
-                    mode={"flat"}
-                    onPress={() => {
-                      toggleTag(tag);
-                    }}
-                    selected={tag.active}
-                  >
-                    {tag.text}
-                  </Chip>
-                );
-              })}
-            </HStack>
-          </Box>
-        </HStack>
-      </View>
-
-      <Button
-        alignSelf={"center"}
-        bgColor={colors.green}
-        borderRadius={15}
-        onPress={handleSubmit(onSubmit)}
-        padding={"3%"}
-        width={"40%"}
-      >
-        Post
-      </Button>
-    </VStack>
+          Post
+        </Button>
+      </VStack>
+    </ScrollView>
   );
 };
 

@@ -27,9 +27,7 @@ const Upload = ({ navigation }) => {
   return (
     <NativeBaseProvider theme={theme}>
       <Box flex="1" safeArea bgColor={"white"}>
-        <ScrollView bgColor={"white"}>
-          <PostForm navigation={navigation} />
-        </ScrollView>
+        <PostForm navigation={navigation} />
       </Box>
     </NativeBaseProvider>
   );
