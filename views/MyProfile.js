@@ -133,7 +133,15 @@ const Profile = ({ navigation }) => {
         >
           {userBio}
         </Box>
-        <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
+        <Button
+          bgColor={"#FED766"}
+          w={"40%"}
+          alignSelf="center"
+          mb={5}
+          onPress={() => {
+            navigation.navigate("UpdateUser");
+          }}
+        >
           <HStack>
             <Icon
               as={MaterialIcons}

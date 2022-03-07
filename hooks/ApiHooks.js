@@ -32,6 +32,18 @@ const useUser = () => {
     return json;
   };
 
+  const putUser = async (data, token) => {
+    const options = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token,
+      },
+      body: JSON.stringify(data),
+    };
+    return await doFetch(baseUrl + "users", options);
+  };
+
   const checkUsername = async (userName) => {
     const response = await doFetch(baseUrl + "users/username/" + userName);
     return await response;
@@ -55,7 +67,7 @@ const useUser = () => {
     return userData;
   };
 
-  return { postUser, checkUsername, getUserById, getUserByToken };
+  return { postUser, putUser, checkUsername, getUserById, getUserByToken };
 };
 
 const useLogin = () => {
@@ -91,6 +103,18 @@ const useMedia = (tagSelected) => {
     };
     const result = await doFetch(baseUrl + "media", options);
     return result;
+  };
+
+  const putMedia = async (data, token, fileId) => {
+    const options = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token,
+      },
+      body: JSON.stringify(data),
+    };
+    return await doFetch(`${baseUrl}media/${fileId}`, options);
   };
 
   const getMediaById = async (fileId) => {
@@ -189,6 +213,7 @@ const useMedia = (tagSelected) => {
     scrapsMediaArray,
     deleteMediaById,
     getMediaByFileId,
+    putMedia,
   };
 };
 
