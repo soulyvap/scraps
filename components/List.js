@@ -97,7 +97,7 @@ const List = ({ navigation, tagSelected }) => {
 
   useEffect(() => {
     filterItems(categorySelected);
-  }, [mediaArray, isCategorySelected, categorySelected]);
+  }, [mediaArray, isCategorySelected, categorySelected, tagSelected]);
 
   if (!loading) {
     return (
