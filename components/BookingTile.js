@@ -12,7 +12,7 @@ import react, { useContext, useEffect, useRef, useState } from "react";
 import { Alert, TouchableOpacity } from "react-native";
 import { colors } from "../utils/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useComment, useMedia, useUser } from "../hooks/ApiHooks";
+import { useComment, useMedia, useUser, useTag } from "../hooks/ApiHooks";
 import { uploadsUrl } from "../utils/variables";
 import { listingStatus } from "./PostForm";
 import {
@@ -47,6 +47,7 @@ const BookingTile = ({
   const [user, setUser] = useState();
   const menuRef = useRef();
   const { getUserById } = useUser();
+  const { postTag } = useTag();
 
   const updateStatus = async (newStatus) => {
     const userToken = await AsyncStorage.getItem("userToken");
@@ -61,10 +62,27 @@ const BookingTile = ({
         comment: comment,
       };
       const commentResponse = await postComment(commentData, userToken);
+      if (newStatus === listingStatus.cancelled) {
+        await addCancelTag();
+      }
       console.log(commentResponse);
       await refresh();
     } catch (error) {
       console.error("confirm", error);
+    }
+  };
+
+  const addCancelTag = async () => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    const tagData = {
+      file_id: fileId,
+      tag: listingStatus.cancelled,
+    };
+    try {
+      const response = await postTag(tagData, userToken);
+      console.log("tag added", response);
+    } catch (error) {
+      console.error("add tag", error);
     }
   };
 
@@ -104,7 +122,7 @@ const BookingTile = ({
         requiredMessage = own ? "✔️ Booked" : "⌛ Awaiting confirmation";
         break;
       case listingStatus.confirmed:
-        requiredMessage = `✔️ Confirmed: (pickup time: ${pickupInfo.pickupTime})`;
+        requiredMessage = `✔️ Confirmed for ${pickupInfo.pickupTime}`;
         break;
       case listingStatus.pickedUp:
         requiredMessage = "✔️ Picked up";
@@ -119,9 +137,9 @@ const BookingTile = ({
   const selectView = (status) =>
     !own
       ? "BookingSummary"
-      : status === listingStatus.confirmed
-      ? "ConfirmBooking"
-      : "Single";
+      : status === listingStatus.listed || status === listingStatus.cancelled
+      ? "Single"
+      : "ConfirmBooking";
 
   const selectData = (destination) => {
     return destination === "Single" ? { file: file } : { fileId: fileId };
@@ -217,14 +235,18 @@ const BookingTile = ({
                 </MenuTrigger>
                 {own ? (
                   <MenuOptions>
-                    <MenuOption
-                      text={`💬 Chat with ${user.username}`}
-                      onSelect={toChat}
-                    />
-                    <MenuOption
-                      text={`❌ Cancel booking`}
-                      onSelect={() => updateStatus(listingStatus.cancelled)}
-                    />
+                    {status !== listingStatus.cancelled && (
+                      <MenuOption
+                        text={`💬 Chat with ${user.username}`}
+                        onSelect={toChat}
+                      />
+                    )}
+                    {status !== listingStatus.cancelled && (
+                      <MenuOption
+                        text={`❌ Cancel booking`}
+                        onSelect={() => updateStatus(listingStatus.cancelled)}
+                      />
+                    )}
                     <MenuOption text="🗑️ Delete" onSelect={handleDelete} />
                   </MenuOptions>
                 ) : (

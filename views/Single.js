@@ -35,7 +35,7 @@ const Single = ({ route, navigation }) => {
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [showModal, setShowModal] = useState(false);
   const [tags, setTags] = useState();
-  const { update, setUpdate } = useContext(MainContext);
+  const { update, setUpdate, user } = useContext(MainContext);
 
   const descriptionData = file.description;
   const allData = JSON.parse(descriptionData);
@@ -147,7 +147,14 @@ const Single = ({ route, navigation }) => {
         top={"35%"}
         alignItems={"center"}
       >
-        <Text fontSize={25} color="#132A15" fontWeight={"bold"} mt={2}>
+        <Text
+          fontSize={25}
+          color="#132A15"
+          fontWeight={"bold"}
+          mt={2}
+          px={5}
+          textAlign={"center"}
+        >
           {file.title}
         </Text>
         <HStack w={"90%"} h={"13%"} mt={5}>
@@ -269,18 +276,22 @@ const Single = ({ route, navigation }) => {
             </Box>
           )}
         ></FlatGrid>
-        <Button
-          mt={9}
-          borderRadius={"full"}
-          bgColor={"#33CA7F"}
-          onPress={() =>
-            navigation.navigate("Booking", { fileId: file.file_id })
-          }
-        >
-          <Text color="#F9F4F1" fontWeight={"bold"}>
-            Book now
-          </Text>
-        </Button>
+        {user.user_id !== owner.user_id ? (
+          <Button
+            mt={9}
+            borderRadius={"full"}
+            bgColor={"#33CA7F"}
+            onPress={() =>
+              navigation.navigate("Booking", { fileId: file.file_id })
+            }
+          >
+            <Text color="#F9F4F1" fontWeight={"bold"}>
+              Book now
+            </Text>
+          </Button>
+        ) : (
+          <Box size={10}></Box>
+        )}
       </VStack>
     </Center>
   );

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
 import List from "../components/List";
 import PropTypes from "prop-types";
-import { MaterialIcons } from "@expo/vector-icons";
 import { MainContext } from "../contexts/MainContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -12,6 +11,8 @@ import {
   FlatList,
   Heading,
   HStack,
+  Icon,
+  IconButton,
   NativeBaseProvider,
   Pressable,
   Text,
@@ -19,6 +20,7 @@ import {
 } from "native-base";
 import { foodPostTag, defaultTags } from "../utils/variables";
 import { colors } from "../utils/colors";
+import LogoutButton from "../components/LogoutButton";
 
 const Home = ({ navigation }) => {
   const {
@@ -46,26 +48,22 @@ const Home = ({ navigation }) => {
       <SafeAreaView flex={1}>
         <NativeBaseProvider theme={theme}>
           <Box>
-            <View
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-            >
-              <Heading fontSize="xl" p="4" pb="3" color={"#132A15"} ml={1}>
+            <HStack justifyContent={"space-between"} alignItems={"center"}>
+              <Heading
+                fontSize="xl"
+                p="4"
+                pb="3"
+                color={colors.notBlack}
+                ml={1}
+              >
                 Hi, {user.username}!
               </Heading>
-              <Button
-                bgColor={"#132A15"}
-                paddingY={2}
-                mr={3}
-                shadow={3}
-                _text={{ color: "#F9F4F1", fontWeight: "bold" }}
-                borderRadius="full"
+              <LogoutButton
+                top={3}
+                right={6}
                 onPress={() => logout()}
-              >
-                Logout
-              </Button>
-            </View>
+              ></LogoutButton>
+            </HStack>
             <Text
               ml={"5%"}
               fontSize={17}

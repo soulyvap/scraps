@@ -27,7 +27,7 @@ const BookingSummary = ({ navigation, route }) => {
   const fileId = route.params.fileId;
   const { getCommentsById, postComment } = useComment();
   const { getUserById } = useUser();
-  const { getFilesByTag } = useTag();
+  const { getFilesByTag, postTag } = useTag();
   const { getMediaById } = useMedia();
 
   const [status, setStatus] = useState();
@@ -73,10 +73,27 @@ const BookingSummary = ({ navigation, route }) => {
         comment: comment,
       };
       const commentResponse = await postComment(commentData, userToken);
+      if (newStatus === listingStatus.cancelled) {
+        await addCancelTag();
+      }
       console.log(commentResponse);
       setUpdate(update + 1);
     } catch (error) {
       console.error("confirm", error);
+    }
+  };
+
+  const addCancelTag = async () => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    const tagData = {
+      file_id: fileId,
+      tag: listingStatus.cancelled,
+    };
+    try {
+      const response = await postTag(tagData, userToken);
+      console.log("tag added", response);
+    } catch (error) {
+      console.error("add tag", error);
     }
   };
 
