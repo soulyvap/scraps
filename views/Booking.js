@@ -360,36 +360,38 @@ const Booking = ({ navigation, route }) => {
               <Heading fontSize={"lg"} my={3}>
                 How
               </Heading>
-              <Select
-                fontSize={14}
-                borderRadius={15}
-                bgColor={colors.beige}
-                borderColor={colors.beige}
-                py={1}
-                px={5}
-                w={"100%"}
-                selectedValue={pickupMethod}
-                accessibilityLabel="Choose a pickup method"
-                placeholder="Choose a pickup method"
-                variant="rounded"
-                onValueChange={(value) => {
-                  setPickupMethod(value);
-                }}
-              >
-                <Select.Item
-                  label="Left at the building door"
-                  value="Left at the building door"
-                />
-                <Select.Item
-                  label="Left at the door"
-                  value="Left at the door"
-                />
-                <Select.Item
-                  label="Ring the doorbell"
-                  value="Ring the doorbell"
-                />
-                <Select.Item label="Call me" value="Call me" />
-              </Select>
+              {username && (
+                <Select
+                  fontSize={14}
+                  borderRadius={15}
+                  bgColor={colors.beige}
+                  borderColor={colors.beige}
+                  py={1}
+                  px={5}
+                  w={"100%"}
+                  selectedValue={pickupMethod}
+                  accessibilityLabel="Choose a pickup method"
+                  placeholder="Choose a pickup method"
+                  variant="rounded"
+                  onValueChange={(value) => {
+                    setPickupMethod(value);
+                  }}
+                >
+                  <Select.Item
+                    label="Left at the building door"
+                    value="Left at the building door"
+                  />
+                  <Select.Item
+                    label="Left at the door"
+                    value="Left at the door"
+                  />
+                  <Select.Item
+                    label="Ring the doorbell"
+                    value="Ring the doorbell"
+                  />
+                  <Select.Item label={`Call ${username}`} value="Call me" />
+                </Select>
+              )}
             </View>
             <HStack w={"100%"} mt={3}>
               <Checkbox

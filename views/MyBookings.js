@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { FlatList, HStack, SectionList, Text, View } from "native-base";
+import { Center, FlatList, HStack, SectionList, Text, View } from "native-base";
 import React from "react";
 import react, { useContext, useEffect, useState } from "react";
 import { RefreshControl } from "react-native";
@@ -109,7 +109,7 @@ const MyBookings = ({ navigation }) => {
 
   return (
     <View flex={1}>
-      {data && (
+      {data ? (
         <SectionList
           sections={data}
           keyExtractor={(item, index) => index}
@@ -121,6 +121,8 @@ const MyBookings = ({ navigation }) => {
             <RefreshControl refreshing={refreshing} onRefresh={refresh} />
           }
         />
+      ) : (
+        <Center flex={1}>No bookings yet.</Center>
       )}
     </View>
   );
