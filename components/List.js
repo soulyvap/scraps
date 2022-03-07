@@ -2,10 +2,22 @@ import React, { useState, useEffect, useContext } from "react";
 import { useMedia, useTag } from "../hooks/ApiHooks";
 import ListItem from "./ListItem";
 import PropTypes from "prop-types";
-import { FlatList } from "native-base";
+import {
+  Center,
+  FlatList,
+  Heading,
+  HStack,
+  Skeleton,
+  Spinner,
+  Text,
+  View,
+  VStack,
+} from "native-base";
 import { MainContext } from "../contexts/MainContext";
 import { getDistance } from "geolib";
 import { foodPostTag } from "../utils/variables";
+import { RefreshControl } from "react-native";
+import { colors } from "../utils/colors";
 
 const List = ({ navigation, tagSelected }) => {
   const { mediaArray } = useMedia(foodPostTag);
@@ -13,11 +25,21 @@ const List = ({ navigation, tagSelected }) => {
   const { categorySelected, isCategorySelected, coords } =
     useContext(MainContext);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const myCoords = { latitude: coords.latitude, longitude: coords.longitude };
   const meters = 100000000;
 
+  const refresh = async () => {
+    setRefreshing(true);
+    setLoading(true);
+    setFilteredItems([]);
+    await filterItems();
+  };
+
   const filterItems = async (category) => {
+    setLoading(true);
     // posts with tagSelected
     const foodPostsByTag = await getFilesByTag(tagSelected);
     // keep only matches between mediaArray and foodPostsByTag
@@ -65,6 +87,8 @@ const List = ({ navigation, tagSelected }) => {
     });
 
     setFilteredItems(newArray);
+    setRefreshing(false);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -75,19 +99,46 @@ const List = ({ navigation, tagSelected }) => {
     filterItems(categorySelected);
   }, [mediaArray, isCategorySelected, categorySelected]);
 
-  return (
-    <FlatList
-      width={"90%"}
-      alignSelf={"center"}
-      numColumns={2}
-      data={filteredItems}
-      columnWrapperStyle={{ justifyContent: "space-evenly", marginBottom: 20 }}
-      keyExtractor={(item) => item.file_id.toString()}
-      renderItem={({ item }) => (
-        <ListItem navigation={navigation} singleMedia={item} />
-      )}
-    />
-  );
+  if (!loading) {
+    return (
+      <FlatList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+        }
+        ListEmptyComponent={
+          <Text
+            color={colors.notBlack}
+            fontSize={15}
+            alignSelf={"center"}
+            mt={"60%"}
+          >
+            There are no posts matching your criteria
+          </Text>
+        }
+        width={"90%"}
+        alignSelf={"center"}
+        numColumns={2}
+        data={filteredItems}
+        columnWrapperStyle={{
+          justifyContent: "space-evenly",
+          marginBottom: 20,
+        }}
+        keyExtractor={(item) => item.file_id.toString()}
+        renderItem={({ item }) => (
+          <ListItem navigation={navigation} singleMedia={item} />
+        )}
+      />
+    );
+  } else {
+    return (
+      <HStack space={2} alignSelf="center" mt={"50%"}>
+        <Spinner accessibilityLabel="Loading posts" />
+        <Heading color={colors.green} fontSize="xl">
+          Loading
+        </Heading>
+      </HStack>
+    );
+  }
 };
 
 List.propTypes = {
