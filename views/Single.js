@@ -147,7 +147,14 @@ const Single = ({ route, navigation }) => {
         top={"35%"}
         alignItems={"center"}
       >
-        <Text fontSize={25} color="#132A15" fontWeight={"bold"} mt={2}>
+        <Text
+          fontSize={25}
+          color="#132A15"
+          fontWeight={"bold"}
+          mt={2}
+          px={5}
+          textAlign={"center"}
+        >
           {file.title}
         </Text>
         <HStack w={"90%"} h={"13%"} mt={5}>

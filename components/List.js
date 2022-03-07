@@ -18,6 +18,7 @@ import { getDistance } from "geolib";
 import { foodPostTag } from "../utils/variables";
 import { RefreshControl } from "react-native";
 import { colors } from "../utils/colors";
+import LottieAnimation from "./LottieAnimation";
 
 const List = ({ navigation, tagSelected }) => {
   const { mediaArray } = useMedia(foodPostTag);
@@ -29,7 +30,7 @@ const List = ({ navigation, tagSelected }) => {
   const [loading, setLoading] = useState(true);
 
   const myCoords = { latitude: coords.latitude, longitude: coords.longitude };
-  const meters = 100000000;
+  const meters = 500;
 
   const refresh = async () => {
     setRefreshing(true);
@@ -69,12 +70,13 @@ const List = ({ navigation, tagSelected }) => {
     const newArray = activeListings.filter((item) => {
       const descriptionData = item.description;
       const allData = JSON.parse(descriptionData);
-      const postCoordsLat = 60.170622411146574;
-      const postCoordsLong = 24.94413216537968;
+      // get coordinates of the post
       const postCoords = {
-        latitude: postCoordsLat,
-        longitude: postCoordsLong,
+        latitude: allData.coords.latitude,
+        longitude: allData.coords.longitude,
       };
+
+      // compare distance between user's address and posts location
       const distance = getDistance(myCoords, postCoords);
       if (
         (!isCategorySelected && distance < meters) ||
@@ -86,7 +88,19 @@ const List = ({ navigation, tagSelected }) => {
       }
     });
 
-    setFilteredItems(newArray);
+    // sort array so that newest items are shown first
+    // secondary sorting done by title a to z
+    const sortedArray = newArray.sort((a, b) =>
+      a.time_added < b.time_added
+        ? 1
+        : a.time_added === b.time_added
+        ? a.title > b.title
+          ? 1
+          : -1
+        : -1
+    );
+
+    setFilteredItems(sortedArray);
     setRefreshing(false);
     setLoading(false);
   };
@@ -97,7 +111,7 @@ const List = ({ navigation, tagSelected }) => {
 
   useEffect(() => {
     filterItems(categorySelected);
-  }, [mediaArray, isCategorySelected, categorySelected]);
+  }, [mediaArray, isCategorySelected, categorySelected, refreshing]);
 
   if (!loading) {
     return (
@@ -131,6 +145,9 @@ const List = ({ navigation, tagSelected }) => {
     );
   } else {
     return (
+      // <View>
+      //   <LottieAnimation />
+      // </View>
       <HStack space={2} alignSelf="center" mt={"50%"}>
         <Spinner accessibilityLabel="Loading posts" />
         <Heading color={colors.green} fontSize="xl">

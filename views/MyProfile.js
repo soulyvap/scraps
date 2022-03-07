@@ -18,13 +18,21 @@ import { avatarTag, foodPostTag, uploadsUrl } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
 import { userFileTag } from "../utils/variables";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import LogoutButton from "../components/LogoutButton";
 
 const Profile = ({ navigation }) => {
-  const { user } = useContext(MainContext);
+  const { user, setIsLoggedIn } = useContext(MainContext);
   const { getFilesByTag } = useTag();
   const [userBio, setUserBio] = useState();
   const [avatar, setAvatar] = useState();
   const { userMediaArray } = useMedia(user.user_id);
+
+  const logout = async () => {
+    console.log("logout");
+    await AsyncStorage.clear();
+    setIsLoggedIn(false);
+  };
 
   const fetchAvatar = async () => {
     try {
@@ -68,6 +76,7 @@ const Profile = ({ navigation }) => {
           }}
         />
       </Box>
+      <LogoutButton top={5} right={5} onPress={() => logout()}></LogoutButton>
       <VStack bgColor={"#33CA7F"} alignItems={"center"} mb={5}>
         <Text fontSize={30} fontWeight={"bold"}>
           {user.username}

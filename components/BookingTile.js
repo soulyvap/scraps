@@ -235,14 +235,18 @@ const BookingTile = ({
                 </MenuTrigger>
                 {own ? (
                   <MenuOptions>
-                    <MenuOption
-                      text={`💬 Chat with ${user.username}`}
-                      onSelect={toChat}
-                    />
-                    <MenuOption
-                      text={`❌ Cancel booking`}
-                      onSelect={() => updateStatus(listingStatus.cancelled)}
-                    />
+                    {status !== listingStatus.cancelled && (
+                      <MenuOption
+                        text={`💬 Chat with ${user.username}`}
+                        onSelect={toChat}
+                      />
+                    )}
+                    {status !== listingStatus.cancelled && (
+                      <MenuOption
+                        text={`❌ Cancel booking`}
+                        onSelect={() => updateStatus(listingStatus.cancelled)}
+                      />
+                    )}
                     <MenuOption text="🗑️ Delete" onSelect={handleDelete} />
                   </MenuOptions>
                 ) : (

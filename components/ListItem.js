@@ -131,8 +131,13 @@ const ListItem = ({ navigation, singleMedia }) => {
             </VStack>
           </HStack>
         </Box>
-        <Box w="150" h="50" alignItems="center" justifyContent="center">
-          <Heading size="md" color="#132A15" textAlign="center">
+        <Box w="150" h="50" alignItems="center" justifyContent="center" px={1}>
+          <Heading
+            size="sm"
+            color="#132A15"
+            textAlign="center"
+            numberOfLines={1}
+          >
             {singleMedia.title}
           </Heading>
         </Box>
