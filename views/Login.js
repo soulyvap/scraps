@@ -42,9 +42,9 @@ const Login = ({ navigation }) => {
         const userData = await getUserByToken(userToken);
         console.log("check token", userData);
         if (userData) {
+          await fetchCoordinates(userData.user_id);
           setUser(userData);
           setIsLoggedIn(true);
-          await fetchCoordinates(userData.user_id);
         }
       } catch (error) {
         throw new Error(error.message);

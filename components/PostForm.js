@@ -25,6 +25,7 @@ import { Camera } from "expo-camera";
 import { colors } from "../utils/colors";
 import { foodPostTag } from "../utils/variables";
 import { MainContext } from "../contexts/MainContext";
+import * as ImageManipulator from "expo-image-manipulator";
 
 export const listingStatus = {
   listed: "listed",
@@ -131,12 +132,20 @@ const PostForm = ({ navigation }) => {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        quality: 0.5,
+        quality: 0.1,
         aspect: [1, 1],
       });
-      console.log("take pic", result.uri);
+
+      const uri = result.uri;
+
+      const resized = await ImageManipulator.manipulateAsync(uri, [
+        { resize: { width: 800, height: 800 } },
+      ]);
+
+      console.log(resized);
+
       if (!result.cancelled) {
-        setImage(result.uri);
+        setImage(resized.uri);
         setImageSelected(true);
       }
     }
