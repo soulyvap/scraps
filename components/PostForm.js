@@ -245,6 +245,7 @@ const PostForm = ({ navigation }) => {
         allergens: selectedAllergens,
         category: category,
         active: true,
+        coords: coords,
       };
 
       const formData = new FormData();

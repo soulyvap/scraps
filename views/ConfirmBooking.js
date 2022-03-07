@@ -9,11 +9,10 @@ import {
   View,
   VStack,
 } from "native-base";
-import react, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import BackButton from "../components/BackButton";
 import BookingTile from "../components/BookingTile";
-import Tag from "../components/Tag";
-import { useComment, useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import { useComment, useTag, useUser } from "../hooks/ApiHooks";
 import { colors } from "../utils/colors";
 import { avatarTag, uploadsUrl } from "../utils/variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -25,7 +24,7 @@ const ConfirmBooking = ({ navigation, route }) => {
   const fileId = route.params.fileId;
   const { getCommentsById, postComment } = useComment();
   const { getUserById } = useUser();
-  const { getFilesByTag } = useTag();
+  const { getFilesByTag, postTag } = useTag();
 
   const [status, setStatus] = useState();
   const [username, setUsername] = useState();
@@ -46,11 +45,28 @@ const ConfirmBooking = ({ navigation, route }) => {
         comment: comment,
       };
       const commentResponse = await postComment(commentData, userToken);
+      if (newStatus === listingStatus.cancelled) {
+        await addCancelTag();
+      }
       console.log(commentResponse);
       navigation.goBack();
       setUpdate(update + 1);
     } catch (error) {
       console.error("confirm", error);
+    }
+  };
+
+  const addCancelTag = async () => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    const tagData = {
+      file_id: fileId,
+      tag: listingStatus.cancelled,
+    };
+    try {
+      const response = await postTag(tagData, userToken);
+      console.log("tag added", response);
+    } catch (error) {
+      console.error("add tag", error);
     }
   };
 
