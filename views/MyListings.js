@@ -1,12 +1,13 @@
 import { FlatList, HStack, SectionList, Text, View } from "native-base";
 import react, { useContext, useEffect, useState } from "react";
-import { RefreshControl } from "react-native";
+import { Dimensions, RefreshControl } from "react-native";
 import BookingTile from "../components/BookingTile";
 import { listingStatus } from "../components/PostForm";
 import { MainContext } from "../contexts/MainContext";
 import { useComment, useMedia, useTag } from "../hooks/ApiHooks";
 import { colors } from "../utils/colors";
 import { foodPostTag } from "../utils/variables";
+import LottieView from "lottie-react-native";
 
 const MyListings = ({ navigation }) => {
   const { getFilesByTag } = useTag();
@@ -121,6 +122,8 @@ const MyListings = ({ navigation }) => {
     );
   };
 
+  const h = Dimensions.get("window").height;
+
   return (
     <View flex={1}>
       {data && (
@@ -133,6 +136,17 @@ const MyListings = ({ navigation }) => {
           )}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+          }
+          ListEmptyComponent={
+            <View alignItems={"center"} justifyContent={"center"} h={h * 0.8}>
+              <LottieView
+                autoPlay
+                loop={false}
+                style={{ width: 400, height: 400 }}
+                source={require("../assets/loading-2.json")}
+                speed={1}
+              />
+            </View>
           }
         />
       )}
