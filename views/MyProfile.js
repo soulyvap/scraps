@@ -50,7 +50,8 @@ const Profile = ({ navigation }) => {
   const fetchUserBio = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + user.user_id);
-      const userFile = userFiles[0];
+      console.log(userFiles);
+      const userFile = userFiles.pop();
       const descriptionData = userFile.description;
       const allData = JSON.parse(descriptionData);
       const bio = allData.bio;

@@ -3,6 +3,7 @@ import {
   Button,
   extendTheme,
   FormControl,
+  Heading,
   Icon,
   IconButton,
   Input,
@@ -33,12 +34,13 @@ const UpdateUser = ({ navigation }) => {
   const [bio, setBio] = useState();
   const [formData, setFormData] = useState();
   const [currentForm, setCurrentForm] = useState(regForms.user);
-  const { user, setUser } = useContext(MainContext);
-
+  const { user, setUser, update, setUpdate } = useContext(MainContext);
+  const [bioText, setBioText] = useState();
+  const [userFileData, setUserFileData] = useState([]);
+  const [userFileId, setUserFileId] = useState();
   const { putUser } = useUser();
-  const { getFilesByTag } = useTag();
-  const { putMedia } = useMedia();
-
+  const { getFilesByTag, postTag } = useTag();
+  const { postMedia, deleteMediaById } = useMedia();
   const { checkUsername } = useUser();
 
   console.log(user);
@@ -92,7 +94,6 @@ const UpdateUser = ({ navigation }) => {
   });
 
   const onSubmit = async (data) => {
-    console.log(data);
     try {
       delete data.confirmPassword;
       if (data.password === "") {
@@ -103,30 +104,83 @@ const UpdateUser = ({ navigation }) => {
       console.log("edit profile data onSubmit", userData);
       delete data.password;
       setUser(data);
+      // const bioUpdated = await updateUserFile();
+      // if (userData && bioUpdated) {
+      //   setUpdate(update + 1);
+      //   Alert.alert("Success! Account updated.");
+      // }
       if (userData) {
-        Alert.alert("Success!", userData.message);
-        // navigation.navigate("Profile");
+        Alert.alert("Success! Account updated.");
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  // useEffect(() => {
-  //   if (success) {
-  //     navigation.goBack();
+  const fetchUserBio = async () => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + user.user_id);
+      const myFile = userFiles.pop();
+      console.log("my old file", myFile);
+      setUserFileId(myFile.file_id);
+      const descriptionData = myFile.description;
+      const allData = JSON.parse(descriptionData);
+      setUserFileData(allData);
+      const bio = allData.bio;
+      setBioText(bio);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  // const updateUserFile = async () => {
+  //   try {
+  //     const userToken = await AsyncStorage.getItem("userToken");
+  //     const formData = new FormData();
+  //     formData.append("title", `userfile_${user.user_id}`);
+  //     const description = JSON.stringify({
+  //       coords: userFileData.coords,
+  //       address: userFileData.address,
+  //       bio: bioText,
+  //     });
+  //     formData.append("description", description);
+  //     const userFileUri = Image.resolveAssetSource(userFileImage).uri;
+  //     formData.append("file", {
+  //       uri: userFileUri,
+  //       name: "a.jpg",
+  //       type: "image/jpg",
+  //     });
+  //     console.log("token", userToken);
+  //     const response = await postMedia(formData, userToken);
+  //     const fileId = response.file_id;
+  //     if (response) {
+  //       await addUserFileTag(fileId);
+  //     }
+  //     console.log("new userfile created with id: ", fileId);
+  //     const oldMediaDeleted = await deleteMediaById(userFileId, userToken);
+  //     if (oldMediaDeleted) {
+  //       console.log("old file deleted");
+  //     }
+  //   } catch (error) {
+  //     throw new Error(error.message);
   //   }
-  // }, [success]);
+  // };
 
-  // useEffect(() => {
-  //   console.log(currentForm);
-  // }, [currentForm]);
-
-  // useEffect(async () => {
-  //   console.log(formData);
-  //   // console.log(bio);
-  //   formData && (await updateUser());
-  // }, []);
+  // const addUserFileTag = async (fileId) => {
+  //   try {
+  //     const userToken = await AsyncStorage.getItem("userToken");
+  //     const tagData = {
+  //       file_id: fileId,
+  //       tag: userFileTag + user.user_id,
+  //     };
+  //     const response = await postTag(tagData, userToken);
+  //     if (response) {
+  //       console.log("tag added", tagData.tag);
+  //     }
+  //   } catch (error) {
+  //     throw new Error(error.message);
+  //   }
+  // };
 
   const theme = extendTheme({
     components: {
@@ -157,50 +211,9 @@ const UpdateUser = ({ navigation }) => {
     },
   });
 
-  //   const fetchUserBio = async () => {
-  //     try {
-  //       const userFiles = await getFilesByTag(userFileTag + user.user_id);
-  //       const userFile = userFiles[0];
-  //       const descriptionData = userFile.description;
-  //       const allData = JSON.parse(descriptionData);
-  //       const bio = allData.bio;
-  //       setBio(bio);
-  //     } catch (error) {
-  //       console.error(error.message);
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     fetchUserBio();
-  //   }, []);
-
-  // const updateUser = async (formData) => {
-  //   try {
-  //     delete formData.confirmPassword;
-  //     if (formData.password === "") {
-  //       delete formData.password;
-  //     }
-  //     const userToken = await AsyncStorage.getItem("userToken");
-  //     const userData = await putUser(formData, userToken);
-  //     delete formData.password;
-  //     setUser(formData);
-  //     console.log("Account updated successfully");
-  //     if (userData) {
-  //       Alert.alert("Success!", userData.message);
-  //       navigation.navigate("MyProfile");
-  //     }
-  //   } catch (error) {
-  //     throw new Error("update user", error.message);
-  //   }
-  // };
-
-  //   const updateBio = async () => {
-  //       try {
-
-  //       } catch (error) {
-  //           throw new Error(error.message);
-  //       }
-  //   }
+  useEffect(() => {
+    fetchUserBio();
+  }, []);
 
   return (
     <NativeBaseProvider theme={theme}>
@@ -230,17 +243,18 @@ const UpdateUser = ({ navigation }) => {
           >
             <View flex={1}></View>
             {/* <TextArea
-            value={bio}
-            onChangeText={(input) => setBioText(input)}
-            //   bgColor={colors.beige}
-            fontSize={"md"}
-            mt={5}
-            placeholder="Introduce yourself to your neighbours..."
-            p={3}
-            textAlign={"left"}
-            h={"20%"}
-          /> */}
-            <VStack space={1}>
+              value={bioText}
+              onChangeText={(input) => setBioText(input)}
+              onBlur={() => setBio(bioText)}
+              fontSize={"md"}
+              mt={5}
+              placeholder="Introduce yourself to your neighbours..."
+              p={3}
+              textAlign={"left"}
+              h={"20%"}
+            /> */}
+            <Heading alignSelf={"center"}>Edit account information</Heading>
+            <VStack space={1} mt={5}>
               {/* <View flexDirection={"row"} justifyContent={"center"} mb={2}>
         <Avatar mr={5} source={{ uri: pic }} alt="profile-pic" size={100} />
         <Button bgColor={"#898980"} w={100} onPress={pickImage}>
