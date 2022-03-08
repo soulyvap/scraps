@@ -1,6 +1,5 @@
-import { Box, extendTheme, NativeBaseProvider, ScrollView } from "native-base";
+import { Box, extendTheme, NativeBaseProvider } from "native-base";
 import PostForm from "../components/PostForm";
-import { colors } from "../utils/colors";
 
 const Upload = ({ navigation }) => {
   const theme = extendTheme({

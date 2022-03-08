@@ -14,9 +14,11 @@ import { colors } from "../utils/colors";
 
 const BioForm = ({ setBio }) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
+  //listening to changes in biography input
   const [bioText, setBioText] = useState();
   let bioAdded = false;
 
+  //handling on-screen keyboard display
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardShowing(true);

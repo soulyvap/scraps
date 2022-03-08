@@ -1,12 +1,4 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  FormControl,
-  Input,
-  View,
-  VStack,
-} from "native-base";
+import { Avatar, Button, FormControl, Input, View, VStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
@@ -33,22 +25,23 @@ const RegisterForm = ({
     confirmPassword: "",
   };
 
+  //image picker
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 0.5,
+      aspect: [1, 1],
     });
-    console.log(result);
     if (!result.cancelled) {
       setPic(result.uri);
     }
   };
 
+  //prefilling inputs with current values if user happens to come back to this form while still registering.
   useEffect(() => {
     if (typeof userImage !== "undefined") setPic(userImage);
     if (formData) {
-      console.log(formData);
       setValue("email", formData.email);
       setValue("username", formData.username);
       setValue("full_name", formData.full_name);

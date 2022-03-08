@@ -1,6 +1,6 @@
 import { ArrowBackIcon, IconButton } from "native-base";
-import react from "react";
 
+//generic back button component
 const BackButton = ({ onPress, top, left }) => {
   return (
     <IconButton

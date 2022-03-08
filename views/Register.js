@@ -9,6 +9,7 @@ import { Alert, BackHandler, Image } from "react-native";
 import BackButton from "../components/BackButton";
 import BioForm from "../components/BioForm";
 
+//names of the three forms that the user needs to fill in to create an account.
 export const regForms = {
   user: "user",
   map: "map",
@@ -32,6 +33,7 @@ const Register = ({ navigation }) => {
   const { postTag } = useTag();
   const { postMedia } = useMedia();
 
+  //on back press, the app either navigates back to Login or to the previous form.
   const handleBack = () => {
     switch (currentForm) {
       case regForms.user:
@@ -46,6 +48,7 @@ const Register = ({ navigation }) => {
     }
   };
 
+  //listener for on-screen keyboard to handle UI changes when the keyboard is displayed.
   useEffect(() => {
     const onBackPress = () => true;
 
@@ -56,21 +59,15 @@ const Register = ({ navigation }) => {
     };
   }, []);
 
+  //navigates back to Login when registering is successful.
   useEffect(() => {
     if (success) {
       navigation.goBack();
     }
   }, [success]);
 
-  useEffect(() => {
-    console.log(currentForm);
-  }, [currentForm]);
-
+  //creates the account once a biography is set.
   useEffect(async () => {
-    console.log(formData);
-    console.log(address);
-    console.log(pinpoint);
-    console.log(bio);
     formData && (await createUser());
   }, [bio]);
 
@@ -116,6 +113,7 @@ const Register = ({ navigation }) => {
     }
   };
 
+  //logs the user in to get token and posts the files that require token: profile pic and userFile.
   const createFilesWithToken = async () => {
     try {
       const userCredentials = {
@@ -134,6 +132,7 @@ const Register = ({ navigation }) => {
     }
   };
 
+  //posts profile pic
   const createProfilePic = async () => {
     const formData = new FormData();
     formData.append("title", `profile_${userId}`);
@@ -155,6 +154,7 @@ const Register = ({ navigation }) => {
     }
   };
 
+  //posts special tag for app specific profile pics
   const addProfilePicTag = async (fileId) => {
     try {
       const tagData = {
@@ -168,6 +168,7 @@ const Register = ({ navigation }) => {
     }
   };
 
+  //creates a userfile that contains the address, the coordinates and the bio of a user in its description.
   const createUserFile = async () => {
     const formData = new FormData();
     formData.append("title", `userfile_${userId}`);
@@ -179,6 +180,7 @@ const Register = ({ navigation }) => {
     console.log("userfile desc", description);
     formData.append("description", description);
     const userFileUri = Image.resolveAssetSource(userFileImage).uri;
+    //smallest file possible. it does not matter which file this is.
     formData.append("file", {
       uri: userFileUri,
       name: "a.jpg",
@@ -193,6 +195,7 @@ const Register = ({ navigation }) => {
     }
   };
 
+  //tag to identify a user's userfile
   const addUserFileTag = async (fileId) => {
     try {
       const tagData = {

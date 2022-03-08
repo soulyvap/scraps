@@ -94,6 +94,7 @@ const PostForm = ({ navigation }) => {
     setShow(true);
   };
 
+  //when a date is selected on the datepicker, the latter is hidden, the date is set and the date text is generated
   const onChanged = (event, selectedDate) => {
     setShow(false);
     setDate(selectedDate);
@@ -109,6 +110,7 @@ const PostForm = ({ navigation }) => {
     setDateText(final);
   };
 
+  //checks for permissions to use the phones cameras
   const permisionFunction = async () => {
     const cameraPermission = await Camera.requestCameraPermissionsAsync();
 
@@ -129,6 +131,7 @@ const PostForm = ({ navigation }) => {
     permisionFunction();
   }, []);
 
+  //handles taking a picture with the phone's cameras
   const takePicture = async () => {
     if (cameraPermission) {
       const result = await ImagePicker.launchCameraAsync({
@@ -140,6 +143,7 @@ const PostForm = ({ navigation }) => {
 
       const uri = result.uri;
 
+      //resizes the image to make sure it isn't too large for the backend
       const resized = await ImageManipulator.manipulateAsync(uri, [
         { resize: { width: 800, height: 800 } },
       ]);
@@ -153,6 +157,7 @@ const PostForm = ({ navigation }) => {
     }
   };
 
+  //handles picking an image from the gallery
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -161,12 +166,20 @@ const PostForm = ({ navigation }) => {
       aspect: [1, 1],
     });
 
+    const uri = result.uri;
+
+    //resizes the image to make sure it isn't too large for the backend
+    const resized = await ImageManipulator.manipulateAsync(uri, [
+      { resize: { width: 800, height: 800 } },
+    ]);
+
     if (!result.cancelled) {
-      setImage(result.uri);
+      setImage(resized.uri);
       setImageSelected(true);
     }
   };
 
+  //handles the selection of allergens. they can be active or inactive
   const toggleAllergenChip = (chip) => {
     console.log("toggleAllergens: ", chip);
     let copy = [...allergenChips];
@@ -175,8 +188,8 @@ const PostForm = ({ navigation }) => {
     setAllergenChips(copy);
     console.log(chip);
   };
-  // When clickin a tag
 
+  //handles the selection of tags. they can be active or inactive
   const toggleTag = (tag) => {
     console.log("toggleTag: ", tag);
     let copyOftags = [...tags];
@@ -185,6 +198,7 @@ const PostForm = ({ navigation }) => {
     setTags(copyOftags);
   };
 
+  //resetting the form after it is submitted
   const resetForm = () => {
     setImage(null);
     setImageSelected(false);
@@ -199,9 +213,11 @@ const PostForm = ({ navigation }) => {
     scrollRef.current.scrollTo({ y: 0, animation: true });
   };
 
+  //mapping tags into an array of strings
   const tagsToArray = (tags) =>
     tags.filter((tag) => tag.active).map((tag) => tag.text);
 
+  //adding all the tags selected to the food post file.
   const addFoodTags = async (tags, fileId, token) => {
     tags.forEach(async (tag) => {
       const tagData = {
@@ -218,6 +234,7 @@ const PostForm = ({ navigation }) => {
     return true;
   };
 
+  //input validation
   const checkForm = () => {
     const { title } = getValues();
     if (!imageSelected) {
@@ -237,7 +254,9 @@ const PostForm = ({ navigation }) => {
     }
   };
 
-  // Posting
+  //when adding a post, a file is created with the food picture.
+  //all the other info is attached to its description.
+  //tags are added.
   const onSubmit = async (data) => {
     const formValid = checkForm();
 

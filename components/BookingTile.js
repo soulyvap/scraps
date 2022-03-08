@@ -1,14 +1,5 @@
-import {
-  Heading,
-  HStack,
-  Icon,
-  IconButton,
-  Image,
-  Text,
-  View,
-  VStack,
-} from "native-base";
-import react, { useContext, useEffect, useRef, useState } from "react";
+import { Heading, HStack, Icon, Image, Text, View, VStack } from "native-base";
+import { useEffect, useRef, useState } from "react";
 import { Alert, TouchableOpacity } from "react-native";
 import { colors } from "../utils/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -21,10 +12,8 @@ import {
   MenuOption,
   MenuTrigger,
 } from "react-native-popup-menu";
-import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MainContext } from "../contexts/MainContext";
 
 const BookingTile = ({
   fileId,
@@ -235,14 +224,18 @@ const BookingTile = ({
                 </MenuTrigger>
                 {own ? (
                   <MenuOptions>
-                    <MenuOption
-                      text={`💬 Chat with ${user.username}`}
-                      onSelect={toChat}
-                    />
-                    <MenuOption
-                      text={`❌ Cancel booking`}
-                      onSelect={() => updateStatus(listingStatus.cancelled)}
-                    />
+                    {status !== listingStatus.cancelled && (
+                      <MenuOption
+                        text={`💬 Chat with ${user.username}`}
+                        onSelect={toChat}
+                      />
+                    )}
+                    {status !== listingStatus.cancelled && (
+                      <MenuOption
+                        text={`❌ Cancel booking`}
+                        onSelect={() => updateStatus(listingStatus.cancelled)}
+                      />
+                    )}
                     <MenuOption text="🗑️ Delete" onSelect={handleDelete} />
                   </MenuOptions>
                 ) : (

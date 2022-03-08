@@ -1,6 +1,4 @@
 import {
-  Avatar,
-  FlatList,
   Heading,
   HStack,
   Image,
@@ -9,9 +7,8 @@ import {
   View,
   VStack,
 } from "native-base";
-import react, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dimensions } from "react-native";
-import { Chip } from "react-native-paper";
 import { colors } from "../utils/colors";
 import { uploadsUrl } from "../utils/variables";
 

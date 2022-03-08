@@ -1,9 +1,9 @@
 import { Center, FlatList, Text, View } from "native-base";
-import react from "react";
 import { colors } from "../utils/colors";
 import ChatBubble from "./ChatBubble";
 import { Ionicons } from "@expo/vector-icons";
 
+//list of all messages of a chat conversation
 const ChatBubbleList = ({ messages, username }) => {
   const renderItem = ({ item }) => {
     return (

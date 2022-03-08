@@ -16,12 +16,16 @@ const MyListings = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  //refreshing the list of bookings
   const refresh = async () => {
     setRefreshing(true);
     setData([]);
     await fetchListings();
   };
 
+  //fetching all the bookings that have the status "booked", "confirmed" or "picked-up"
+  //the bookings are then sorted into active (booked, confirmed) and inactive (picked-up).
+  //that sorting is used for the section list to display bookings into "active" or "archived"
   const fetchListings = async () => {
     const active = [];
     const inactive = [];
@@ -75,6 +79,7 @@ const MyListings = ({ navigation }) => {
     fetchListings();
   }, [update]);
 
+  //rendering the items of the section list
   const renderItem = (item) => {
     if (!item.lastComment) {
       return (
@@ -106,6 +111,7 @@ const MyListings = ({ navigation }) => {
     }
   };
 
+  //header component
   const SectionHeader = ({ section }) => {
     return (
       <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
