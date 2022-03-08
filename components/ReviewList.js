@@ -1,5 +1,5 @@
 import { FlatList, ScrollView, View } from "native-base";
-import react, { useEffect, useState } from "react";
+import react, { useContext, useEffect, useState } from "react";
 import {
   useComment,
   useMedia,
@@ -10,6 +10,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { avatarTag, uploadsUrl } from "../utils/variables";
 import ReviewTile from "./ReviewTile";
+import { MainContext } from "../contexts/MainContext";
 
 const ReviewList = ({ userFileId, setReviewCount }) => {
   const { getCommentsById } = useComment();
@@ -17,6 +18,7 @@ const ReviewList = ({ userFileId, setReviewCount }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
   const { getMediaById } = useMedia();
+  const { update } = useContext(MainContext);
   const [reviews, setReviews] = useState([]);
 
   const fetchReviews = async () => {
@@ -60,7 +62,7 @@ const ReviewList = ({ userFileId, setReviewCount }) => {
 
   useEffect(() => {
     fetchReviews();
-  }, []);
+  }, [update]);
 
   return (
     <ScrollView nestedScrollEnabled h={300}>

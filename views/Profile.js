@@ -13,7 +13,13 @@ import {
   VStack,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
-import { useMedia, useRating, useTag, useUser } from "../hooks/ApiHooks";
+import {
+  useComment,
+  useMedia,
+  useRating,
+  useTag,
+  useUser,
+} from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import {
   avatarTag,
@@ -38,6 +44,8 @@ const Profile = ({ navigation, route }) => {
   const { getUserById } = useUser();
   const { getFilesByTag, getTagsByFileId } = useTag();
   const { getRatingsById } = useRating();
+  const { getCommentsById } = useComment();
+  const { user } = useContext(MainContext);
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [userMediaArray, setUserMediaArray] = useState([]);
@@ -45,6 +53,7 @@ const Profile = ({ navigation, route }) => {
   const [userBio, setUserBio] = useState();
   const [reviewCount, setReviewCount] = useState(0);
   const [rating, setRating] = useState();
+  const [commented, setCommented] = useState();
 
   const fetchUserMedia = async (owner) => {
     try {
@@ -114,19 +123,7 @@ const Profile = ({ navigation, route }) => {
       console.error("fetchRating", error.message);
     }
   };
-  // const fetchUserBio = async (userFileId) => {
-  //   try {
-  //     const userFiles = await getFilesByTag(userFileTag + file.user_id);
-  //     const userFile = userFiles[0];
-  //     const descriptionData = userFile.description;
-  //     const allData = JSON.parse(descriptionData);
-  //     const bio = allData.bio;
-  //     setUserBio(bio);
-  //     console.log(userFile.file_id);
-  //   } catch (error) {
-  //     console.error(error.message);
-  //   }
-  // };
+
   const fetchAvatar = async () => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + file.user_id);
@@ -140,6 +137,23 @@ const Profile = ({ navigation, route }) => {
     }
   };
 
+  const checkReview = async () => {
+    try {
+      const comments = await getCommentsById(userFileId);
+      const ownComment = comments.find(
+        (comment) => comment.user_id === user.user_id
+      );
+      if (ownComment) {
+        setCommented(true);
+      } else {
+        setCommented(false);
+      }
+      console.log(commented);
+    } catch (error) {
+      console.error("checkReview", error);
+    }
+  };
+
   useEffect(() => {
     fetchOwner();
     setOwner(owner);
@@ -149,10 +163,10 @@ const Profile = ({ navigation, route }) => {
     fetchAvatar();
     setAvatar(avatar);
     fetchUserFile();
-    // fetchUserBio();
     setUserBio(userBio);
     fetchUserMedia(owner);
     setUserMediaArray(userMediaArray);
+    checkReview();
   }, [owner]);
 
   return (
@@ -235,30 +249,33 @@ const Profile = ({ navigation, route }) => {
               </Text>
             </HStack>
           </Button>
-          <Button
-            bgColor={"#FED766"}
-            w={"40%"}
-            alignSelf="center"
-            mb={5}
-            onPress={() => {
-              navigation.navigate("Review", {
-                targetId: file.user_id,
-                targetUser: owner.username,
-              });
-            }}
-          >
-            <HStack alignItems={"baseline"}>
-              <Icon
-                as={MaterialIcons}
-                name="star"
-                size={5}
-                color="#132A15"
-              ></Icon>
-              <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
-                Review
-              </Text>
-            </HStack>
-          </Button>
+          {!commented && (
+            <Button
+              bgColor={!commented ? colors.yellow : colors.grey}
+              disabled={commented}
+              w={"40%"}
+              alignSelf="center"
+              mb={5}
+              onPress={() => {
+                navigation.navigate("Review", {
+                  targetId: file.user_id,
+                  targetUser: owner.username,
+                });
+              }}
+            >
+              <HStack alignItems={"baseline"}>
+                <Icon
+                  as={MaterialIcons}
+                  name="star"
+                  size={5}
+                  color="#132A15"
+                ></Icon>
+                <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
+                  Review
+                </Text>
+              </HStack>
+            </Button>
+          )}
         </HStack>
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>

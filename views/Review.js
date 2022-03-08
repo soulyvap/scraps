@@ -119,11 +119,11 @@ const Review = ({ route, navigation }) => {
 
       //  redirecting back to home when rating successfull
       ratingResponse && setUpdate(update + 1);
-      Alert.alert("Review saved or something", "Well done, you made it.", [
+      Alert.alert("Review saved", "", [
         {
           text: "Ok",
           onPress: () => {
-            navigation.navigate("Home");
+            navigation.goBack();
           },
         },
       ]);
