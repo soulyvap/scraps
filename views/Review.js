@@ -27,6 +27,7 @@ const Review = ({ route, navigation }) => {
   const { getFilesByTag } = useTag();
   const { getRatingsByFileId, postRating, deleteRating } = useRating();
   const { getCommentsById, postComment } = useComment();
+  const { update, setUpdate } = useContext(MainContext);
 
   const {
     control,
@@ -117,15 +118,15 @@ const Review = ({ route, navigation }) => {
       }
 
       //  redirecting back to home when rating successfull
-      ratingResponse &&
-        Alert.alert("Review saved or something", "Well done, you made it.", [
-          {
-            text: "Ok",
-            onPress: () => {
-              navigation.navigate("Home");
-            },
+      ratingResponse && setUpdate(update + 1);
+      Alert.alert("Review saved or something", "Well done, you made it.", [
+        {
+          text: "Ok",
+          onPress: () => {
+            navigation.navigate("Home");
           },
-        ]);
+        },
+      ]);
     } catch (error) {
       console.error(error.message);
     }
