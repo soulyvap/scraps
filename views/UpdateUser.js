@@ -3,6 +3,8 @@ import {
   Button,
   extendTheme,
   FormControl,
+  Icon,
+  IconButton,
   Input,
   NativeBaseProvider,
   TextArea,
@@ -10,7 +12,6 @@ import {
   VStack,
 } from "native-base";
 import React, { useEffect, useState, useContext } from "react";
-import CreateUserUI from "../components/UpdateAccountUI";
 import LocationForm from "../components/LocationForm";
 import { useLogin, useMedia, useTag, useUser } from "../hooks/ApiHooks";
 import { avatarTag, userFileTag } from "../utils/variables";
@@ -18,10 +19,10 @@ import userFileImage from "../assets/a.jpg";
 import { Alert, BackHandler, Image, Keyboard } from "react-native";
 import BackButton from "../components/BackButton";
 import BioForm from "../components/BioForm";
-import UpdateAccountUI from "../components/UpdateAccountUI";
 import { MainContext } from "../contexts/MainContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Controller, useForm } from "react-hook-form";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export const regForms = {
   user: "user",
@@ -39,6 +40,8 @@ const UpdateUser = ({ navigation }) => {
   const { putMedia } = useMedia();
 
   const { checkUsername } = useUser();
+
+  console.log(user);
 
   const defVal = {
     email: user.email,
@@ -66,16 +69,16 @@ const UpdateUser = ({ navigation }) => {
 
   const formBoxHeight = 90;
 
-  useEffect(() => {
-    if (formData) {
-      console.log(formData);
-      setValue("email", formData.email);
-      setValue("username", formData.username);
-      setValue("full_name", formData.full_name);
-      setValue("password", formData.password);
-      setValue("confirmPassword", formData.confirmPassword);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (formData) {
+  //     console.log(formData);
+  //     setValue("email", formData.email);
+  //     setValue("username", formData.username);
+  //     setValue("full_name", formData.full_name);
+  //     setValue("password", formData.password);
+  //     setValue("confirmPassword", formData.confirmPassword);
+  //   }
+  // }, []);
 
   const {
     control,
@@ -102,18 +105,18 @@ const UpdateUser = ({ navigation }) => {
       setUser(data);
       if (userData) {
         Alert.alert("Success!", userData.message);
-        navigation.navigate("Profile");
+        // navigation.navigate("Profile");
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    if (success) {
-      navigation.goBack();
-    }
-  }, [success]);
+  // useEffect(() => {
+  //   if (success) {
+  //     navigation.goBack();
+  //   }
+  // }, [success]);
 
   // useEffect(() => {
   //   console.log(currentForm);
@@ -202,17 +205,22 @@ const UpdateUser = ({ navigation }) => {
   return (
     <NativeBaseProvider theme={theme}>
       <View flex={1}>
-        <BackButton
-          top={currentForm === regForms.map ? 0 : "2%"}
-          left={currentForm === regForms.map ? 0 : "5%"}
-          //   onPress={handleBack}
-        />
         <View
           flex={1}
           bgColor={"#33CA7F"}
           display={"flex"}
           justifyContent={keyboardShowing ? "flex-start" : "flex-end"}
         >
+          <Box position={"absolute"} top={5} left={5} w={10} h={10}>
+            <IconButton
+              icon={<Icon as={MaterialIcons} name="arrow-back" />}
+              size={7}
+              color="#132A15"
+              onPress={() => {
+                navigation.goBack();
+              }}
+            />
+          </Box>
           <Box
             height={keyboardShowing ? "100%" : formBoxHeight + "%"}
             bgColor={"white"}
@@ -335,16 +343,13 @@ const UpdateUser = ({ navigation }) => {
 
               <Controller
                 control={control}
-                rules={{
-                  required: true,
-                }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <FormControl isRequired isInvalid={errors.password}>
                     <Input
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value}
-                      placeholder={"password"}
+                      placeholder={"new password"}
                       autoCapitalize="none"
                       secureTextEntry={true}
                     />
@@ -363,7 +368,6 @@ const UpdateUser = ({ navigation }) => {
               <Controller
                 control={control}
                 rules={{
-                  required: { value: true, message: "This is required." },
                   validate: (value) => {
                     const { password } = getValues();
                     if (password === value) {
