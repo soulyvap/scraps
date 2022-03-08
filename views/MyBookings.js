@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { FlatList, HStack, SectionList, Text, View } from "native-base";
+import { Center, FlatList, HStack, SectionList, Text, View } from "native-base";
 import React from "react";
 import react, { useContext, useEffect, useState } from "react";
 import { RefreshControl } from "react-native";
@@ -17,12 +17,16 @@ const MyBookings = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  //refreshing the list of bookings
   const refresh = async () => {
     setRefreshing(true);
     setData([]);
     await fetchBookings();
   };
 
+  //fetching all the bookings that have the status "booked", "confirmed" or "picked-up"
+  //the bookings are then sorted into active (booked, confirmed) and inactive (picked-up).
+  //that sorting is used for the section list to display bookings into "active" or "archived"
   const fetchBookings = async () => {
     const active = [];
     const inactive = [];
@@ -80,6 +84,7 @@ const MyBookings = ({ navigation }) => {
     fetchBookings();
   }, [update]);
 
+  //rendering the items of the section list
   const renderItem = (item) => {
     const info = JSON.parse(item.lastComment.comment);
     const status = info.status;
@@ -98,6 +103,7 @@ const MyBookings = ({ navigation }) => {
     );
   };
 
+  //header component
   const SectionHeader = ({ section }) => {
     return (
       <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
@@ -109,7 +115,7 @@ const MyBookings = ({ navigation }) => {
 
   return (
     <View flex={1}>
-      {data && (
+      {data ? (
         <SectionList
           sections={data}
           keyExtractor={(item, index) => index}
@@ -121,6 +127,8 @@ const MyBookings = ({ navigation }) => {
             <RefreshControl refreshing={refreshing} onRefresh={refresh} />
           }
         />
+      ) : (
+        <Center flex={1}>No bookings yet.</Center>
       )}
     </View>
   );

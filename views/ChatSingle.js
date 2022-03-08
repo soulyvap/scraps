@@ -54,6 +54,7 @@ const ChatSingle = ({ route, navigation }) => {
   const { getCommentsById, postComment } = useComment();
   const { user } = useContext(MainContext);
 
+  //updating chat messages every 7 seconds this view is focused
   useFocusEffect(
     React.useCallback(() => {
       const interval = setInterval(() => {
@@ -73,14 +74,13 @@ const ChatSingle = ({ route, navigation }) => {
     fetchChatFile();
   }, []);
 
-  //set other user info
-
   useEffect(() => {
     if (update > 0) {
       chatFileId && fetchMessages(chatFileId);
     }
   }, [update]);
 
+  //fetch the username of the other user
   const fetchUsername = async () => {
     try {
       const userToken = await AsyncStorage.getItem("userToken");
@@ -91,6 +91,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //fetch the avatar of the other user
   const fetchAvatar = async () => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + userId2);
@@ -101,6 +102,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //fetch the other user's userfile to get their rating
   const fetchUserFile = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + userId2);
@@ -111,7 +113,6 @@ const ChatSingle = ({ route, navigation }) => {
       console.error("fetchUserFile", error.message);
     }
   };
-
   const fetchRating = async (userFileId) => {
     try {
       const ratingList = await getRatingsById(userFileId);
@@ -123,6 +124,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //finding the right chatfile among all the chatfiles that contain the current user's id in their title.
   const findChatFile = (array) => {
     const currentUserId = user.user_id;
     return array.find(
@@ -132,6 +134,9 @@ const ChatSingle = ({ route, navigation }) => {
     );
   };
 
+  //fetching the relevant chatfile if it exists (the users have already chatted in the past).
+  //a chatfile is just a file that represents a conversation between two users.
+  //the two users can comment on that file to chat with each other.
   const fetchChatFile = async () => {
     try {
       const chatFiles = await getFilesByTag(chatTag);
@@ -148,6 +153,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //creates a new chat file containing both user ids in its title.
   const createChatFile = async () => {
     const currentUserId = user.user_id;
     const userToken = await AsyncStorage.getItem("userToken");
@@ -172,6 +178,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //posting a tag that identifies all the chatfiles of Scraps
   const addChatTag = async (fileId) => {
     const userToken = await AsyncStorage.getItem("userToken");
     try {
@@ -186,6 +193,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //fetching all the comments related to a chatfile. they are used to represent chat messages.
   const fetchMessages = async (chatFileId) => {
     const currentUserId = user.user_id;
     try {
@@ -205,6 +213,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //on send, checks if a chatfile is already set. if not, a new file is created and the message is sent.
   const handleSend = async () => {
     if (chatFileId) {
       await sendMessage(inputValue, chatFileId);
@@ -214,6 +223,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //adds a comment to the current chatfile. these are used to represent chat messages
   const sendMessage = async (text, fileId) => {
     const userToken = await AsyncStorage.getItem("userToken");
     console.log(fileId);
@@ -231,6 +241,7 @@ const ChatSingle = ({ route, navigation }) => {
     }
   };
 
+  //handling UI changes when on-screen keyboard is showing
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardShowing(true);

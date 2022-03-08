@@ -1,8 +1,8 @@
-import { Button, Center, Text, View } from "native-base";
-import react from "react";
-import { FlatList, SafeAreaView } from "react-native";
+import { Text, View } from "native-base";
+import { FlatList } from "react-native";
 import ChatListTile from "./ChatListTile";
 
+//displaying all the current user's chats with other users
 const ChatList = ({ chatData, navigation, update }) => {
   const renderItem = ({ item }) => (
     <View>
@@ -32,14 +32,6 @@ const ChatList = ({ chatData, navigation, update }) => {
             your neighbours!
           </Text>
           <View flex={1} />
-          {/* //test button for creating new chat */}
-          <Button
-            borderRadius={10}
-            mb={3}
-            onPress={() => navigation.navigate("ChatSingle", { userId2: 663 })}
-          >
-            Start a chat with Chat Boi (test)
-          </Button>
         </View>
       )}
     </View>

@@ -1,7 +1,6 @@
 import {
   Avatar,
   Button,
-  Center,
   Heading,
   HStack,
   Icon,
@@ -10,7 +9,7 @@ import {
   View,
   VStack,
 } from "native-base";
-import react, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import BackButton from "../components/BackButton";
 import BookingTile from "../components/BookingTile";
 import { useComment, useMedia, useTag, useUser } from "../hooks/ApiHooks";
@@ -62,6 +61,9 @@ const BookingSummary = ({ navigation, route }) => {
     );
   };
 
+  //updating the status of a booking.
+  //a comment is added with a new status
+  //if a booking is cancelled a "cancelled" tag is also added to relist the item
   const updateStatus = async (newStatus) => {
     const userToken = await AsyncStorage.getItem("userToken");
     try {
@@ -82,7 +84,7 @@ const BookingSummary = ({ navigation, route }) => {
       console.error("confirm", error);
     }
   };
-
+  //adding a cancel tag
   const addCancelTag = async () => {
     const userToken = await AsyncStorage.getItem("userToken");
     const tagData = {
@@ -97,6 +99,7 @@ const BookingSummary = ({ navigation, route }) => {
     }
   };
 
+  //fetching all the booking's infos (status, pickupinfo, booker's infos)
   const fetchBooking = async () => {
     try {
       const comments = await getCommentsById(fileId);
@@ -118,6 +121,7 @@ const BookingSummary = ({ navigation, route }) => {
     }
   };
 
+  //fetching the username of the poster
   const fetchUsername = async (userId) => {
     try {
       const userToken = await AsyncStorage.getItem("userToken");
@@ -128,6 +132,7 @@ const BookingSummary = ({ navigation, route }) => {
     }
   };
 
+  //fetching the userfile of the poster to get their address and coordinates
   const fetchUserFile = async (userId) => {
     try {
       const userFiles = await getFilesByTag(userFileTag + userId);
@@ -142,6 +147,7 @@ const BookingSummary = ({ navigation, route }) => {
     }
   };
 
+  //fetching the avatar of the poster
   const fetchAvatar = async (userId) => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + userId);
@@ -152,6 +158,7 @@ const BookingSummary = ({ navigation, route }) => {
     }
   };
 
+  //select the right emoji for the pickup method
   const methodEmoji = (method) => {
     if (method.includes("door")) {
       return "🚪";
@@ -171,6 +178,7 @@ const BookingSummary = ({ navigation, route }) => {
   const h = Dimensions.get("window").height;
   const w = Dimensions.get("window").width;
 
+  //open a map appliction with the right coordinates
   const openMap = async (lat, lng) => {
     const scheme = Platform.select({
       ios: "maps:0,0?q=",

@@ -1,5 +1,5 @@
 import { Box, Image, View } from "native-base";
-import react, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Keyboard } from "react-native";
 import CreateUserForm from "./CreateUserForm";
 
@@ -12,6 +12,7 @@ const CreateUserUI = ({
 }) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
 
+  //listener for on screen keyboard. helps with adapting ui when keyboard is displayed
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardShowing(true);

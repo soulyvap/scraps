@@ -4,9 +4,7 @@ import {
   ChevronRightIcon,
   Heading,
   HStack,
-  Image,
   Text,
-  View,
   VStack,
 } from "native-base";
 import { useEffect, useState } from "react";
@@ -29,7 +27,6 @@ const ChatListTile = ({ chatData, onPress, update }) => {
   useEffect(async () => {
     await fetchAvatar();
     await fetchUsername();
-    console.log(chatData.file_id);
     await fetchLastMessage();
   }, []);
 
@@ -37,6 +34,7 @@ const ChatListTile = ({ chatData, onPress, update }) => {
     await fetchLastMessage();
   }, [update]);
 
+  //fetching the avatar of the user with whom the current user is chatting
   const fetchAvatar = async () => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + chatData.userId2);
@@ -49,6 +47,7 @@ const ChatListTile = ({ chatData, onPress, update }) => {
     }
   };
 
+  //fetching the username of the user with whom the current user is chatting
   const fetchUsername = async () => {
     const token = await AsyncStorage.getItem("userToken");
     try {
@@ -60,6 +59,7 @@ const ChatListTile = ({ chatData, onPress, update }) => {
     }
   };
 
+  //fetching the last message of a chat for display
   const fetchLastMessage = async () => {
     try {
       const comments = await getCommentsById(chatData.file_id);

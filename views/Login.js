@@ -22,6 +22,7 @@ const Login = ({ navigation }) => {
   const { setUser, setIsLoggedIn, setCoords } = useContext(MainContext);
   const { getFilesByTag } = useTag();
 
+  //getting current user address coordinates from userFile then setting them in MainContext
   const fetchCoordinates = async (userId) => {
     try {
       const userFiles = await getFilesByTag(userFileTag + userId);
@@ -34,6 +35,8 @@ const Login = ({ navigation }) => {
     }
   };
 
+  //checking if userToken is stored in AsyncStorage.
+  //if yes, user is logged in and some info is stored in MainContext.
   const checkToken = async () => {
     const userToken = await AsyncStorage.getItem("userToken");
     console.log("Token in storage", userToken);
@@ -42,9 +45,9 @@ const Login = ({ navigation }) => {
         const userData = await getUserByToken(userToken);
         console.log("check token", userData);
         if (userData) {
+          await fetchCoordinates(userData.user_id);
           setUser(userData);
           setIsLoggedIn(true);
-          await fetchCoordinates(userData.user_id);
         }
       } catch (error) {
         throw new Error(error.message);
@@ -56,6 +59,7 @@ const Login = ({ navigation }) => {
     checkToken();
   }, []);
 
+  //listener for on-screen keyboard. helps with adapting the UI when keyboard shows
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardShowing(true);
@@ -70,6 +74,7 @@ const Login = ({ navigation }) => {
     };
   }, []);
 
+  //theming for some components
   const theme = extendTheme({
     components: {
       Box: {

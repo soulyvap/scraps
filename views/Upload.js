@@ -1,6 +1,5 @@
-import { Box, extendTheme, NativeBaseProvider, ScrollView } from "native-base";
+import { Box, extendTheme, NativeBaseProvider } from "native-base";
 import PostForm from "../components/PostForm";
-import { colors } from "../utils/colors";
 
 const Upload = ({ navigation }) => {
   const theme = extendTheme({
@@ -27,9 +26,7 @@ const Upload = ({ navigation }) => {
   return (
     <NativeBaseProvider theme={theme}>
       <Box flex="1" safeArea bgColor={"white"}>
-        <ScrollView bgColor={"white"}>
-          <PostForm navigation={navigation} />
-        </ScrollView>
+        <PostForm navigation={navigation} />
       </Box>
     </NativeBaseProvider>
   );

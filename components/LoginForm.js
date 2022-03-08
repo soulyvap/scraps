@@ -1,5 +1,5 @@
-import { Box, Button, FormControl, Input, Text, VStack } from "native-base";
-import react, { useContext } from "react";
+import { Button, FormControl, Input, VStack } from "native-base";
+import { useContext } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useLogin } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -7,7 +7,7 @@ import { MainContext } from "../contexts/MainContext";
 
 const LoginForm = () => {
   const { postLogin } = useLogin();
-  const { user, setUser, isLoggedIn, setIsLoggedIn } = useContext(MainContext);
+  const { setUser, setIsLoggedIn } = useContext(MainContext);
 
   const {
     control,
@@ -19,6 +19,9 @@ const LoginForm = () => {
       password: "",
     },
   });
+
+  //on submit, form data is used to login.
+  //if successful, user is logged in and userData is stored in MainContext
   const onSubmit = async (data) => {
     try {
       const loginData = await postLogin(data);

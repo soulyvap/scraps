@@ -34,6 +34,9 @@ const ConfirmBooking = ({ navigation, route }) => {
   const [bookingInfo, setBookingInfo] = useState();
   const { update, setUpdate } = useContext(MainContext);
 
+  //updating the status of a booking.
+  //a comment is added with a new status (e.g. booked)
+  //if a booking is cancelled a "cancelled" tag is also added to relist the item
   const updateStatus = async (newStatus) => {
     const userToken = await AsyncStorage.getItem("userToken");
     try {
@@ -56,6 +59,7 @@ const ConfirmBooking = ({ navigation, route }) => {
     }
   };
 
+  //adding cancel tag to a cancelled booking to relist the item on the home screen
   const addCancelTag = async () => {
     const userToken = await AsyncStorage.getItem("userToken");
     const tagData = {
@@ -70,6 +74,7 @@ const ConfirmBooking = ({ navigation, route }) => {
     }
   };
 
+  //fetching all the booking's infos (status, pickupinfo, booker's infos)
   const fetchBooking = async () => {
     try {
       const comments = await getCommentsById(fileId);
@@ -88,6 +93,7 @@ const ConfirmBooking = ({ navigation, route }) => {
     }
   };
 
+  //fetching the username of the booker
   const fetchUsername = async (userId) => {
     try {
       const userToken = await AsyncStorage.getItem("userToken");
@@ -98,6 +104,7 @@ const ConfirmBooking = ({ navigation, route }) => {
     }
   };
 
+  //fetching the avatar of the booker
   const fetchAvatar = async (userId) => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + userId);

@@ -30,6 +30,7 @@ const LocationForm = ({
   const [align, setAlign] = useState("center");
   const ref = useRef();
 
+  //formatting the coordinates provided by GooglePlacesAutoComplete form.
   const formatLocation = (location) => {
     return {
       latitude: location.lat,
@@ -39,14 +40,17 @@ const LocationForm = ({
     };
   };
 
+  //setting coordinates as user pinpoint location on the mapview.
   const setPointer = (coords) => {
     pointer = coords;
   };
 
+  //setting coordinates when user inputs an address.
   useEffect(() => {
     setPointer(region);
   }, [region]);
 
+  //if user comes back to this form, sets the previously input info.
   useEffect(() => {
     if (pinpoint && address) {
       setCurrentAddress(address);
@@ -63,6 +67,7 @@ const LocationForm = ({
     currentAddress && ref.current?.setAddressText(currentAddress);
   }, [currentAddress]);
 
+  //handling on screen keyboard display event.
   const [keyboardShowing, setKeyboardShowing] = useState(false);
 
   useEffect(() => {
@@ -199,8 +204,6 @@ const LocationForm = ({
               disabled={!addressSelected}
               onPress={() => {
                 setPinpoint(pointer);
-                console.log(currentAddress);
-                console.log(pointer);
                 setAddress(currentAddress);
                 setCurrentForm(regForms.bio);
               }}

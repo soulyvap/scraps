@@ -1,21 +1,17 @@
 import {
   Avatar,
-  Box,
   Button,
-  Center,
   Checkbox,
-  FlatList,
   Heading,
   HStack,
   IconButton,
-  Input,
   ScrollView,
   Select,
   Text,
   View,
   VStack,
 } from "native-base";
-import react, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ListingCardLg from "../components/ListingCardLg";
 import {
   useComment,
@@ -31,13 +27,10 @@ import {
   userFileTag,
 } from "../utils/variables";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Chip } from "react-native-paper";
-import { Alert, SafeAreaView, TouchableOpacity } from "react-native";
-import { FlatGrid } from "react-native-super-grid";
+import { Alert, TouchableOpacity } from "react-native";
 import { colors } from "../utils/colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { MaterialIcons } from "@expo/vector-icons";
-import { set } from "react-hook-form";
 import BackButton from "../components/BackButton";
 import Tag from "../components/Tag";
 import { listingStatus } from "../components/PostForm";
@@ -69,6 +62,7 @@ const Booking = ({ navigation, route }) => {
   const [pickupMethod, setPickupMethod] = useState();
   const [contactless, setContactless] = useState(false);
 
+  //input validation
   const checkForm = () => {
     if (!dateText) {
       Alert.alert("Please select a pickup time");
@@ -81,6 +75,7 @@ const Booking = ({ navigation, route }) => {
     return true;
   };
 
+  //adding a comment with the desired pickup info and adding a "booked" tag to the targeted listing file.
   const submit = async () => {
     const formValid = checkForm();
 
@@ -92,13 +87,13 @@ const Booking = ({ navigation, route }) => {
         contactless: contactless,
         bookedBy: user.user_id,
       };
-      const listingLog = {
+      const statusAndInfo = {
         status: listingStatus.booked,
         pickupInfo: pickupInfo,
       };
       const commentData = {
         file_id: fileId,
-        comment: JSON.stringify(listingLog),
+        comment: JSON.stringify(statusAndInfo),
       };
       const tagData = {
         file_id: fileId,
@@ -108,9 +103,6 @@ const Booking = ({ navigation, route }) => {
       try {
         const commentResponse = await postComment(commentData, token);
         const tagResponse = await postTag(tagData, token);
-
-        console.log(commentResponse);
-        console.log(tagResponse);
 
         if (commentResponse && tagResponse) {
           Alert.alert(
@@ -126,6 +118,7 @@ const Booking = ({ navigation, route }) => {
     }
   };
 
+  //fetching all the info related to the listing (title, description, latest pickup, tags, etc.)
   const fetchMedia = async () => {
     try {
       const listingFetched = await getMediaById(fileId);
@@ -151,6 +144,7 @@ const Booking = ({ navigation, route }) => {
     }
   };
 
+  //fetching the poster's avatar
   const fetchAvatar = async (userId) => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + userId);
@@ -161,6 +155,7 @@ const Booking = ({ navigation, route }) => {
     }
   };
 
+  //fetching the poster's username
   const fetchUsername = async (userId) => {
     const token = await AsyncStorage.getItem("userToken");
     try {
@@ -172,6 +167,7 @@ const Booking = ({ navigation, route }) => {
     }
   };
 
+  //fetching the poster's userfile to get their rating
   const fetchUserFile = async (userId) => {
     try {
       const userFiles = await getFilesByTag(userFileTag + userId);
@@ -181,7 +177,6 @@ const Booking = ({ navigation, route }) => {
       console.error("fetchUserFile", error.message);
     }
   };
-
   const fetchRating = async (userFileId) => {
     try {
       const ratingList = await getRatingsById(userFileId);
@@ -193,10 +188,17 @@ const Booking = ({ navigation, route }) => {
     }
   };
 
+  //fetching tags, removing the unnecessary ones.
   const fetchTags = async () => {
     try {
       const tagArray = await getTagsByFileId(fileId);
-      const filteredTags = tagArray.filter((tag) => tag.tag !== foodPostTag);
+      const filteredTags = tagArray.filter((tag) => {
+        return (
+          tag.tag !== foodPostTag &&
+          tag.tag !== listingStatus.booked &&
+          tag.tag !== listingStatus.cancelled
+        );
+      });
       filteredTags.length > 0 && setTags(filteredTags);
     } catch (error) {}
   };
@@ -214,6 +216,7 @@ const Booking = ({ navigation, route }) => {
     setShow(true);
   };
 
+  //setting the date when the datepicker is used
   const onChanged = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     switch (mode) {
@@ -233,6 +236,7 @@ const Booking = ({ navigation, route }) => {
     }
   };
 
+  //formatting the date into a more understandable string
   const formatTime = (date) => {
     let day = date.getDate();
     let month = date.getMonth() + 1;
@@ -360,36 +364,38 @@ const Booking = ({ navigation, route }) => {
               <Heading fontSize={"lg"} my={3}>
                 How
               </Heading>
-              <Select
-                fontSize={14}
-                borderRadius={15}
-                bgColor={colors.beige}
-                borderColor={colors.beige}
-                py={1}
-                px={5}
-                w={"100%"}
-                selectedValue={pickupMethod}
-                accessibilityLabel="Choose a pickup method"
-                placeholder="Choose a pickup method"
-                variant="rounded"
-                onValueChange={(value) => {
-                  setPickupMethod(value);
-                }}
-              >
-                <Select.Item
-                  label="Left at the building door"
-                  value="Left at the building door"
-                />
-                <Select.Item
-                  label="Left at the door"
-                  value="Left at the door"
-                />
-                <Select.Item
-                  label="Ring the doorbell"
-                  value="Ring the doorbell"
-                />
-                <Select.Item label="Call me" value="Call me" />
-              </Select>
+              {username && (
+                <Select
+                  fontSize={14}
+                  borderRadius={15}
+                  bgColor={colors.beige}
+                  borderColor={colors.beige}
+                  py={1}
+                  px={5}
+                  w={"100%"}
+                  selectedValue={pickupMethod}
+                  accessibilityLabel="Choose a pickup method"
+                  placeholder="Choose a pickup method"
+                  variant="rounded"
+                  onValueChange={(value) => {
+                    setPickupMethod(value);
+                  }}
+                >
+                  <Select.Item
+                    label="Left at the building door"
+                    value="Left at the building door"
+                  />
+                  <Select.Item
+                    label="Left at the door"
+                    value="Left at the door"
+                  />
+                  <Select.Item
+                    label="Ring the doorbell"
+                    value="Ring the doorbell"
+                  />
+                  <Select.Item label={`Call ${username}`} value="Call me" />
+                </Select>
+              )}
             </View>
             <HStack w={"100%"} mt={3}>
               <Checkbox

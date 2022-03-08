@@ -44,6 +44,10 @@ const Single = ({ route, navigation }) => {
   const suitableTimeSlot = allData.suitableTimeSlot;
   const allergens = allData.allergens;
 
+  useEffect(() => {
+    console.log(descriptionData);
+  }, []);
+
   const AllergenDisplay = () => {
     if (allergens.length === 0) {
       return (
