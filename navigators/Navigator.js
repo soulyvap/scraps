@@ -21,6 +21,7 @@ import MyListings from "../views/MyListings";
 import { colors } from "../utils/colors";
 import ConfirmBooking from "../views/ConfirmBooking";
 import BookingSummary from "../views/BookingSummary";
+import UpdateUser from "../views/UpdateUser";
 import Review from "../views/Review";
 
 const Tab = createBottomTabNavigator();
@@ -149,6 +150,11 @@ const StackScreen = () => {
           <Stack.Screen
             name="BookingSummary"
             component={BookingSummary}
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="UpdateUser"
+            component={UpdateUser}
             options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen

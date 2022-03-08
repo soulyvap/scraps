@@ -65,7 +65,8 @@ const Profile = ({ navigation }) => {
   const fetchUserBio = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + user.user_id);
-      const userFile = userFiles[0];
+      console.log(userFiles);
+      const userFile = userFiles.pop();
       const descriptionData = userFile.description;
       const allData = JSON.parse(descriptionData);
       const bio = allData.bio;
@@ -139,8 +140,15 @@ const Profile = ({ navigation }) => {
         >
           {userBio}
         </Box>
-
-        <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
+        <Button
+          bgColor={"#FED766"}
+          w={"40%"}
+          alignSelf="center"
+          mb={5}
+          onPress={() => {
+            navigation.navigate("UpdateUser");
+          }}
+        >
           <HStack>
             <Icon
               as={MaterialIcons}
