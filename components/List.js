@@ -66,9 +66,9 @@ const List = ({ navigation, tagSelected }) => {
     );
 
     // filter items further by distance and category selected
-    const newArray = activeListings.filter((item) => {
+    const newArray = activeListings.filter(async (item) => {
       const descriptionData = item.description;
-      const allData = JSON.parse(descriptionData);
+      const allData = await JSON.parse(descriptionData);
       // get coordinates of the post
       const postCoords = {
         latitude: allData.coords.latitude,

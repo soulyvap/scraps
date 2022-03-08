@@ -164,9 +164,13 @@ const Single = ({ route, navigation }) => {
         <HStack w={"90%"} h={"13%"} mt={5}>
           <Pressable
             onPress={() => {
-              navigation.navigate("Profile", {
-                file: file,
-              });
+              if (owner.user_id === user.user_id) {
+                navigation.navigate("MyProfile");
+              } else {
+                navigation.navigate("Profile", {
+                  file: file,
+                });
+              }
             }}
             bgColor={"#F9F4F1"}
             w={"50%"}

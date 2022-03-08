@@ -181,6 +181,9 @@ const Profile = ({ navigation, route }) => {
             alignSelf="center"
             mb={5}
             mr={5}
+            onPress={() => {
+              navigation.navigate("ChatSingle", { userId2: owner.user_id });
+            }}
           >
             <HStack alignItems={"baseline"}>
               <Icon

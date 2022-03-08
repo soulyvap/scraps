@@ -128,11 +128,6 @@ const StackScreen = () => {
             options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen
-            name="MyProfile"
-            component={TabScreen}
-            options={{ headerShown: false }}
-          ></Stack.Screen>
-          <Stack.Screen
             name="Booking"
             component={Booking}
             options={{ headerShown: false }}
