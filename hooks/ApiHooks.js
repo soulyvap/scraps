@@ -127,12 +127,11 @@ const useMedia = (tagSelected) => {
   };
 
   //fetch only user's files
-  const loadUserMedia = async (userId) => {
+  const loadUserMedia = async () => {
     setLoading(true);
-
     try {
       let json = await useTag().getFilesByTag(foodPostTag);
-      json = json.filter((file) => file.user_id === userId);
+      json = json.filter((file) => file.user_id === user.user_id);
       const media = await Promise.all(
         json.map(async (item) => {
           const response = await fetch(baseUrl + "media/" + item.file_id);

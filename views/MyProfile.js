@@ -8,6 +8,8 @@ import {
   Pressable,
   ScrollView,
   Text,
+  TextArea,
+  View,
   VStack,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
@@ -18,20 +20,33 @@ import { avatarTag, foodPostTag, uploadsUrl } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
 import { userFileTag } from "../utils/variables";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import LogoutButton from "../components/LogoutButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { colors } from "../utils/colors";
+import StarIcon from "../components/StarIcon";
+import LottieView from "lottie-react-native";
 
 const Profile = ({ navigation }) => {
   const { user, setIsLoggedIn } = useContext(MainContext);
-  const { getFilesByTag } = useTag();
+  const { getFilesByTag, getTagsByFileId } = useTag();
   const [userBio, setUserBio] = useState();
   const [avatar, setAvatar] = useState();
-  const { userMediaArray } = useMedia(user.user_id);
+  const [activeListings, setActiveListings] = useState([]);
+  const { userMediaArray } = useMedia();
 
-  const logout = async () => {
-    console.log("logout");
-    await AsyncStorage.clear();
-    setIsLoggedIn(false);
+  const filterActive = async () => {
+    const activeListings = [];
+    const active = await Promise.all(
+      userMediaArray.map(async (post) => {
+        const fileId = post.file_id;
+        const tags = await getTagsByFileId(fileId);
+        const lastTag = tags.pop();
+        if (lastTag.tag !== "booked") {
+          activeListings.push(post);
+        }
+      })
+    );
+    setActiveListings(activeListings);
   };
 
   const fetchAvatar = async () => {
@@ -61,8 +76,16 @@ const Profile = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchUserBio(), fetchAvatar();
-  }, []);
+    fetchAvatar(user);
+    setAvatar(avatar);
+    fetchUserBio(user);
+    setUserBio(userBio);
+  }, [user]);
+
+  useEffect(() => {
+    filterActive(userMediaArray);
+    setActiveListings([]);
+  }, [userMediaArray]);
 
   return (
     <Box flex="1">
@@ -76,43 +99,17 @@ const Profile = ({ navigation }) => {
           }}
         />
       </Box>
-      <LogoutButton top={5} right={5} onPress={() => logout()}></LogoutButton>
       <VStack bgColor={"#33CA7F"} alignItems={"center"} mb={5}>
         <Text fontSize={30} fontWeight={"bold"}>
           {user.username}
         </Text>
         {/* rating stars */}
         <HStack marginBottom={5}>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
         </HStack>
       </VStack>
       <ScrollView>
@@ -142,6 +139,7 @@ const Profile = ({ navigation }) => {
         >
           {userBio}
         </Box>
+
         <Button bgColor={"#FED766"} w={"40%"} alignSelf="center" mb={5}>
           <HStack>
             <Icon
@@ -155,18 +153,17 @@ const Profile = ({ navigation }) => {
             </Text>
           </HStack>
         </Button>
+        <LogoutButton top={0} right={5}></LogoutButton>
         {/* user's listings */}
-        {/* currently shows all, not just active */}
-        {/* TODO: show just active listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
-          Active listings ({userMediaArray.length})
+          Active listings ({activeListings.length})
         </Text>
         <Box w={"90%"} alignSelf={"center"}>
           <FlatGrid
             horizontal={true}
             itemDimension={200}
             height={100}
-            data={userMediaArray}
+            data={activeListings}
             keyExtractor={(item) => item.file_id.toString()}
             renderItem={({ item }) => (
               <Pressable
@@ -180,6 +177,25 @@ const Profile = ({ navigation }) => {
                 ></Avatar>
               </Pressable>
             )}
+            ListEmptyComponent={
+              <HStack alignItems={"baseline"} alignSelf={"flex-start"} flex={1}>
+                <LottieView
+                  autoPlay
+                  loop={true}
+                  style={{ width: 50, height: 50 }}
+                  source={require("../assets/cooking.json")}
+                  speed={1}
+                />
+                <Text
+                  color={colors.notBlack}
+                  fontSize={17}
+                  width={"80%"}
+                  ml={2}
+                >
+                  Better start cooking!
+                </Text>
+              </HStack>
+            }
           />
         </Box>
         <Text fontSize={20} fontWeight={"bold"} px={5}>

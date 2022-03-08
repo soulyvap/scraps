@@ -1,8 +1,19 @@
 import { Icon, IconButton } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../utils/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useContext } from "react";
+import { MainContext } from "../contexts/MainContext";
 
 const LogoutButton = ({ onPress, top, right }) => {
+  const { setIsLoggedIn } = useContext(MainContext);
+
+  const logout = async () => {
+    console.log("logout");
+    await AsyncStorage.clear();
+    setIsLoggedIn(false);
+  };
+
   return (
     <IconButton
       position={"absolute"}
@@ -13,7 +24,7 @@ const LogoutButton = ({ onPress, top, right }) => {
       size={"md"}
       shadow={3}
       borderRadius="full"
-      onPress={onPress}
+      onPress={() => logout()}
       icon={
         <Icon
           as={MaterialIcons}

@@ -3,7 +3,6 @@ import { SafeAreaView } from "react-native";
 import List from "../components/List";
 import PropTypes from "prop-types";
 import { MainContext } from "../contexts/MainContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Box,
   Button,
@@ -11,12 +10,9 @@ import {
   FlatList,
   Heading,
   HStack,
-  Icon,
-  IconButton,
   NativeBaseProvider,
   Pressable,
   Text,
-  View,
 } from "native-base";
 import { foodPostTag, defaultTags } from "../utils/variables";
 import { colors } from "../utils/colors";
@@ -26,56 +22,30 @@ const Home = ({ navigation }) => {
   const {
     user,
     update,
-    coords,
     setUpdate,
-    setIsLoggedIn,
     categorySelected,
     setCategorySelected,
-    isCategorySelected,
     setIsCategorySelected,
   } = useContext(MainContext);
   const [tagSelected, setTagSelected] = useState(foodPostTag);
   const [tag, setTag] = useState("all");
 
-  const logout = async () => {
-    console.log("logout");
-    await AsyncStorage.clear();
-    setIsLoggedIn(false);
-  };
-
   return (
     <>
       <SafeAreaView flex={1}>
         <NativeBaseProvider theme={theme}>
-          <Box>
+          <Box w={"90%"} alignSelf={"center"} mt={5}>
             <HStack justifyContent={"space-between"} alignItems={"center"}>
-              <Heading
-                fontSize="xl"
-                p="4"
-                pb="3"
-                color={colors.notBlack}
-                ml={1}
-              >
+              <Heading fontSize="xl" pb="3" color={colors.notBlack}>
                 Hi, {user.username}!
               </Heading>
-              <LogoutButton
-                top={3}
-                right={6}
-                onPress={() => logout()}
-              ></LogoutButton>
+              <LogoutButton top={0} right={3}></LogoutButton>
             </HStack>
-            <Text
-              ml={"5%"}
-              fontSize={17}
-              fontWeight={"bold"}
-              mt={1}
-              color={"#132A15"}
-            >
+            <Text fontSize={17} fontWeight={"bold"} mt={1} color={"#132A15"}>
               Search by tags
             </Text>
             <FlatList
               horizontal
-              w={"90%"}
               alignSelf={"center"}
               data={defaultTags}
               keyExtractor={(item) => item.id}
@@ -92,7 +62,7 @@ const Home = ({ navigation }) => {
                     setUpdate(update + 1);
                   }}
                 >
-                  <Box mx={1} mt={1} p={1} alignSelf="center" height={10}>
+                  <Box mt={2} mr={4} p={1} alignSelf="center" height={10}>
                     <Text
                       color={tag === item.text ? colors.notBlack : colors.green}
                       textAlign={"center"}
@@ -105,11 +75,11 @@ const Home = ({ navigation }) => {
                 </Pressable>
               )}
             ></FlatList>
-            <Text ml={"5%"} fontSize={17} fontWeight={"bold"} color={"#132A15"}>
+            <Text fontSize={17} fontWeight={"bold"} color={"#132A15"}>
               Select a category
             </Text>
             <HStack
-              w={"90%"}
+              w={"100%"}
               alignSelf={"center"}
               justifyContent={"space-evenly"}
               my={3}

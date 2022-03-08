@@ -9,9 +9,10 @@ import {
   ScrollView,
   Text,
   useDisclose,
+  View,
   VStack,
 } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import {
@@ -19,25 +20,62 @@ import {
   uploadsUrl,
   defaultAvatar,
   userFileTag,
+  baseUrl,
+  foodPostTag,
 } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FlatGrid } from "react-native-super-grid";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MainContext } from "../contexts/MainContext";
+import StarIcon from "../components/StarIcon";
+import { colors } from "../utils/colors";
 
 const Profile = ({ navigation, route }) => {
   const { file } = route.params;
   const { getUserById } = useUser();
-  const { getFilesByTag } = useTag();
+  const { getFilesByTag, getTagsByFileId } = useTag();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
-  const { userMediaArray } = useMedia(file.user_id);
+  const [userMediaArray, setUserMediaArray] = useState([]);
   const [userBio, setUserBio] = useState();
+
+  const fetchUserMedia = async (owner) => {
+    try {
+      // fetch all posts with app post tag
+      let json = await getFilesByTag(foodPostTag);
+      // filter only those that match the profile owner's id
+      json = json.filter((file) => file.user_id === owner.user_id);
+      const media = await Promise.all(
+        json.map(async (item) => {
+          const response = await fetch(baseUrl + "media/" + item.file_id);
+          const mediaData = await response.json();
+          return mediaData;
+        })
+      );
+      // filter it even more by removing those items that are booked already = not active
+      const activeListings = [];
+      const active = await Promise.all(
+        media.map(async (post) => {
+          const fileId = post.file_id;
+          const tags = await getTagsByFileId(fileId);
+          const lastTag = tags.pop();
+          if (lastTag.tag !== "booked") {
+            activeListings.push(post);
+          }
+        })
+      );
+      setUserMediaArray(activeListings);
+    } catch (error) {
+      console.error("Problem fetching user files from API", error);
+    }
+  };
 
   const fetchOwner = async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
       const userData = await getUserById(file.user_id, token);
       setOwner(userData);
+      console.log(owner);
     } catch (error) {
       console.error("fetch owner error", error);
       setOwner({ username: "[not available]" });
@@ -71,8 +109,18 @@ const Profile = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    fetchOwner(), fetchAvatar(), fetchUserBio();
+    fetchOwner();
+    setOwner(owner);
   }, []);
+
+  useEffect(() => {
+    fetchAvatar();
+    setAvatar(avatar);
+    fetchUserBio();
+    setUserBio(userBio);
+    fetchUserMedia(owner);
+    setUserMediaArray(userMediaArray);
+  }, [owner]);
 
   return (
     <Box flex="1">
@@ -92,36 +140,11 @@ const Profile = ({ navigation, route }) => {
         </Text>
         {/* rating stars */}
         <HStack marginBottom={5}>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
-          <Icon
-            as={MaterialIcons}
-            name="star-outline"
-            size={5}
-            color="#FED766"
-          ></Icon>
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
         </HStack>
       </VStack>
       <ScrollView>
@@ -151,7 +174,7 @@ const Profile = ({ navigation, route }) => {
         >
           {userBio}
         </Box>
-        <HStack alignSelf={"center"}>
+        <HStack alignSelf={"center"} w={"90%"} justifyContent={"space-evenly"}>
           <Button
             bgColor={"#FED766"}
             w={"40%"}
@@ -198,7 +221,7 @@ const Profile = ({ navigation, route }) => {
         </HStack>
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
-          Active listings ()
+          Active listings ({userMediaArray.length})
         </Text>
         <Box w={"90%"} alignSelf={"center"}>
           <FlatGrid

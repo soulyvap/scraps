@@ -127,13 +127,12 @@ const List = ({ navigation, tagSelected }) => {
               source={require("../assets/loading-2.json")}
               speed={1}
             />
-
             <Text color={colors.notBlack} fontSize={15} alignSelf={"center"}>
               There are no posts matching your criteria
             </Text>
           </View>
         }
-        width={"90%"}
+        width={"100%"}
         alignSelf={"center"}
         numColumns={2}
         data={filteredItems}
