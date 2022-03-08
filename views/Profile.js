@@ -13,7 +13,7 @@ import {
   VStack,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
-import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import { useMedia, useRating, useTag, useUser } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import {
   avatarTag,
@@ -30,15 +30,21 @@ import { MainContext } from "../contexts/MainContext";
 import StarIcon from "../components/StarIcon";
 import { colors } from "../utils/colors";
 import ReviewTile from "../components/ReviewTile";
+import ReviewList from "../components/ReviewList";
+import { Rating } from "react-native-ratings";
 
 const Profile = ({ navigation, route }) => {
   const { file } = route.params;
   const { getUserById } = useUser();
   const { getFilesByTag, getTagsByFileId } = useTag();
+  const { getRatingsById } = useRating();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [userMediaArray, setUserMediaArray] = useState([]);
+  const [userFileId, setUserFileId] = useState();
   const [userBio, setUserBio] = useState();
+  const [reviewCount, setReviewCount] = useState(0);
+  const [rating, setRating] = useState();
 
   const fetchUserMedia = async (owner) => {
     try {
@@ -83,6 +89,44 @@ const Profile = ({ navigation, route }) => {
     }
   };
 
+  const fetchUserFile = async () => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + file.user_id);
+      const userFile = userFiles[0];
+      const descriptionData = userFile.description;
+      const allData = JSON.parse(descriptionData);
+      const bio = allData.bio;
+      setUserBio(bio);
+      setUserFileId(userFile.file_id);
+      await fetchRating(userFile.file_id);
+    } catch (error) {
+      console.error("fetchUserFile", error.message);
+    }
+  };
+
+  const fetchRating = async (userFileId) => {
+    try {
+      const ratingList = await getRatingsById(userFileId);
+      const ratings = ratingList.map((rating) => rating.rating);
+      const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      setRating(average);
+    } catch (error) {
+      console.error("fetchRating", error.message);
+    }
+  };
+  // const fetchUserBio = async (userFileId) => {
+  //   try {
+  //     const userFiles = await getFilesByTag(userFileTag + file.user_id);
+  //     const userFile = userFiles[0];
+  //     const descriptionData = userFile.description;
+  //     const allData = JSON.parse(descriptionData);
+  //     const bio = allData.bio;
+  //     setUserBio(bio);
+  //     console.log(userFile.file_id);
+  //   } catch (error) {
+  //     console.error(error.message);
+  //   }
+  // };
   const fetchAvatar = async () => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + file.user_id);
@@ -96,19 +140,6 @@ const Profile = ({ navigation, route }) => {
     }
   };
 
-  const fetchUserBio = async () => {
-    try {
-      const userFiles = await getFilesByTag(userFileTag + file.user_id);
-      const userFile = userFiles[0];
-      const descriptionData = userFile.description;
-      const allData = JSON.parse(descriptionData);
-      const bio = allData.bio;
-      setUserBio(bio);
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
   useEffect(() => {
     fetchOwner();
     setOwner(owner);
@@ -117,7 +148,8 @@ const Profile = ({ navigation, route }) => {
   useEffect(() => {
     fetchAvatar();
     setAvatar(avatar);
-    fetchUserBio();
+    fetchUserFile();
+    // fetchUserBio();
     setUserBio(userBio);
     fetchUserMedia(owner);
     setUserMediaArray(userMediaArray);
@@ -141,14 +173,22 @@ const Profile = ({ navigation, route }) => {
         </Text>
         {/* rating stars */}
         <HStack marginBottom={5}>
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
+          {rating ? (
+            <Rating
+              startingValue={rating}
+              imageSize={15}
+              readonly={true}
+              tintColor={colors.green}
+              type="custom"
+              ratingBackgroundColor={colors.grey}
+              ratingColor={colors.yellow}
+            />
+          ) : (
+            <Text>Not rated yet</Text>
+          )}
         </HStack>
       </VStack>
-      <ScrollView>
+      <ScrollView nestedScrollEnabled>
         {/* profile image */}
         <Avatar
           alignSelf={"center"}
@@ -245,10 +285,12 @@ const Profile = ({ navigation, route }) => {
             )}
           />
         </Box>
-        <Text fontSize={20} fontWeight={"bold"} px={5}>
-          Reviews
+        <Text fontSize={20} fontWeight={"bold"} px={5} mb={2}>
+          Reviews ({reviewCount})
         </Text>
-        <ReviewTile />
+        {userFileId && (
+          <ReviewList userFileId={userFileId} setReviewCount={setReviewCount} />
+        )}
       </ScrollView>
     </Box>
   );

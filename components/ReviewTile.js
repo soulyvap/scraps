@@ -2,10 +2,11 @@ import { Avatar, HStack, Text, VStack } from "native-base";
 import { Rating } from "react-native-ratings";
 import { colors } from "../utils/colors";
 
-const ReviewTile = () => {
-  const pic = "";
-  const rating = 4.0;
-  const comment = "Very nice food. Even better person!";
+const ReviewTile = ({ review }) => {
+  const pic = review.avatar;
+  const rating = review.rating;
+  const comment = review.comment;
+  const username = review.username;
   return (
     <HStack
       bgColor={colors.beige}
@@ -14,16 +15,28 @@ const ReviewTile = () => {
       borderRadius={10}
       space={3}
       p={2}
+      alignItems="center"
+      w={"90%"}
+      alignSelf={"center"}
     >
-      <Avatar size={"md"} source={{ uri: pic }} shadow="4" />
-      <VStack alignItems={"flex-start"} space={1}>
-        <Rating
-          minValue={rating}
-          imageSize={15}
-          readonly={true}
-          tintColor={colors.beige}
-        />
-        <Text>{comment}</Text>
+      <Avatar size={"16"} source={{ uri: pic }} shadow="4" />
+      <VStack alignItems={"flex-start"} space={1} flex={1}>
+        <HStack justifyContent={"space-between"}>
+          <Rating
+            startingValue={rating}
+            imageSize={15}
+            readonly={true}
+            tintColor={colors.beige}
+            type="custom"
+            ratingBackgroundColor={colors.grey}
+            ratingColor={colors.yellow}
+          />
+          <Text flex={1} italic textAlign={"right"}>{`~${username}`}</Text>
+        </HStack>
+
+        <Text italic flex={1}>
+          {comment}
+        </Text>
       </VStack>
     </HStack>
   );
