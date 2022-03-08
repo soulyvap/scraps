@@ -15,6 +15,7 @@ import { useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
 import { userFileTag } from "../utils/variables";
+import { colors } from "../utils/colors";
 
 const Login = ({ navigation }) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
@@ -90,6 +91,7 @@ const Login = ({ navigation }) => {
           bgColor: "#F9F4F1",
           borderColor: "transparent",
           marginBottom: 0,
+          _focus: { borderColor: colors.green },
         },
       },
       Button: {
