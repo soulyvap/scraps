@@ -1,33 +1,24 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  FormControl,
-  Input,
-  View,
-  VStack,
-} from "native-base";
-import { useContext, useEffect, useState } from "react";
+import { Button, FormControl, Input, VStack } from "native-base";
+import { useContext, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 // import * as ImagePicker from "expo-image-picker";
 import { useUser } from "../hooks/ApiHooks";
-import { regForms } from "../views/Register";
 import { MainContext } from "../contexts/MainContext";
 import PropTypes from "prop-types";
 
 const UpdateAccountForm = ({
   navigation,
-  //   setFormData,
+  setFormData,
   //   setUserImage,
-  //   setCurrentForm,
-  //   formData,
+  setCurrentForm,
+  formData,
   //   userImage,
 }) => {
   //   const [pic, setPic] = useState(
   //     "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
   //   );
-  const { checkUsername, putUser } = useUser();
-  const { user, setUser } = useContext(MainContext);
+  const { checkUsername } = useUser();
+  const { user } = useContext(MainContext);
 
   const defVal = {
     email: user.email,
@@ -61,12 +52,23 @@ const UpdateAccountForm = ({
   //     }
   //   }, []);
 
+  useEffect(() => {
+    if (formData) {
+      console.log(formData);
+      setValue("email", formData.email);
+      setValue("username", formData.username);
+      setValue("full_name", formData.full_name);
+      setValue("password", formData.password);
+      setValue("confirmPassword", formData.confirmPassword);
+    }
+  }, []);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     getValues,
-    // setValue,
+    setValue,
   } = useForm({
     defaultValues: defVal,
     mode: "onBlur",
@@ -121,7 +123,7 @@ const UpdateAccountForm = ({
           },
           validate: async (value) => {
             const usernameInfo = await checkUsername(value);
-            if (usernameInfo.available) {
+            if (usernameInfo.available || user.username === value) {
               return true;
             } else {
               return `${usernameInfo.username} is already taken`;
