@@ -1,4 +1,13 @@
-import { Heading, HStack, Icon, Image, Text, View, VStack } from "native-base";
+import {
+  Center,
+  Heading,
+  HStack,
+  Icon,
+  Image,
+  Text,
+  View,
+  VStack,
+} from "native-base";
 import { useEffect, useRef, useState } from "react";
 import { Alert, TouchableOpacity } from "react-native";
 import { colors } from "../utils/colors";
@@ -14,6 +23,7 @@ import {
 } from "react-native-popup-menu";
 import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LottieView from "lottie-react-native";
 
 const BookingTile = ({
   fileId,
@@ -34,6 +44,7 @@ const BookingTile = ({
   const [latest, setLatest] = useState();
   const [file, setFile] = useState();
   const [user, setUser] = useState();
+  const [loading, setLoading] = useState(false);
   const menuRef = useRef();
   const { getUserById } = useUser();
   const { postTag } = useTag();
@@ -142,6 +153,7 @@ const BookingTile = ({
   };
 
   const fetchMedia = async () => {
+    setLoading(true);
     try {
       const listing = await getMediaById(fileId);
       setPic(uploadsUrl + listing.thumbnails.w320);
@@ -155,6 +167,7 @@ const BookingTile = ({
       if (pickupInfo) {
         await fetchUser(listing.user_id);
       }
+      setLoading(false);
     } catch (error) {
       console.error(`fetchMedia ${fileId}`, error);
     }
@@ -176,16 +189,39 @@ const BookingTile = ({
     fetchMedia();
   }, []);
 
+  if (loading) {
+    return (
+      <Center
+        my={2}
+        w={"92%"}
+        alignSelf="center"
+        bgColor={active ? "white" : colors.beige}
+        shadow={"0"}
+        borderRadius={10}
+        py={10}
+        space={2}
+      >
+        <LottieView
+          autoPlay
+          loop={false}
+          style={{ width: 30, height: 30 }}
+          source={require("../assets/loading-3.json")}
+          speed={1}
+        />
+      </Center>
+    );
+  }
   return (
     <TouchableOpacity
       onPress={() => {
-        const navigationData = getDestination(status);
-        console.log(navigationData);
-        console.log(status);
-
-        navigation.navigate(navigationData.destination, navigationData.data);
+        if (!loading) {
+          const navigationData = getDestination(status);
+          console.log(navigationData);
+          console.log(status);
+          navigation.navigate(navigationData.destination, navigationData.data);
+        }
       }}
-      disabled={!active}
+      disabled={!active || loading}
     >
       <HStack
         my={2}
@@ -197,15 +233,14 @@ const BookingTile = ({
         p={3}
         space={2}
       >
-        {pic && (
-          <Image
-            style={{ aspectRatio: 1, height: 100, width: undefined }}
-            source={{ uri: pic }}
-            borderWidth={0.1}
-            borderColor={colors.grey}
-            alt="food-image"
-          />
-        )}
+        <Image
+          style={{ aspectRatio: 1, height: 100, width: undefined }}
+          source={{ uri: pic }}
+          borderWidth={0.1}
+          borderColor={colors.grey}
+          alt="food-image"
+        />
+
         <VStack flex={1} space={1} justifyContent={"space-between"}>
           <HStack space={2} alignItems="center">
             {title && (

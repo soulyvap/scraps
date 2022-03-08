@@ -1,13 +1,15 @@
-import { Button, FormControl, Input, VStack } from "native-base";
-import { useContext } from "react";
+import { Button, FormControl, Input, Text, VStack } from "native-base";
+import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useLogin } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
+import { colors } from "../utils/colors";
 
 const LoginForm = () => {
   const { postLogin } = useLogin();
   const { setUser, setIsLoggedIn } = useContext(MainContext);
+  const [failed, setFailed] = useState(false);
 
   const {
     control,
@@ -30,12 +32,18 @@ const LoginForm = () => {
       setUser(loginData.user);
       await AsyncStorage.setItem("userToken", token);
     } catch (error) {
+      setFailed(true);
       throw new Error(error.message);
     }
   };
 
   return (
     <VStack space={2}>
+      {failed && (
+        <Text color={colors.red} fontSize={13} textAlign={"center"}>
+          Wrong username or password
+        </Text>
+      )}
       <Controller
         control={control}
         rules={{
@@ -49,6 +57,7 @@ const LoginForm = () => {
               value={value}
               placeholder={"username"}
               autoCapitalize="none"
+              onFocus={() => setFailed(false)}
             />
             {errors.username && (
               <FormControl.ErrorMessage>
@@ -74,6 +83,7 @@ const LoginForm = () => {
               placeholder={"password"}
               autoCapitalize="none"
               secureTextEntry={true}
+              onFocus={() => setFailed(false)}
             />
             {errors.password ? (
               <FormControl.ErrorMessage>

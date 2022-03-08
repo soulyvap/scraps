@@ -11,16 +11,23 @@ import {
   Pressable,
 } from "native-base";
 import PropTypes from "prop-types";
-import { avatarTag, uploadsUrl, defaultAvatar } from "../utils/variables";
-import { useTag, useUser } from "../hooks/ApiHooks";
+import {
+  avatarTag,
+  uploadsUrl,
+  defaultAvatar,
+  userFileTag,
+} from "../utils/variables";
+import { useRating, useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
 
 const ListItem = ({ navigation, singleMedia }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
+  const { getRatingsById } = useRating();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
+  const [rating, setRating] = useState();
   const { update, setUpdate, user } = useContext(MainContext);
 
   const fetchOwner = async () => {
@@ -48,9 +55,27 @@ const ListItem = ({ navigation, singleMedia }) => {
     }
   };
 
+  const fetchRating = async () => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + singleMedia.user_id);
+      const userFile = userFiles[0];
+      const ratingList = await getRatingsById(userFile.file_id);
+      if (ratingList.length > 0) {
+        const ratings = ratingList.map((rating) => rating.rating);
+        const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+        setRating(average);
+      } else {
+        setRating(null);
+      }
+    } catch (error) {
+      console.error("fetchUserFile", error.message);
+    }
+  };
+
   useEffect(() => {
     fetchOwner();
     fetchAvatar();
+    fetchRating();
   }, []);
 
   return (
@@ -126,7 +151,7 @@ const ListItem = ({ navigation, singleMedia }) => {
                 {owner.username}
               </Text>
               <Text color="#132A15" fontWeight="400">
-                5 stars
+                {rating ? `${rating} stars` : "not rated yet"}
               </Text>
             </VStack>
           </HStack>

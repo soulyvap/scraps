@@ -13,7 +13,13 @@ import {
   VStack,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
-import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import {
+  useComment,
+  useMedia,
+  useRating,
+  useTag,
+  useUser,
+} from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import {
   avatarTag,
@@ -29,15 +35,25 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
 import StarIcon from "../components/StarIcon";
 import { colors } from "../utils/colors";
+import ReviewTile from "../components/ReviewTile";
+import ReviewList from "../components/ReviewList";
+import { Rating } from "react-native-ratings";
 
 const Profile = ({ navigation, route }) => {
   const { file } = route.params;
   const { getUserById } = useUser();
   const { getFilesByTag, getTagsByFileId } = useTag();
+  const { getRatingsById } = useRating();
+  const { getCommentsById } = useComment();
+  const { user } = useContext(MainContext);
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [userMediaArray, setUserMediaArray] = useState([]);
+  const [userFileId, setUserFileId] = useState();
   const [userBio, setUserBio] = useState();
+  const [reviewCount, setReviewCount] = useState(0);
+  const [rating, setRating] = useState();
+  const [commented, setCommented] = useState();
 
   const fetchUserMedia = async (owner) => {
     try {
@@ -82,6 +98,32 @@ const Profile = ({ navigation, route }) => {
     }
   };
 
+  const fetchUserFile = async () => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + file.user_id);
+      const userFile = userFiles[0];
+      const descriptionData = userFile.description;
+      const allData = JSON.parse(descriptionData);
+      const bio = allData.bio;
+      setUserBio(bio);
+      setUserFileId(userFile.file_id);
+      await fetchRating(userFile.file_id);
+    } catch (error) {
+      console.error("fetchUserFile", error.message);
+    }
+  };
+
+  const fetchRating = async (userFileId) => {
+    try {
+      const ratingList = await getRatingsById(userFileId);
+      const ratings = ratingList.map((rating) => rating.rating);
+      const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      setRating(average);
+    } catch (error) {
+      console.error("fetchRating", error.message);
+    }
+  };
+
   const fetchAvatar = async () => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + file.user_id);
@@ -95,16 +137,20 @@ const Profile = ({ navigation, route }) => {
     }
   };
 
-  const fetchUserBio = async () => {
+  const checkReview = async () => {
     try {
-      const userFiles = await getFilesByTag(userFileTag + file.user_id);
-      const userFile = userFiles[0];
-      const descriptionData = userFile.description;
-      const allData = JSON.parse(descriptionData);
-      const bio = allData.bio;
-      setUserBio(bio);
+      const comments = await getCommentsById(userFileId);
+      const ownComment = comments.find(
+        (comment) => comment.user_id === user.user_id
+      );
+      if (ownComment) {
+        setCommented(true);
+      } else {
+        setCommented(false);
+      }
+      console.log(commented);
     } catch (error) {
-      console.error(error.message);
+      console.error("checkReview", error);
     }
   };
 
@@ -116,10 +162,11 @@ const Profile = ({ navigation, route }) => {
   useEffect(() => {
     fetchAvatar();
     setAvatar(avatar);
-    fetchUserBio();
+    fetchUserFile();
     setUserBio(userBio);
     fetchUserMedia(owner);
     setUserMediaArray(userMediaArray);
+    checkReview();
   }, [owner]);
 
   return (
@@ -140,14 +187,22 @@ const Profile = ({ navigation, route }) => {
         </Text>
         {/* rating stars */}
         <HStack marginBottom={5}>
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
+          {rating ? (
+            <Rating
+              startingValue={rating}
+              imageSize={15}
+              readonly={true}
+              tintColor={colors.green}
+              type="custom"
+              ratingBackgroundColor={colors.grey}
+              ratingColor={colors.yellow}
+            />
+          ) : (
+            <Text>Not rated yet</Text>
+          )}
         </HStack>
       </VStack>
-      <ScrollView>
+      <ScrollView nestedScrollEnabled>
         {/* profile image */}
         <Avatar
           alignSelf={"center"}
@@ -197,30 +252,33 @@ const Profile = ({ navigation, route }) => {
               </Text>
             </HStack>
           </Button>
-          <Button
-            bgColor={"#FED766"}
-            w={"40%"}
-            alignSelf="center"
-            mb={5}
-            onPress={() => {
-              navigation.navigate("Review", {
-                targetId: file.user_id,
-                targetUser: owner.username,
-              });
-            }}
-          >
-            <HStack alignItems={"baseline"}>
-              <Icon
-                as={MaterialIcons}
-                name="star"
-                size={5}
-                color="#132A15"
-              ></Icon>
-              <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
-                Review
-              </Text>
-            </HStack>
-          </Button>
+          {!commented && (
+            <Button
+              bgColor={!commented ? colors.yellow : colors.grey}
+              disabled={commented}
+              w={"40%"}
+              alignSelf="center"
+              mb={5}
+              onPress={() => {
+                navigation.navigate("Review", {
+                  targetId: file.user_id,
+                  targetUser: owner.username,
+                });
+              }}
+            >
+              <HStack alignItems={"baseline"}>
+                <Icon
+                  as={MaterialIcons}
+                  name="star"
+                  size={5}
+                  color="#132A15"
+                ></Icon>
+                <Text color={"#132A15"} fontWeight={"bold"} ml={1}>
+                  Review
+                </Text>
+              </HStack>
+            </Button>
+          )}
         </HStack>
         {/* user's listings */}
         <Text fontSize={20} fontWeight={"bold"} px={5}>
@@ -247,12 +305,12 @@ const Profile = ({ navigation, route }) => {
             )}
           />
         </Box>
-        <Text fontSize={20} fontWeight={"bold"} px={5}>
-          Reviews
+        <Text fontSize={20} fontWeight={"bold"} px={5} mb={2}>
+          Reviews ({reviewCount})
         </Text>
-        <Text fontSize={16} px={5}>
-          Reviews will be placed here.
-        </Text>
+        {userFileId && (
+          <ReviewList userFileId={userFileId} setReviewCount={setReviewCount} />
+        )}
       </ScrollView>
     </Box>
   );
