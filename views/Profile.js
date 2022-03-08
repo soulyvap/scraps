@@ -29,6 +29,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
 import StarIcon from "../components/StarIcon";
 import { colors } from "../utils/colors";
+import ReviewTile from "../components/ReviewTile";
 
 const Profile = ({ navigation, route }) => {
   const { file } = route.params;
@@ -247,9 +248,7 @@ const Profile = ({ navigation, route }) => {
         <Text fontSize={20} fontWeight={"bold"} px={5}>
           Reviews
         </Text>
-        <Text fontSize={16} px={5}>
-          Reviews will be placed here.
-        </Text>
+        <ReviewTile />
       </ScrollView>
     </Box>
   );
