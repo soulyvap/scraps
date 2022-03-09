@@ -283,7 +283,7 @@ const ChatSingle = ({ route, navigation }) => {
               }}
             />
           )}
-          <VStack>
+          <VStack maxW="60%">
             {username && <Heading fontSize="2xl">{username}</Heading>}
             {rating ? (
               <Rating readonly={true} startingValue={rating} imageSize={15} />

@@ -65,7 +65,7 @@ const ReviewList = ({ userFileId, setReviewCount }) => {
   }, [update]);
 
   return (
-    <ScrollView nestedScrollEnabled h={300}>
+    <ScrollView nestedScrollEnabled maxH={400}>
       {reviews.length > 0 &&
         reviews.map((review, index) => (
           <ReviewTile review={review} key={index} />

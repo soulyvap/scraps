@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   extendTheme,
@@ -15,7 +16,7 @@ import {
 import React, { useEffect, useState, useContext } from "react";
 import LocationForm from "../components/LocationForm";
 import { useLogin, useMedia, useTag, useUser } from "../hooks/ApiHooks";
-import { avatarTag, userFileTag } from "../utils/variables";
+import { avatarTag, uploadsUrl, userFileTag } from "../utils/variables";
 import userFileImage from "../assets/a.jpg";
 import { Alert, BackHandler, Image, Keyboard } from "react-native";
 import BackButton from "../components/BackButton";
@@ -24,6 +25,7 @@ import { MainContext } from "../contexts/MainContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Controller, useForm } from "react-hook-form";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 export const regForms = {
   user: "user",
@@ -38,12 +40,25 @@ const UpdateUser = ({ navigation }) => {
   const [bioText, setBioText] = useState();
   const [userFileData, setUserFileData] = useState([]);
   const [userFileId, setUserFileId] = useState();
+  const [pic, setPic] = useState();
+  const [picChanged, setPicChanged] = useState(false);
   const { putUser } = useUser();
   const { getFilesByTag, postTag } = useTag();
-  const { postMedia, deleteMediaById } = useMedia();
+  const { postMedia, putMedia } = useMedia();
   const { checkUsername } = useUser();
 
-  console.log(user);
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.5,
+      aspect: [1, 1],
+    });
+    if (!result.cancelled) {
+      setPic(result.uri);
+      setPicChanged(true);
+    }
+  };
 
   const defVal = {
     email: user.email,
@@ -71,17 +86,6 @@ const UpdateUser = ({ navigation }) => {
 
   const formBoxHeight = 90;
 
-  // useEffect(() => {
-  //   if (formData) {
-  //     console.log(formData);
-  //     setValue("email", formData.email);
-  //     setValue("username", formData.username);
-  //     setValue("full_name", formData.full_name);
-  //     setValue("password", formData.password);
-  //     setValue("confirmPassword", formData.confirmPassword);
-  //   }
-  // }, []);
-
   const {
     control,
     handleSubmit,
@@ -103,15 +107,23 @@ const UpdateUser = ({ navigation }) => {
       const userData = await putUser(data, userToken);
       console.log("edit profile data onSubmit", userData);
       delete data.password;
-      setUser(data);
-      // const bioUpdated = await updateUserFile();
-      // if (userData && bioUpdated) {
-      //   setUpdate(update + 1);
-      //   Alert.alert("Success! Account updated.");
-      // }
+      let newUserData = user;
+      newUserData.email = data.email;
+      newUserData.username = data.username;
+      newUserData.full_name = data.full_name;
+      console.log("new user data", newUserData);
+      setUser(newUserData);
+      if (bioText.length > 0) {
+        await updateUserFile();
+      }
+      if (picChanged) {
+        await createProfilePic();
+      }
       if (userData) {
         Alert.alert("Success! Account updated.");
+        navigation.goBack();
       }
+      setUpdate(update + 1);
     } catch (error) {
       console.error(error);
     }
@@ -120,6 +132,7 @@ const UpdateUser = ({ navigation }) => {
   const fetchUserBio = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + user.user_id);
+      console.log(user);
       const myFile = userFiles.pop();
       console.log("my old file", myFile);
       setUserFileId(myFile.file_id);
@@ -133,54 +146,68 @@ const UpdateUser = ({ navigation }) => {
     }
   };
 
-  // const updateUserFile = async () => {
-  //   try {
-  //     const userToken = await AsyncStorage.getItem("userToken");
-  //     const formData = new FormData();
-  //     formData.append("title", `userfile_${user.user_id}`);
-  //     const description = JSON.stringify({
-  //       coords: userFileData.coords,
-  //       address: userFileData.address,
-  //       bio: bioText,
-  //     });
-  //     formData.append("description", description);
-  //     const userFileUri = Image.resolveAssetSource(userFileImage).uri;
-  //     formData.append("file", {
-  //       uri: userFileUri,
-  //       name: "a.jpg",
-  //       type: "image/jpg",
-  //     });
-  //     console.log("token", userToken);
-  //     const response = await postMedia(formData, userToken);
-  //     const fileId = response.file_id;
-  //     if (response) {
-  //       await addUserFileTag(fileId);
-  //     }
-  //     console.log("new userfile created with id: ", fileId);
-  //     const oldMediaDeleted = await deleteMediaById(userFileId, userToken);
-  //     if (oldMediaDeleted) {
-  //       console.log("old file deleted");
-  //     }
-  //   } catch (error) {
-  //     throw new Error(error.message);
-  //   }
-  // };
+  const updateUserFile = async () => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    try {
+      let newDescription = userFileData;
+      newDescription.bio = bioText;
+      const data = {
+        description: JSON.stringify(newDescription),
+      };
+      console.log("here", data);
+      const response = await putMedia(data, userToken, userFileId);
+      console.log(response);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 
-  // const addUserFileTag = async (fileId) => {
-  //   try {
-  //     const userToken = await AsyncStorage.getItem("userToken");
-  //     const tagData = {
-  //       file_id: fileId,
-  //       tag: userFileTag + user.user_id,
-  //     };
-  //     const response = await postTag(tagData, userToken);
-  //     if (response) {
-  //       console.log("tag added", tagData.tag);
-  //     }
-  //   } catch (error) {
-  //     throw new Error(error.message);
-  //   }
-  // };
+  const fetchAvatar = async () => {
+    try {
+      const avatarArray = await getFilesByTag(avatarTag + user.user_id);
+      const avatarFetched = await avatarArray.pop();
+      setPic(uploadsUrl + avatarFetched.filename);
+    } catch (error) {
+      console.error("fetchAvatar", error.message);
+    }
+  };
+
+  const createProfilePic = async () => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    const formData = new FormData();
+    formData.append("title", `profile_${user.user_id}`);
+    const filename = pic.split("/").pop();
+    let fileExtension = filename.split(".").pop();
+    fileExtension = fileExtension === "jpg" ? "jpeg" : fileExtension;
+    formData.append("file", {
+      uri: pic,
+      name: filename,
+      type: "image/" + fileExtension,
+    });
+    try {
+      const response = await postMedia(formData, userToken);
+      const fileId = response.file_id;
+      response && console.log("create profile pic", response);
+      await addProfilePicTag(fileId);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  //posts special tag for app specific profile pics
+  const addProfilePicTag = async (fileId) => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    try {
+      const tagData = {
+        file_id: fileId,
+        tag: avatarTag + user.user_id,
+      };
+      const response = await postTag(tagData, userToken);
+      response && console.log("tag added", tagData.tag);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 
   const theme = extendTheme({
     components: {
@@ -213,6 +240,7 @@ const UpdateUser = ({ navigation }) => {
 
   useEffect(() => {
     fetchUserBio();
+    fetchAvatar();
   }, []);
 
   return (
@@ -241,26 +269,23 @@ const UpdateUser = ({ navigation }) => {
             borderTopLeftRadius={keyboardShowing ? 0 : 90}
             borderTopRightRadius={keyboardShowing ? 0 : 90}
           >
-            <View flex={1}></View>
-            {/* <TextArea
-              value={bioText}
-              onChangeText={(input) => setBioText(input)}
-              onBlur={() => setBio(bioText)}
-              fontSize={"md"}
-              mt={5}
-              placeholder="Introduce yourself to your neighbours..."
-              p={3}
-              textAlign={"left"}
-              h={"20%"}
-            /> */}
-            <Heading alignSelf={"center"}>Edit account information</Heading>
+            <Heading mt={10} alignSelf={"center"}>
+              Edit account information
+            </Heading>
             <VStack space={1} mt={5}>
-              {/* <View flexDirection={"row"} justifyContent={"center"} mb={2}>
-        <Avatar mr={5} source={{ uri: pic }} alt="profile-pic" size={100} />
-        <Button bgColor={"#898980"} w={100} onPress={pickImage}>
-          Choose File
-        </Button>
-      </View> */}
+              {pic && (
+                <View flexDirection={"row"} justifyContent={"center"} mb={2}>
+                  <Avatar
+                    mr={5}
+                    source={{ uri: pic }}
+                    alt="profile-pic"
+                    size={100}
+                  />
+                  <Button bgColor={"#898980"} w={100} onPress={pickImage}>
+                    Choose File
+                  </Button>
+                </View>
+              )}
               <Controller
                 control={control}
                 rules={{
@@ -411,6 +436,17 @@ const UpdateUser = ({ navigation }) => {
                   </FormControl>
                 )}
                 name="confirmPassword"
+              />
+
+              <TextArea
+                value={bioText}
+                onChangeText={(input) => setBioText(input)}
+                onBlur={() => setBio(bioText)}
+                fontSize={"md"}
+                placeholder="Introduce yourself to your neighbours..."
+                p={3}
+                textAlign={"left"}
+                h={"20%"}
               />
 
               <Button

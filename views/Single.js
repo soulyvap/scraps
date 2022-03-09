@@ -5,8 +5,9 @@ import {
   defaultAvatar,
   avatarTag,
   appId,
+  userFileTag,
 } from "../utils/variables";
-import { useTag, useUser } from "../hooks/ApiHooks";
+import { useRating, useTag, useUser } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Avatar,
@@ -31,10 +32,12 @@ const Single = ({ route, navigation }) => {
   const { file } = route.params;
   const { getUserById } = useUser();
   const { getFilesByTag, getTagsByFileId } = useTag();
+  const { getRatingsById } = useRating();
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [showModal, setShowModal] = useState(false);
   const [tags, setTags] = useState();
+  const [rating, setRating] = useState();
   const { update, setUpdate, user } = useContext(MainContext);
 
   const descriptionData = file.description;
@@ -108,10 +111,32 @@ const Single = ({ route, navigation }) => {
     }
   };
 
+  const fetchUserFile = async () => {
+    try {
+      const userFiles = await getFilesByTag(userFileTag + file.user_id);
+      const userFile = userFiles[0];
+      await fetchRating(userFile.file_id);
+    } catch (error) {
+      console.error("fetchUserFile", error.message);
+    }
+  };
+
+  const fetchRating = async (userFileId) => {
+    try {
+      const ratingList = await getRatingsById(userFileId);
+      const ratings = ratingList.map((rating) => rating.rating);
+      const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      setRating(average);
+    } catch (error) {
+      console.error("fetchRating", error.message);
+    }
+  };
+
   useEffect(() => {
     fetchOwner();
     fetchAvatar();
     fetchTags();
+    fetchUserFile();
   }, []);
 
   return (
@@ -201,7 +226,7 @@ const Single = ({ route, navigation }) => {
                   {owner.username}
                 </Text>
                 <Text color="#132A15" fontWeight="400">
-                  5 stars
+                  {rating ? `${rating} stars` : "not rated yet"}
                 </Text>
               </VStack>
             </HStack>
