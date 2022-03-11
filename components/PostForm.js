@@ -39,20 +39,18 @@ export const listingStatus = {
 
 const PostForm = ({ navigation }) => {
   const defaultAllergens = [
-    { text: "dairy", active: false },
-    { text: "egg", active: false },
     { text: "peanut", active: false },
     { text: "tree nuts", active: false },
     { text: "sesame", active: false },
     { text: "soy", active: false },
     { text: "fish", active: false },
     { text: "shellfish", active: false },
-    { text: "gluten", active: false },
     { text: "sulphites", active: false },
   ];
   const defaultTags = [
     { text: "dairy-free", active: false },
     { text: "egg-free", active: false },
+    { text: "fodmap", active: false },
     { text: "gluten-free", active: false },
     { text: "keto", active: false },
     { text: "nut-free", active: false },
