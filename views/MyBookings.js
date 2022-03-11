@@ -108,7 +108,9 @@ const MyBookings = ({ navigation }) => {
   const SectionHeader = ({ section }) => {
     return (
       <HStack alignItems={"center"} space={2} mx={"5%"} my={5}>
-        <Text>{`${section.title}(${section.data.length})`}</Text>
+        <Text
+          fontSize={"lg"}
+        >{`${section.title}(${section.data.length})`}</Text>
         <View h={0.4} bgColor={colors.grey} flex={1} />
       </HStack>
     );

@@ -244,7 +244,7 @@ const BookingTile = ({
         <VStack flex={1} space={1} justifyContent={"space-between"}>
           <HStack space={2} alignItems="center">
             {title && (
-              <Heading flex={0.99} fontSize={14} numberOfLines={1}>
+              <Heading flex={0.99} fontSize={"md"} numberOfLines={1}>
                 {title}
               </Heading>
             )}
@@ -308,13 +308,13 @@ const BookingTile = ({
             borderRadius={5}
             p={1.5}
           >
-            <Text fontSize={10} numberOfLines={3}>
+            <Text fontSize={"xs"} numberOfLines={3}>
               {description}
             </Text>
           </View>
 
           {status && (
-            <Text fontSize={11} textAlign={messageAlign}>
+            <Text fontSize={"xs"} textAlign={messageAlign}>
               {getMessage(status)}
             </Text>
           )}

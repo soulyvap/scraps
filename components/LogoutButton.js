@@ -4,14 +4,16 @@ import { colors } from "../utils/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useContext } from "react";
 import { MainContext } from "../contexts/MainContext";
+import { Alert } from "react-native";
 
 const LogoutButton = ({ onPress, top, right }) => {
-  const { setIsLoggedIn } = useContext(MainContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(MainContext);
 
   const logout = async () => {
     console.log("logout");
     await AsyncStorage.clear();
     setIsLoggedIn(false);
+    isLoggedIn && Alert.alert("Logged out succesfully");
   };
 
   return (
