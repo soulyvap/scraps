@@ -122,7 +122,7 @@ const List = ({ navigation, tagSelected }) => {
           <View alignItems={"center"} justifyContent={"center"} flex={1}>
             <LottieView
               autoPlay
-              loop={false}
+              loop={true}
               style={{ width: 200, height: 200 }}
               source={require("../assets/loading-2.json")}
               speed={1}
