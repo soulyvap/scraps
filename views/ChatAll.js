@@ -27,22 +27,11 @@ const ChatAll = ({ navigation }) => {
     })
   );
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const timeout = setTimeout(() => {
-        setUpdate(update + 1);
-      }, 1000);
-
-      return () => {
-        clearTimeout(timeout);
-      };
-    })
-  );
-
   //fetching all chats on update
   useEffect(async () => {
     if (currentUserId) {
       getMyChats();
+      console.log(chatArray);
     }
   }, [update]);
 
@@ -70,7 +59,11 @@ const ChatAll = ({ navigation }) => {
           const ids = file.title.split("_");
           return ids[0] !== ids[1];
         });
-        setChatArray(secondFilter);
+        const thirdFilter = userChatFiles.filter((file) => {
+          const ids = file.title.split("_");
+          return !ids.includes("undefined");
+        });
+        setChatArray(thirdFilter);
       }
     } catch (error) {
       throw new Error(error.message);

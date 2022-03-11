@@ -295,8 +295,8 @@ const Booking = ({ navigation, route }) => {
               <HStack w={"100%"}>
                 <Text w={"40%"}>Tags</Text>
                 <HStack flex={1} flexWrap="wrap">
-                  {tags.map((tag) => (
-                    <Tag name={tag.tag} />
+                  {tags.map((tag, index) => (
+                    <Tag name={tag.tag} key={index} />
                   ))}
                 </HStack>
               </HStack>
@@ -305,8 +305,8 @@ const Booking = ({ navigation, route }) => {
               <HStack w={"100%"}>
                 <Text w={"40%"}>Allergens</Text>
                 <HStack flex={1} flexWrap="wrap">
-                  {allergens.map((tag) => (
-                    <Tag name={tag} />
+                  {allergens.map((tag, index) => (
+                    <Tag name={tag} key={index} />
                   ))}
                 </HStack>
               </HStack>

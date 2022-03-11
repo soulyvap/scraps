@@ -14,7 +14,7 @@ import {
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
 import { MainContext } from "../contexts/MainContext";
-import { useMedia, useTag } from "../hooks/ApiHooks";
+import { useComment, useMedia, useRating, useTag } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
 import { avatarTag, foodPostTag, uploadsUrl } from "../utils/variables";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -25,11 +25,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors } from "../utils/colors";
 import StarIcon from "../components/StarIcon";
 import LottieView from "lottie-react-native";
+import { Rating } from "react-native-ratings";
+import ReviewList from "../components/ReviewList";
 
 const Profile = ({ navigation }) => {
-  const { user, setIsLoggedIn } = useContext(MainContext);
+  const { user, setIsLoggedIn, update } = useContext(MainContext);
   const { getFilesByTag, getTagsByFileId } = useTag();
+  const { getRatingsById } = useRating();
+  const { getCommentsById } = useComment();
+  const [userFileId, setUserFileId] = useState();
   const [userBio, setUserBio] = useState();
+  const [reviewCount, setReviewCount] = useState(0);
+  const [rating, setRating] = useState();
   const [avatar, setAvatar] = useState();
   const [activeListings, setActiveListings] = useState([]);
   const { userMediaArray } = useMedia();
@@ -62,26 +69,53 @@ const Profile = ({ navigation }) => {
     }
   };
 
-  const fetchUserBio = async () => {
+  const fetchUserFile = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + user.user_id);
-      console.log(userFiles);
-      const userFile = userFiles.pop();
+      const userFile = userFiles[0];
       const descriptionData = userFile.description;
       const allData = JSON.parse(descriptionData);
       const bio = allData.bio;
       setUserBio(bio);
+      setUserFileId(userFile.file_id);
+      await fetchRating(userFile.file_id);
     } catch (error) {
-      console.error(error.message);
+      console.error("fetchUserFile", error.message);
     }
   };
+
+  const fetchRating = async (userFileId) => {
+    try {
+      const ratingList = await getRatingsById(userFileId);
+      const ratings = ratingList.map((rating) => rating.rating);
+      const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      setRating(average);
+    } catch (error) {
+      console.error("fetchRating", error.message);
+    }
+  };
+
+  // const fetchUserBio = async () => {
+  //   try {
+  //     const userFiles = await getFilesByTag(userFileTag + user.user_id);
+  //     console.log(userFiles);
+  //     const userFile = userFiles.pop();
+  //     const descriptionData = userFile.description;
+  //     const allData = JSON.parse(descriptionData);
+  //     const bio = allData.bio;
+  //     setUserBio(bio);
+  //   } catch (error) {
+  //     console.error(error.message);
+  //   }
+  // };
 
   useEffect(() => {
     fetchAvatar(user);
     setAvatar(avatar);
-    fetchUserBio(user);
+    fetchUserFile();
+    // fetchUserBio(user);
     setUserBio(userBio);
-  }, [user]);
+  }, [user, update]);
 
   useEffect(() => {
     filterActive(userMediaArray);
@@ -106,11 +140,19 @@ const Profile = ({ navigation }) => {
         </Text>
         {/* rating stars */}
         <HStack marginBottom={5}>
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
-          <StarIcon />
+          {rating ? (
+            <Rating
+              startingValue={rating}
+              imageSize={15}
+              readonly={true}
+              tintColor={colors.green}
+              type="custom"
+              ratingBackgroundColor={colors.grey}
+              ratingColor={colors.yellow}
+            />
+          ) : (
+            <Text>Not rated yet</Text>
+          )}
         </HStack>
       </VStack>
       <ScrollView>
@@ -206,12 +248,12 @@ const Profile = ({ navigation }) => {
             }
           />
         </Box>
-        <Text fontSize={20} fontWeight={"bold"} px={5}>
-          Reviews
+        <Text fontSize={20} fontWeight={"bold"} px={5} mb={2}>
+          Reviews ({reviewCount})
         </Text>
-        <Text fontSize={16} px={5}>
-          Reviews will be placed here.
-        </Text>
+        {userFileId && (
+          <ReviewList userFileId={userFileId} setReviewCount={setReviewCount} />
+        )}
       </ScrollView>
     </Box>
   );
