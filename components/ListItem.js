@@ -86,8 +86,8 @@ const ListItem = ({ navigation, singleMedia }) => {
       }}
     >
       <Box
-        w="150"
-        h="200"
+        w="160"
+        h="220"
         rounded="lg"
         overflow="hidden"
         borderColor={"#898980"}

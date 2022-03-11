@@ -1,6 +1,6 @@
 const baseUrl = "https://media.mw.metropolia.fi/wbma/";
 const uploadsUrl = "https://media.mw.metropolia.fi/wbma/uploads/";
-const appId = "scraps_final";
+const appId = "sparcs";
 const avatarTag = `${appId}_avatar_`;
 const userFileTag = `${appId}_`;
 const chatTag = `${appId}_chat`;
