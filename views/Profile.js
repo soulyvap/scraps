@@ -1,3 +1,5 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Avatar,
   Box,
@@ -8,36 +10,24 @@ import {
   Pressable,
   ScrollView,
   Text,
-  useDisclose,
-  View,
   VStack,
 } from "native-base";
-import React, { useContext, useEffect, useState } from "react";
-import {
-  useComment,
-  useMedia,
-  useRating,
-  useTag,
-  useUser,
-} from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
+import React, { useContext, useEffect, useState } from "react";
+import { Rating } from "react-native-ratings";
+import { FlatGrid } from "react-native-super-grid";
+import ReviewList from "../components/ReviewList";
+import { MainContext } from "../contexts/MainContext";
+import { useComment, useRating, useTag, useUser } from "../hooks/ApiHooks";
+import { colors } from "../utils/colors";
 import {
   avatarTag,
-  uploadsUrl,
-  defaultAvatar,
-  userFileTag,
   baseUrl,
+  defaultAvatar,
   foodPostTag,
+  uploadsUrl,
+  userFileTag,
 } from "../utils/variables";
-import { MaterialIcons } from "@expo/vector-icons";
-import { FlatGrid } from "react-native-super-grid";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MainContext } from "../contexts/MainContext";
-import StarIcon from "../components/StarIcon";
-import { colors } from "../utils/colors";
-import ReviewTile from "../components/ReviewTile";
-import ReviewList from "../components/ReviewList";
-import { Rating } from "react-native-ratings";
 
 const Profile = ({ navigation, route }) => {
   const { file } = route.params;
@@ -98,6 +88,7 @@ const Profile = ({ navigation, route }) => {
     }
   };
 
+  // userfile contains additional details about the user, like bio
   const fetchUserFile = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + file.user_id);

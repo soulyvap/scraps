@@ -1,3 +1,5 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 import {
   Avatar,
   Box,
@@ -8,31 +10,23 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextArea,
-  View,
   VStack,
 } from "native-base";
-import React, { useContext, useEffect, useState } from "react";
-import { MainContext } from "../contexts/MainContext";
-import { useComment, useMedia, useRating, useTag } from "../hooks/ApiHooks";
 import PropTypes from "prop-types";
-import { avatarTag, foodPostTag, uploadsUrl } from "../utils/variables";
-import { MaterialIcons } from "@expo/vector-icons";
-import { FlatGrid } from "react-native-super-grid";
-import { userFileTag } from "../utils/variables";
-import LogoutButton from "../components/LogoutButton";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { colors } from "../utils/colors";
-import StarIcon from "../components/StarIcon";
-import LottieView from "lottie-react-native";
+import React, { useContext, useEffect, useState } from "react";
 import { Rating } from "react-native-ratings";
+import { FlatGrid } from "react-native-super-grid";
+import LogoutButton from "../components/LogoutButton";
 import ReviewList from "../components/ReviewList";
+import { MainContext } from "../contexts/MainContext";
+import { useMedia, useRating, useTag } from "../hooks/ApiHooks";
+import { colors } from "../utils/colors";
+import { avatarTag, uploadsUrl, userFileTag } from "../utils/variables";
 
 const Profile = ({ navigation }) => {
-  const { user, setIsLoggedIn, update } = useContext(MainContext);
+  const { user, update } = useContext(MainContext);
   const { getFilesByTag, getTagsByFileId } = useTag();
   const { getRatingsById } = useRating();
-  const { getCommentsById } = useComment();
   const [userFileId, setUserFileId] = useState();
   const [userBio, setUserBio] = useState();
   const [reviewCount, setReviewCount] = useState(0);
@@ -41,6 +35,7 @@ const Profile = ({ navigation }) => {
   const [activeListings, setActiveListings] = useState([]);
   const { userMediaArray } = useMedia();
 
+  // filter out booked listings so they wouldn't be displayed
   const filterActive = async () => {
     const activeListings = [];
     const active = await Promise.all(
@@ -69,6 +64,8 @@ const Profile = ({ navigation }) => {
     }
   };
 
+  // fetch file that contains additional user details
+  // user bio is located in userfile
   const fetchUserFile = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + user.user_id);
@@ -95,25 +92,10 @@ const Profile = ({ navigation }) => {
     }
   };
 
-  // const fetchUserBio = async () => {
-  //   try {
-  //     const userFiles = await getFilesByTag(userFileTag + user.user_id);
-  //     console.log(userFiles);
-  //     const userFile = userFiles.pop();
-  //     const descriptionData = userFile.description;
-  //     const allData = JSON.parse(descriptionData);
-  //     const bio = allData.bio;
-  //     setUserBio(bio);
-  //   } catch (error) {
-  //     console.error(error.message);
-  //   }
-  // };
-
   useEffect(() => {
     fetchAvatar(user);
     setAvatar(avatar);
     fetchUserFile();
-    // fetchUserBio(user);
     setUserBio(userBio);
   }, [user, update]);
 

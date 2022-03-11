@@ -1,38 +1,38 @@
-import React, { useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  AspectRatio,
+  Avatar,
   Box,
   Heading,
-  Avatar,
-  AspectRatio,
-  Image,
-  Text,
   HStack,
-  VStack,
+  Image,
   Pressable,
+  Text,
+  VStack,
 } from "native-base";
 import PropTypes from "prop-types";
+import React, { useContext, useEffect, useState } from "react";
+import { MainContext } from "../contexts/MainContext";
+import { useRating, useTag, useUser } from "../hooks/ApiHooks";
 import {
   avatarTag,
-  uploadsUrl,
   defaultAvatar,
+  uploadsUrl,
   userFileTag,
 } from "../utils/variables";
-import { useRating, useTag, useUser } from "../hooks/ApiHooks";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MainContext } from "../contexts/MainContext";
 
 const ListItem = ({ navigation, singleMedia }) => {
   const { getUserById } = useUser();
   const { getFilesByTag } = useTag();
   const { getRatingsById } = useRating();
+  const { update, setUpdate, user } = useContext(MainContext);
   const [owner, setOwner] = useState({ username: "fetching..." });
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [rating, setRating] = useState();
-  const { update, setUpdate, user } = useContext(MainContext);
 
+  // get owner information
   const fetchOwner = async () => {
     try {
-      // TODO: change token when login ready
       const token = await AsyncStorage.getItem("userToken");
       const userData = await getUserById(singleMedia.user_id, token);
       setOwner(userData) && setUpdate(update + 1);
@@ -42,6 +42,7 @@ const ListItem = ({ navigation, singleMedia }) => {
     }
   };
 
+  // get post owner avatar
   const fetchAvatar = async () => {
     try {
       const avatarArray = await getFilesByTag(avatarTag + singleMedia.user_id);
@@ -55,6 +56,9 @@ const ListItem = ({ navigation, singleMedia }) => {
     }
   };
 
+  // get post owner's rating
+  // calculate average if not null
+  // if there are no ratings yet, return null
   const fetchRating = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + singleMedia.user_id);
@@ -87,7 +91,7 @@ const ListItem = ({ navigation, singleMedia }) => {
     >
       <Box
         w="160"
-        h="220"
+        h="210"
         rounded="lg"
         overflow="hidden"
         borderColor={"#898980"}

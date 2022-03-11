@@ -1,8 +1,3 @@
-import React, { useContext, useEffect, useState } from "react";
-import { SafeAreaView } from "react-native";
-import List from "../components/List";
-import PropTypes from "prop-types";
-import { MainContext } from "../contexts/MainContext";
 import {
   Box,
   Button,
@@ -14,9 +9,14 @@ import {
   Pressable,
   Text,
 } from "native-base";
-import { foodPostTag, defaultTags } from "../utils/variables";
-import { colors } from "../utils/colors";
+import PropTypes from "prop-types";
+import React, { useContext, useState } from "react";
+import { SafeAreaView } from "react-native";
+import List from "../components/List";
 import LogoutButton from "../components/LogoutButton";
+import { MainContext } from "../contexts/MainContext";
+import { colors } from "../utils/colors";
+import { defaultTags, foodPostTag } from "../utils/variables";
 
 const Home = ({ navigation }) => {
   const {
@@ -44,6 +44,7 @@ const Home = ({ navigation }) => {
             <Text fontSize={17} fontWeight={"bold"} mt={1} color={"#132A15"}>
               Search by tags
             </Text>
+            {/* filtering by tags. Tags are set by us (hardcoded) */}
             <FlatList
               horizontal
               alignSelf={"center"}
@@ -84,6 +85,7 @@ const Home = ({ navigation }) => {
               justifyContent={"space-evenly"}
               my={3}
             >
+              {/* filtering by categories. Like tags, categories are also pre-determined */}
               <Button
                 bgColor={
                   categorySelected === "" ? colors.notBlack : colors.green
