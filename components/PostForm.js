@@ -50,7 +50,6 @@ const PostForm = ({ navigation }) => {
   const defaultTags = [
     { text: "dairy-free", active: false },
     { text: "egg-free", active: false },
-    { text: "fodmap", active: false },
     { text: "gluten-free", active: false },
     { text: "keto", active: false },
     { text: "nut-free", active: false },
