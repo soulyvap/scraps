@@ -1,9 +1,21 @@
-import { Avatar, Button, FormControl, Input, View, VStack } from "native-base";
+import {
+  Avatar,
+  Button,
+  FormControl,
+  HStack,
+  Icon,
+  IconButton,
+  Input,
+  View,
+  VStack,
+} from "native-base";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { useUser } from "../hooks/ApiHooks";
 import { regForms } from "../views/Register";
+import { Feather } from "@expo/vector-icons";
+import { colors } from "../utils/colors";
 
 const RegisterForm = ({
   setFormData,
@@ -16,6 +28,7 @@ const RegisterForm = ({
     "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
   );
   const { checkUsername } = useUser();
+  const [showPass, setShowPass] = useState(false);
 
   const defVal = {
     email: "",
@@ -167,67 +180,83 @@ const RegisterForm = ({
         name="full_name"
       />
 
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isRequired isInvalid={errors.password}>
-            <Input
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder={"password"}
-              autoCapitalize="none"
-              secureTextEntry={true}
-            />
-            {errors.password ? (
-              <FormControl.ErrorMessage my={0}>
-                Password is required
-              </FormControl.ErrorMessage>
-            ) : (
-              <></>
+      <HStack w={"100%"} alignItems="center">
+        <VStack w={"100%"}>
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl isRequired isInvalid={errors.password}>
+                <Input
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder={"password"}
+                  autoCapitalize="none"
+                  secureTextEntry={!showPass}
+                />
+                {errors.password ? (
+                  <FormControl.ErrorMessage my={0}>
+                    Password is required
+                  </FormControl.ErrorMessage>
+                ) : (
+                  <></>
+                )}
+              </FormControl>
             )}
-          </FormControl>
-        )}
-        name="password"
-      />
+            name="password"
+          />
 
-      <Controller
-        control={control}
-        rules={{
-          required: { value: true, message: "This is required." },
-          validate: (value) => {
-            const { password } = getValues();
-            if (password === value) {
-              return true;
-            } else {
-              return "Passwords must match";
-            }
-          },
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isRequired isInvalid={errors.confirmPassword}>
-            <Input
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder={"confirm password"}
-              autoCapitalize="none"
-              secureTextEntry={true}
-            />
-            {errors.confirmPassword ? (
-              <FormControl.ErrorMessage my={0}>
-                {errors.confirmPassword.message}
-              </FormControl.ErrorMessage>
-            ) : (
-              <></>
+          <Controller
+            control={control}
+            rules={{
+              required: { value: true, message: "This is required." },
+              validate: (value) => {
+                const { password } = getValues();
+                if (password === value) {
+                  return true;
+                } else {
+                  return "Passwords must match";
+                }
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl isRequired isInvalid={errors.confirmPassword}>
+                <Input
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder={"confirm password"}
+                  autoCapitalize="none"
+                  secureTextEntry={!showPass}
+                />
+                {errors.confirmPassword ? (
+                  <FormControl.ErrorMessage my={0}>
+                    {errors.confirmPassword.message}
+                  </FormControl.ErrorMessage>
+                ) : (
+                  <></>
+                )}
+              </FormControl>
             )}
-          </FormControl>
-        )}
-        name="confirmPassword"
-      />
+            name="confirmPassword"
+          />
+        </VStack>
+        <IconButton
+          onPress={() => setShowPass(!showPass)}
+          position={"absolute"}
+          right={2}
+          icon={
+            <Icon
+              color={colors.notBlack}
+              size={"sm"}
+              as={<Feather name={showPass ? "eye-off" : "eye"} />}
+            />
+          }
+        />
+      </HStack>
 
       <Button mt={2} bgColor={"#33CA7F"} onPress={handleSubmit(onSubmit)}>
         Next
