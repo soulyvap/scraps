@@ -27,11 +27,23 @@ const ChatAll = ({ navigation }) => {
     })
   );
 
+  //refreshing after 1 second of focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const timeout = setTimeout(() => {
+        setUpdate(update + 1);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    })
+  );
+
   //fetching all chats on update
   useEffect(async () => {
     if (currentUserId) {
       getMyChats();
-      console.log(chatArray);
     }
   }, [update]);
 
