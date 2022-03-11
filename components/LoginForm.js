@@ -58,6 +58,7 @@ const LoginForm = () => {
               placeholder={"username"}
               autoCapitalize="none"
               onFocus={() => setFailed(false)}
+              size={"md"}
             />
             {errors.username && (
               <FormControl.ErrorMessage>
@@ -84,6 +85,7 @@ const LoginForm = () => {
               autoCapitalize="none"
               secureTextEntry={true}
               onFocus={() => setFailed(false)}
+              size={"md"}
             />
             {errors.password ? (
               <FormControl.ErrorMessage>
