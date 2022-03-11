@@ -114,6 +114,7 @@ const LoginForm = () => {
           right={2}
           icon={
             <Icon
+              size={"sm"}
               color={colors.notBlack}
               as={<Feather name={showPass ? "eye-off" : "eye"} />}
             />
