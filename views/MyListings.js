@@ -142,7 +142,7 @@ const MyListings = ({ navigation }) => {
               <LottieView
                 autoPlay
                 loop={false}
-                style={{ width: 400, height: 400 }}
+                style={{ width: 200, height: 200 }}
                 source={require("../assets/loading-2.json")}
                 speed={1}
               />
