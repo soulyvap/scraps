@@ -20,7 +20,7 @@ import { colors } from "../utils/colors";
 const Login = ({ navigation }) => {
   const [keyboardShowing, setKeyboardShowing] = useState(false);
   const { getUserByToken } = useUser();
-  const { setUser, setIsLoggedIn, setCoords } = useContext(MainContext);
+  const { setUser, setIsLoggedIn, setCoords, update } = useContext(MainContext);
   const { getFilesByTag } = useTag();
 
   //getting current user address coordinates from userFile then setting them in MainContext
@@ -31,6 +31,7 @@ const Login = ({ navigation }) => {
       const description = JSON.parse(userFile.description);
       const coords = description.coords;
       setCoords(coords);
+      console.log(coords);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -45,11 +46,9 @@ const Login = ({ navigation }) => {
       try {
         const userData = await getUserByToken(userToken);
         console.log("check token", userData);
-        if (userData) {
-          await fetchCoordinates(userData.user_id);
-          setUser(userData);
-          setIsLoggedIn(true);
-        }
+        await fetchCoordinates(userData.user_id);
+        setUser(userData);
+        setIsLoggedIn(true);
       } catch (error) {
         throw new Error(error.message);
       }
@@ -58,7 +57,7 @@ const Login = ({ navigation }) => {
 
   useEffect(() => {
     checkToken();
-  }, []);
+  }, [update]);
 
   //listener for on-screen keyboard. helps with adapting the UI when keyboard shows
   useEffect(() => {

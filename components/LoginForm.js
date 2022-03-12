@@ -1,14 +1,16 @@
 import { Button, FormControl, Input, Text, VStack } from "native-base";
 import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useLogin } from "../hooks/ApiHooks";
+import { useLogin, useTag } from "../hooks/ApiHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
 import { colors } from "../utils/colors";
+import { userFileTag } from "../utils/variables";
 
 const LoginForm = () => {
   const { postLogin } = useLogin();
-  const { setUser, setIsLoggedIn } = useContext(MainContext);
+  const { update, setUpdate } = useContext(MainContext);
+  const { getFilesByTag } = useTag();
   const [failed, setFailed] = useState(false);
 
   const {
@@ -28,9 +30,8 @@ const LoginForm = () => {
     try {
       const loginData = await postLogin(data);
       const token = loginData.token;
-      setIsLoggedIn(true);
-      setUser(loginData.user);
       await AsyncStorage.setItem("userToken", token);
+      setUpdate(update + 1);
     } catch (error) {
       setFailed(true);
       throw new Error(error.message);

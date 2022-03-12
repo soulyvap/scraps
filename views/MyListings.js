@@ -27,6 +27,7 @@ const MyListings = ({ navigation }) => {
   //fetching all the bookings that have the status "booked", "confirmed" or "picked-up"
   //the bookings are then sorted into active (booked, confirmed) and inactive (picked-up).
   //that sorting is used for the section list to display bookings into "active" or "archived"
+  //deleted files are not shown either.
   const fetchListings = async () => {
     const active = [];
     const inactive = [];
