@@ -1,4 +1,13 @@
-import { Button, FormControl, Input, Text, VStack } from "native-base";
+import {
+  Button,
+  FormControl,
+  HStack,
+  Icon,
+  IconButton,
+  Input,
+  Text,
+  VStack,
+} from "native-base";
 import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useLogin, useTag } from "../hooks/ApiHooks";
@@ -6,12 +15,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainContext } from "../contexts/MainContext";
 import { colors } from "../utils/colors";
 import { userFileTag } from "../utils/variables";
+import { Feather } from "@expo/vector-icons";
 
 const LoginForm = () => {
   const { postLogin } = useLogin();
   const { update, setUpdate } = useContext(MainContext);
   const { getFilesByTag } = useTag();
   const [failed, setFailed] = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
   const {
     control,
@@ -71,34 +82,48 @@ const LoginForm = () => {
         name="username"
       />
 
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormControl isRequired isInvalid={errors.password}>
-            <Input
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder={"password"}
-              autoCapitalize="none"
-              secureTextEntry={true}
-              onFocus={() => setFailed(false)}
-              size={"md"}
+      <HStack alignItems={"center"}>
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormControl isRequired isInvalid={errors.password}>
+              <Input
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+				size={"md"}
+                placeholder={"password"}
+                autoCapitalize="none"
+                secureTextEntry={!showPass}
+                onFocus={() => setFailed(false)}
+              />
+              {errors.password ? (
+                <FormControl.ErrorMessage>
+                  Password is required
+                </FormControl.ErrorMessage>
+              ) : (
+                <></>
+              )}
+            </FormControl>
+          )}
+          name="password"
+        />
+        <IconButton
+          onPress={() => setShowPass(!showPass)}
+          position={"absolute"}
+          right={2}
+          icon={
+            <Icon
+              size={"sm"}
+              color={colors.notBlack}
+              as={<Feather name={showPass ? "eye-off" : "eye"} />}
             />
-            {errors.password ? (
-              <FormControl.ErrorMessage>
-                Password is required
-              </FormControl.ErrorMessage>
-            ) : (
-              <></>
-            )}
-          </FormControl>
-        )}
-        name="password"
-      />
+          }
+        />
+      </HStack>
 
       <Button bgColor={"#33CA7F"} onPress={handleSubmit(onSubmit)}>
         Login
