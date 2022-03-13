@@ -12,6 +12,7 @@ import {
   IconButton,
   Input,
   NativeBaseProvider,
+  ScrollView,
   TextArea,
   View,
   VStack,
@@ -28,12 +29,12 @@ export const regForms = {
 };
 
 const UpdateUser = ({ navigation }) => {
-  const [setBio] = useState();
   const [bioText, setBioText] = useState();
   const [userFileData, setUserFileData] = useState([]);
   const [userFileId, setUserFileId] = useState();
   const [pic, setPic] = useState();
   const [picChanged, setPicChanged] = useState(false);
+  const [setBio] = useState();
   const { putUser } = useUser();
   const { getFilesByTag, postTag } = useTag();
   const { postMedia, putMedia } = useMedia();
@@ -350,7 +351,10 @@ const UpdateUser = ({ navigation }) => {
               <Controller
                 control={control}
                 rules={{
-                  required: { value: true, message: "Full name is required." },
+                  required: {
+                    value: true,
+                    message: "Full name is required.",
+                  },
                   minLength: {
                     value: 3,
                     message: "Full name should be at least 3 characters",
