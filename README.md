@@ -31,7 +31,7 @@ We used a simple media sharing backend that was provided. Therefore, implementat
 
 ## Changes after feedback
 
-Some bigger issues during testing session were caused by testers reusing their old account that do not work on our application. However, some feedback mentioned included good suggestions and we implemented the following changes:
+Some bigger issues during testing session were caused by testers reusing their old accounts that do not work on our application. However, some feedback mentioned included good suggestions and we implemented the following changes:
 
  - Detailed post page had too much text --> tags removed.
  - Tags and allergens are too similar/overlap --> made them different.
