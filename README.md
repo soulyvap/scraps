@@ -42,6 +42,7 @@ Some bigger issues during testing session were caused by testers reusing their o
 During the testing session, some iOS users have pointed out two main issues:
 - Date and time picker in post creation didn't work therefore they were not able to create a post.
 - Issues with keyboard avoiding view and not being able to click off the keyboard to hide it.
+
 We were not able to fix iOS issues as non of our team members have immediate access to an iOS device that would allow us to test it.
 
 ## Video
