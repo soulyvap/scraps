@@ -75,7 +75,7 @@ Some bigger issues during testing session were caused by testers reusing their o
 
  - Detailed post page had too much text --> tags removed.
  - Tags and allergens are too similar/overlap --> made them different.
- - Input font size in post creation too small --> made font size larger.
+ - Some of the fonts were too small --> made font size larger.
  - Product card could be larger --> slightly enlarged the product card.
  - Make a possibility to view password --> added "eye icon" to reveal password if needed.
 
