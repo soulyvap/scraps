@@ -296,19 +296,6 @@ const Single = ({ route, navigation }) => {
             Suitable timeslots: {suitableTimeSlot}.
           </Text>
         </Box>
-
-        <FlatGrid
-          width={"90%"}
-          horizontal={true}
-          data={tags}
-          renderItem={({ item }) => (
-            <Box bgColor={"#F9F4F1"} borderRadius="10" px={2} pt={1} h={8}>
-              <Text textAlign="center" color={"#898980"}>
-                {item.tag}
-              </Text>
-            </Box>
-          )}
-        ></FlatGrid>
         {user.user_id !== owner.user_id ? (
           <Button
             mt={9}

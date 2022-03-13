@@ -1,11 +1,12 @@
-import { Icon, IconButton } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
-import { colors } from "../utils/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Icon, IconButton } from "native-base";
 import { useContext } from "react";
-import { MainContext } from "../contexts/MainContext";
 import { Alert } from "react-native";
+import { MainContext } from "../contexts/MainContext";
+import { colors } from "../utils/colors";
 
+// logout button displayed in home page and own profile page
 const LogoutButton = ({ onPress, top, right }) => {
   const { isLoggedIn, setIsLoggedIn } = useContext(MainContext);
 

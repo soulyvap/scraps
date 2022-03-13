@@ -1,24 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useMedia, useTag } from "../hooks/ApiHooks";
-import ListItem from "./ListItem";
-import PropTypes from "prop-types";
-import {
-  Center,
-  FlatList,
-  Heading,
-  HStack,
-  Skeleton,
-  Spinner,
-  Text,
-  View,
-  VStack,
-} from "native-base";
-import { MainContext } from "../contexts/MainContext";
 import { getDistance } from "geolib";
-import { foodPostTag } from "../utils/variables";
-import { RefreshControl } from "react-native";
-import { colors } from "../utils/colors";
 import LottieView from "lottie-react-native";
+import { FlatList, Text, View } from "native-base";
+import PropTypes from "prop-types";
+import React, { useContext, useEffect, useState } from "react";
+import { RefreshControl } from "react-native";
+import { MainContext } from "../contexts/MainContext";
+import { useMedia, useTag } from "../hooks/ApiHooks";
+import { colors } from "../utils/colors";
+import { foodPostTag } from "../utils/variables";
+import ListItem from "./ListItem";
 
 const List = ({ navigation, tagSelected }) => {
   const { mediaArray } = useMedia(foodPostTag);
@@ -30,6 +20,7 @@ const List = ({ navigation, tagSelected }) => {
   const [loading, setLoading] = useState(true);
 
   const myCoords = { latitude: coords.latitude, longitude: coords.longitude };
+  // this distance will be used to display posts within 500meter radius from own location
   const meters = 500;
 
   const refresh = async () => {
@@ -66,9 +57,9 @@ const List = ({ navigation, tagSelected }) => {
     );
 
     // filter items further by distance and category selected
-    const newArray = activeListings.filter(async (item) => {
+    const newArray = activeListings.filter((item) => {
       const descriptionData = item.description;
-      const allData = await JSON.parse(descriptionData);
+      const allData = JSON.parse(descriptionData);
       // get coordinates of the post
       const postCoords = {
         latitude: allData.coords.latitude,
@@ -78,10 +69,10 @@ const List = ({ navigation, tagSelected }) => {
       // compare distance between user's address and posts location
       const distance = getDistance(myCoords, postCoords);
       if (
-        (!isCategorySelected && distance < meters) ||
+        (!isCategorySelected && distance <= meters) ||
         (isCategorySelected &&
           allData.category === category &&
-          distance < meters)
+          distance <= meters)
       ) {
         return item;
       }
@@ -122,7 +113,7 @@ const List = ({ navigation, tagSelected }) => {
           <View alignItems={"center"} justifyContent={"center"} flex={1}>
             <LottieView
               autoPlay
-              loop={false}
+              loop={true}
               style={{ width: 200, height: 200 }}
               source={require("../assets/loading-2.json")}
               speed={1}
@@ -147,6 +138,7 @@ const List = ({ navigation, tagSelected }) => {
       />
     );
   } else {
+    // display a lottie while the list is loading
     return (
       <View alignItems={"center"} justifyContent={"center"} flex={1}>
         <LottieView

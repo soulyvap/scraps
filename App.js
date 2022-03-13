@@ -8,6 +8,7 @@ import ChatSingle from "./views/ChatSingle";
 import ConfirmBooking from "./views/ConfirmBooking";
 import { MenuProvider } from "react-native-popup-menu";
 import { colors } from "./utils/colors";
+import { KeyboardAvoidingView } from "react-native";
 
 const App = () => {
   const theme = extendTheme({
@@ -23,11 +24,16 @@ const App = () => {
   return (
     <MenuProvider backHandler={true}>
       <MainProvider>
-        <NativeBaseProvider theme={theme}>
-          <Box flex={1} safeArea bgColor={"white"}>
-            <Navigator />
-          </Box>
-        </NativeBaseProvider>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : ""}
+          style={{ flex: 1, padding: 0 }}
+        >
+          <NativeBaseProvider theme={theme}>
+            <Box flex={1} safeArea bgColor={"white"}>
+              <Navigator />
+            </Box>
+          </NativeBaseProvider>
+        </KeyboardAvoidingView>
       </MainProvider>
     </MenuProvider>
   );

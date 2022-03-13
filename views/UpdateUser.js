@@ -1,3 +1,6 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 import {
   Avatar,
   Box,
@@ -13,30 +16,19 @@ import {
   View,
   VStack,
 } from "native-base";
-import React, { useEffect, useState, useContext } from "react";
-import LocationForm from "../components/LocationForm";
-import { useLogin, useMedia, useTag, useUser } from "../hooks/ApiHooks";
-import { avatarTag, uploadsUrl, userFileTag } from "../utils/variables";
-import userFileImage from "../assets/a.jpg";
-import { Alert, BackHandler, Image, Keyboard } from "react-native";
-import BackButton from "../components/BackButton";
-import BioForm from "../components/BioForm";
-import { MainContext } from "../contexts/MainContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { MaterialIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
+import { Alert, Keyboard } from "react-native";
+import { MainContext } from "../contexts/MainContext";
+import { useMedia, useTag, useUser } from "../hooks/ApiHooks";
+import { avatarTag, uploadsUrl, userFileTag } from "../utils/variables";
 
 export const regForms = {
   user: "user",
 };
 
 const UpdateUser = ({ navigation }) => {
-  const [success, setSuccess] = useState(false);
-  const [bio, setBio] = useState();
-  const [formData, setFormData] = useState();
-  const [currentForm, setCurrentForm] = useState(regForms.user);
-  const { user, setUser, update, setUpdate } = useContext(MainContext);
+  const [setBio] = useState();
   const [bioText, setBioText] = useState();
   const [userFileData, setUserFileData] = useState([]);
   const [userFileId, setUserFileId] = useState();
@@ -46,7 +38,9 @@ const UpdateUser = ({ navigation }) => {
   const { getFilesByTag, postTag } = useTag();
   const { postMedia, putMedia } = useMedia();
   const { checkUsername } = useUser();
+  const { user, setUser, update, setUpdate } = useContext(MainContext);
 
+  // picking new profile image
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -60,6 +54,7 @@ const UpdateUser = ({ navigation }) => {
     }
   };
 
+  // default values for the form
   const defVal = {
     email: user.email,
     username: user.username,
@@ -129,6 +124,7 @@ const UpdateUser = ({ navigation }) => {
     }
   };
 
+  // fetch userfile that contains bio
   const fetchUserBio = async () => {
     try {
       const userFiles = await getFilesByTag(userFileTag + user.user_id);
@@ -149,12 +145,15 @@ const UpdateUser = ({ navigation }) => {
   const updateUserFile = async () => {
     const userToken = await AsyncStorage.getItem("userToken");
     try {
+      // copy old information to new description
       let newDescription = userFileData;
+      // set bio to new one
       newDescription.bio = bioText;
       const data = {
         description: JSON.stringify(newDescription),
       };
       console.log("here", data);
+      // update file
       const response = await putMedia(data, userToken, userFileId);
       console.log(response);
     } catch (error) {
