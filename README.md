@@ -8,7 +8,7 @@ You can watch our short ad video [here](https://youtu.be/0MC6VphN8bM). We also p
 
 # Main features
 
- - After registering his/her address on Scraps, the user is able to view post within 500 meter radius ensuring the "neighbour" aspect of the app.
+ - After registering their address on Scraps, the user is able to view post within 500 meter radius ensuring the "neighbour" aspect of the app.
  - Users are able to post detailed posts listing their food items. They can include allergens, assign tags, category and provide latest pick up date and suitable time slots for pick up. 
  - Users can book the food items, arrange pick ups, cancel, delete or mark listings as picked up.
  - Chat feature allows users to get to know their neighbours, talk about food, clarify pick up circumstances, ask for recipes, etc.
